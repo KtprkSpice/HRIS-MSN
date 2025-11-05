@@ -5,6 +5,9 @@
     {{-- Create Employees Button --}}
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">Tambah Karyawan</div>
+        @if (session('success'))
+            <span class="alert alert-success">{{ session('success') }}</span>
+        @endif
         <div class="card-body">
             <a href="{{ route('employee.create') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i>
                 Tambah Data Karyawan</a>

@@ -10,24 +10,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Employee extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = [
-        'fullname',
-        'nik',
-        'division_id',
-        'address',
-        'email',
-        'user_id',
-        'phone',
-        'hire_date',
-        'born_date',
-        'bpjs_kesehatan',
-        'bpjs_ketenagakerjaan',
-        'npwp',
-        'status',
-    ];
+    protected $fillable = ['fullname', 'nik', 'division_id', 'address', 'email', 'user_id', 'phone', 'hire_date', 'born_date', 'bpjs_kesehatan', 'bpjs_ketenagakerjaan', 'npwp', 'status'];
 
     public function division(): BelongsTo
     {
         return $this->belongsTo(Division::class, 'division_id');
+    }
+
+    public function roles(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'roles_id');
     }
 }
