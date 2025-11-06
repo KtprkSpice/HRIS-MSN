@@ -17,8 +17,4 @@ class Employee extends Model
         return $this->belongsTo(Division::class, 'division_id');
     }
 
-    public function roles(): BelongsTo
-    {
-        return $this->belongsTo(Role::class, 'roles_id');
-    }
 }

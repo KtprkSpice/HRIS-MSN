@@ -43,7 +43,7 @@
                                 <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
                                 <td>1990</td>
                                 <td>
-                                    <button class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></button>
+                                    <a href="{{ route('employee.edit', $employee->id) }}"  class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
                                     <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
                                 </td>
                             </tr>

@@ -10,14 +10,29 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Dashboard
-Route::resource('/dashboard', DashboardController::class);
+// Owner Route
+Route::middleware(['auth', 'role:owner'])->group(function () {
+    // Dashboard
+    Route::resource('/dashboard', DashboardController::class);
 
-// Employees
-Route::resource('/employee', EmployeeController::class);
+    // Employees
+    Route::resource('/employee', EmployeeController::class);
 
-// Task
-Route::resource('/task', TaskController::class);
+    // Task
+    Route::resource('/task', TaskController::class);
 
-// Payroll
-Route::resource('/payroll', PayrollController::class);
+    // Payroll
+    Route::resource('/payroll', PayrollController::class);
+});
+
+// employee Route
+Route::middleware(['auth', 'role:employee'])->group(function () {
+    // Dashboard
+    Route::resource('/dashboard', DashboardController::class);
+
+    // Employees
+    Route::resource('/employee', EmployeeController::class);
+
+    // Payroll
+    Route::resource('/payroll', PayrollController::class);
+});

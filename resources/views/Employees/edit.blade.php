@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Data Karyawan')
+@section('header', 'Edit Data Karyawan')
 
 @section('content')
     @if ($errors->any())
@@ -12,14 +12,14 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('employee.store') }}" method="post">
+    <form class="row g-3" action="" method="post">
         @csrf
         <div class="col-md-6">
             <label for="fullname" class="form-label">Nama Lengkap</label>
             <input type="text" class="form-control @error('fullname')
                 is-invalid
             @enderror"
-                id="fullname" name="fullname" required value="{{ old('fullname') }}">
+                id="fullname" name="fullname" required value="{{ old('fullname', $employee->fullname) }}">
             @error('fullname')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -30,7 +30,7 @@
                 is-invalid
             @enderror">NIK</label>
             <input type="number" min="0" class="form-control" id="nik" placeholder="123456" required
-                value="{{ old('nik') }}" name="nik">
+                value="{{ old('nik', $employee->nik) }}" name="nik">
             @error('nik')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -40,7 +40,7 @@
             <input type="email" class="form-control @error('email')
                 is-invalid
             @enderror"
-                id="email" name="email" required value="{{ old('email') }}">
+                id="email" name="email" required value="{{ old('email', $employee->email) }}">
             @error('email')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -53,8 +53,8 @@
                     class="form-control @error('phone')
                     is-invalid
                 @enderror"
-                    min="0" id="phone" placeholder="8911235516" value="{{ old('phone') }}" name="phone"
-                    required>
+                    min="0" id="phone" placeholder="8911235516" value="{{ old('phone', $employee->phone) }}"
+                    name="phone" required>
                 @error('phone')
                     <span class="invalid-feedback">{{ $message }}</span>
                 @enderror
@@ -62,13 +62,15 @@
         </div>
         <div class="col-md-6">
             <label for="division_id" class="form-label">Division</label>
-            <select id="division_id" class="form-select @error('division_id')
+            <select id="division_id"
+                class="form-select @error('division_id')
                 is-invalid
             @enderror"
                 name="division_id" required>
                 <option selected>Choose...</option>
                 @foreach ($divisions as $division)
-                    <option value="{{ $division->id }}" {{ old('division_id') == $division->id ? 'selected' : '' }}>
+                    <option value="{{ $division->id }}"
+                        {{ old('division_id', $employee->division_id) == $division->id ? 'selected' : '' }}>
                         {{ ucwords($division->name) }}</option>
                 @endforeach
                 @error('division_id')
@@ -84,7 +86,8 @@
                 name="role_id" required>
                 <option selected>Choose...</option>
                 @foreach ($roles as $role)
-                    <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
+                    <option value="{{ $role->id }}"
+                        {{ old('role_id', $employee->role_id) == $role->id ? 'selected' : '' }}>
                         {{ ucwords($role->name) }}</option>
                 @endforeach
                 @error('role_id')
@@ -99,7 +102,7 @@
                 is-invalid
             @enderror"
                 id="no_bpjs_kesehatan" placeholder="123456" min="0" name="bpjs_kesehatan" required
-                value="{{ old('bpjs_kesehatan') }}">
+                value="{{ old('bpjs_kesehatan', $employee->bpjs_kesehatan) }}">
             @error('bpjs_kesehatan')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -111,7 +114,7 @@
                 is-invalid
             @enderror"
                 min="0" id="no_bpjs_ketenagakerjaan" placeholder="123456" name="bpjs_ketenagakerjaan" required
-                value="{{ old('bpjs_ketenagakerjaan') }}">
+                value="{{ old('bpjs_ketenagakerjaan', $employee->bpjs_ketenagakerjaan) }}">
             @error('bpjs_ketenagakerjaan')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -121,7 +124,7 @@
             <input type="date" class="form-control @error('born_date')
                 is-invalid
             @enderror"
-                id="birh_date" name="born_date" required value="{{ old('born_date') }}">
+                id="birh_date" name="born_date" required value="{{ old('born_date', $employee->born_date) }}">
             @error('born_date')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -131,7 +134,7 @@
             <input type="date" class="form-control @error('hire_date')
                 is-invalid
             @enderror"
-                id="hire_date" name="hire_date" required value="{{ old('hire_date') }}">
+                id="hire_date" name="hire_date" required value="{{ old('hire_date', $employee->hire_date) }}">
             @error('hire_date')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -142,18 +145,32 @@
                 class="form-control @error('npwp')
                 is-invalid
             @enderror" id="npwp"
-                placeholder="12356.63127-1.123" name="npwp" required value="{{ old('npwp') }}">
+                placeholder="12356" name="npwp" required value="{{ old('npwp', $employee->npwp) }}">
             @error('npwp')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+        <div class="col-md-6">
+            <label for="status" class="form-label">Status</label>
+            <select name="status" id="" class="form-select">
+                <option value="active @if ($employee->status == 'active')
+                    selected
+                @endif">Active</option>
+                <option value="inactive @if ($employee->status == 'inactive')
+                    selected
+                @endif">Inactive</option>
+            </select>
+            @error('status')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
         <div class="col-12">
             <label for="address" class="form-label">Alamat</label>
-            <input type="text"
-                class="form-control @error('address')
+            <input type="text" class="form-control @error('address')
                 is-invalid
-            @enderror" id="address"
-                placeholder="Jl.Kenari...." name="address" required value="{{ old('address') }}">
+            @enderror"
+                id="address" placeholder="Jl.Kenari...." name="address" required
+                value="{{ old('address', $employee->address) }}">
             @error('npwp')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror

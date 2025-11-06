@@ -39,7 +39,7 @@ class EmployeeController extends Controller
             'born_date' => 'required|date',
             'bpjs_kesehatan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_kesehatan',
             'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_ketenagakerjaan',
-            'npwp' => 'required|digits_between:1,20|max:20|unique:employees,npwp',
+            'npwp' => 'required|max:30|unique:employees,npwp',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -58,7 +58,7 @@ class EmployeeController extends Controller
                 'phone' => $validated['phone'],
                 'hire_date' => $validated['hire_date'],
                 'born_date' => $validated['born_date'],
-                'bpjas_kesehatan' => $validated['bpjs_kesehatan'],
+                'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
                 'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'],
                 'npwp' => $validated['npwp'],
                 'status' => 'active',
@@ -67,5 +67,12 @@ class EmployeeController extends Controller
         });
 
         return redirect()->route('employee.index')->with('success', 'Data Berhasil Dibuat');
+    }
+
+    public function edit(Employee $employee) {
+        $divisions = Division::all();
+        $roles = Role::all();
+
+        return view('employees.edit', compact('divisions', 'roles', 'employee'));
     }
 }

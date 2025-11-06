@@ -243,17 +243,32 @@
             </div>
         </div>
         <ul>
-            <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
-                        class="fa-solid fa-house"></i> Dashboard</a></li>
-            <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
-            <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
-                        class="fa-solid fa-tasks"></i> Tugas</a></li>
-            <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
-                        class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
-            <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
-            <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
-            <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
-            <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            @if (Auth::user() && Auth::user()->role == 'owner')
+                <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
+                            class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
+                <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
+                            class="fa-solid fa-tasks"></i> Tugas</a></li>
+                <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
+                            class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
+                <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
+                <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
+                <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            @endif
+            @if (Auth::user() && Auth::user()->role == 'employee')
+                <li><a href="{{ route('dashboard.index') }}"
+                        class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
+                        Dashboard</a></li>
+                <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
+                <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
+                            class="fa-solid fa-tasks"></i> Tugas</a></li>
+                <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
+                            class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
+                <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
+                <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            @endif
         </ul>
     </aside>
 
@@ -270,7 +285,7 @@
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://i.pravatar.cc/40" alt="User" class="me-2 rounded-circle">
-                        <div><strong>USername</strong><br><small class="text-muted">Role</small></div>
+                        <div><strong>USername</strong><br><small class="text-muted">ROle</small></div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
                         <li>
