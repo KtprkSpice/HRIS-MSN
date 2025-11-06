@@ -40,6 +40,7 @@ class EmployeeController extends Controller
             'bpjs_kesehatan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_kesehatan',
             'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_ketenagakerjaan',
             'npwp' => 'required|max:30|unique:employees,npwp',
+            'role_id' => 'required|exists:roles,id',
         ]);
 
         DB::transaction(function () use ($validated) {
@@ -47,6 +48,7 @@ class EmployeeController extends Controller
                 'name' => $validated['fullname'],
                 'email' => strtolower(str_replace(' ', '', $validated['fullname'] . '@swatservice.com')),
                 'password' => Hash::make(strtolower(str_replace(' ', '', $validated['fullname'] . '@swatservice.com'))),
+                'role_id' => $validated['role_id']
             ]);
 
             Employee::create([
@@ -69,10 +71,62 @@ class EmployeeController extends Controller
         return redirect()->route('employee.index')->with('success', 'Data Berhasil Dibuat');
     }
 
-    public function edit(Employee $employee) {
+    public function edit(Employee $employee)
+    {
         $divisions = Division::all();
         $roles = Role::all();
+        $user = User::all();
 
-        return view('employees.edit', compact('divisions', 'roles', 'employee'));
+        return view('employees.edit', compact('divisions', 'roles', 'employee', 'user'));
+    }
+
+    public function update(Request $request, Employee $employee)
+    {
+        $nama = $employee->fullname;
+        $request->validate([
+            'fullname' => 'required|string|max:255',
+            'nik' => 'required|digits_between:1,20',
+            'division_id' => 'required',
+            'address' => 'nullable|string',
+            'email' => 'required|string',
+            'phone' => 'required|digits_between:1,20|max:20',
+            'hire_date' => 'required|date',
+            'born_date' => 'required|date',
+            'bpjs_kesehatan' => 'required|digits_between:1,20|max:20',
+            'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20',
+            'npwp' => 'required|max:30',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $employee->update([
+            'fullname' => $request->fullname,
+            'nik' => $request->nik,
+            'division_id' => $request->division_id,
+            'address' => $request->address,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'hire_date' => $request->hire_date,
+            'born_date' => $request->born_date,
+            'bpjs_kesehatan' => $request->bpjs_kesehatan,
+            'bpjs_ketenagakerjaan' =>$request->bpjs_ketenagakerjaan,
+            'npwp' => $request->npwp,
+        ]);
+
+        if($employee->user) {
+            $employee->user->update([
+                'role_id' => $request->role_id,
+            ]);
+        }
+        return redirect()->route('employee.index')->with('success', "Data $nama Telah Diubah");
+    }
+
+    public function destroy(Employee $employee)
+    {
+        $nama = $employee->fullname;
+        $employee->delete();
+
+        return redirect()
+            ->route('employee.index')
+            ->with('success', "Data $nama  Berhasil dihapus");
     }
 }

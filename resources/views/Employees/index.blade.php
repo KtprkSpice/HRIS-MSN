@@ -43,8 +43,15 @@
                                 <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
                                 <td>1990</td>
                                 <td>
-                                    <a href="{{ route('employee.edit', $employee->id) }}"  class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
-                                    <button class="btn btn-sm btn-danger"><i class="fa-solid fa-trash"></i></button>
+                                    <a href="{{ route('employee.edit', $employee->id) }}"
+                                        class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ route('employee.destroy', $employee->id) }}" method="post" class="d-inline" id="deleteForm{{ $employee->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete({{ $employee->id }})">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </form>
                                 </td>
                             </tr>
                         @endforeach
@@ -53,4 +60,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+     function confirmDelete(id) {
+    Swal.fire({
+        title: "Apakah kamu yakin?",
+        text: "Data ini tidak bisa dikembalikan setelah dihapus!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, hapus!",
+        cancelButtonText: "Batal"
+    }).then((result) => {
+        if (result.isConfirmed) {
+            document.getElementById('deleteForm' + id).submit();
+        }
+    });
+}
+    </script>
 @endsection

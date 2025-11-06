@@ -12,8 +12,9 @@
         </div>
     @endif
 
-    <form class="row g-3" action="" method="post">
+    <form class="row g-3" action="{{ route('employee.update', $employee->id) }}" method="post">
         @csrf
+        @method('PUT')
         <div class="col-md-6">
             <label for="fullname" class="form-label">Nama Lengkap</label>
             <input type="text" class="form-control @error('fullname')
@@ -49,7 +50,7 @@
             <label for="phone" class="form-label">No Telepon</label>
             <div class="input-group">
                 <div class="input-group-text">+62</div>
-                <input type="number"
+                <input type="text"
                     class="form-control @error('phone')
                     is-invalid
                 @enderror"
@@ -87,7 +88,7 @@
                 <option selected>Choose...</option>
                 @foreach ($roles as $role)
                     <option value="{{ $role->id }}"
-                        {{ old('role_id', $employee->role_id) == $role->id ? 'selected' : '' }}>
+                        {{ old('role_id', $employee->user->role_id) == $role->id ? 'selected' : '' }}>
                         {{ ucwords($role->name) }}</option>
                 @endforeach
                 @error('role_id')

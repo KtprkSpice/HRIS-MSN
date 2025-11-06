@@ -24,6 +24,9 @@
     <!-- ApexCharts -->
     <script src="{{ asset('js/apexcharts.js') }}"></script>
 
+    {{-- Sweet Alert --}}
+    <link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css') }}">
+
     <style>
         /* ===== BODY ===== */
         body {
@@ -243,7 +246,7 @@
             </div>
         </div>
         <ul>
-            @if (Auth::user() && Auth::user()->role == 'owner')
+            @if (auth()->check() && auth()->user()->role->name == 'owner')
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
@@ -254,9 +257,9 @@
                 <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
                 <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
-                <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             @endif
-            @if (Auth::user() && Auth::user()->role == 'employee')
+            @if (auth()->check() && auth()->user()->role->name == 'hr')
                 <li><a href="{{ route('dashboard.index') }}"
                         class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
                         Dashboard</a></li>
@@ -267,7 +270,7 @@
                             class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
                 <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
                 <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
-                <li><a href="logout.php"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             @endif
         </ul>
     </aside>
@@ -285,20 +288,24 @@
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://i.pravatar.cc/40" alt="User" class="me-2 rounded-circle">
-                        <div><strong>USername</strong><br><small class="text-muted">ROle</small></div>
+                        <div><strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong><br><small class="text-muted">{{ucwords(auth()->user()->role->name)}}</small></div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
                         <li>
-                            <a class="dropdown-item" href="profile.php"><i class="fa-solid fa-user me-2"></i> Edit
+                            <a class="dropdown-item" href="{{ route('profile.edit', auth()->user()->employee->id) }}"><i class="fa-solid fa-user me-2"></i> Edit
                                 Profile</a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item text-danger" href="logout.php"><i
-                                    class="fa-solid fa-right-from-bracket me-2"></i> Logout
-                            </a>
+                           <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            @method('POST')
+                            <button type="submit"  class="dropdown-item text-danger"><i
+                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        </button>
+                           </form>
                         </li>
                     </ul>
                 </div>
@@ -313,6 +320,7 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
     <script src="{{ asset('js/dashboard.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
+    <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
 
 </body>

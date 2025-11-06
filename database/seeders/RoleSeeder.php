@@ -15,14 +15,27 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = faker::create();
-        foreach (range(1, 3) as $i) {
-            DB::table('roles')->insert([
-                'name' => $faker->userName(),
-                'description' => $faker->text(),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-        }
+        DB::table('roles')->insert([
+           [
+            'name' => 'owner',
+            'description' => 'all',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+           ],
+
+           [
+            'name' => 'hr',
+            'description' => 'hr',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+           ],
+           [
+            'name' => 'employee',
+            'description' => 'employee',
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+           ],
+
+        ]);
     }
 }

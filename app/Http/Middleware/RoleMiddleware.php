@@ -17,7 +17,7 @@ class RoleMiddleware
     {
         $user = $request->user();
         if (!$user) {
-            return redirect()->route('login')->with('error', 'Silakhal Login Terlebih Dahulu');
+            return redirect()->route('login')->with('error', 'Harap Login Terlebih Dahulu');
         }
 
         if (!in_array($user->role->name, $roles)) {
