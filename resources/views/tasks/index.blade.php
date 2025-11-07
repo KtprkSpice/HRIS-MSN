@@ -86,9 +86,9 @@
                             <td>{{ Carbon\Carbon::parse($task->start_time)->format('d F y') }}</td>
                             <td>{{ Carbon\Carbon::parse($task->end_time)->format('d F y') }}</td>
                             <td @class([
-                                'badge bg-success text-white' => $task->status == 'done' ,
-                                'badge bg-info text-white' => $task->status == 'on duty',
-                                'badge bg-warning text-white' => $task->status == 'pending',
+                                'badge bg-success text-white text-center' => $task->status == 'done' ,
+                                'badge bg-info text-white text-center' => $task->status == 'on duty',
+                                'badge bg-warning text-white text-center' => $task->status == 'pending',
                             ])>{{ ucwords($task->status) }}</td>
                             <td>
                                 <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>

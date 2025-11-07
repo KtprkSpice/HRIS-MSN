@@ -44,8 +44,8 @@
                                 <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
                                 <td>1990</td>
                                 <td @class([
-                                    'badge bg-success text-white' => $employee->status == 'active', 
-                                    'badge bg-warning text-white' => $employee->status == 'inactive', 
+                                    'badge bg-success text-white text-center' => $employee->status == 'active', 
+                                    'badge bg-warning text-white text-center' => $employee->status == 'inactive', 
                                 ])>{{ ucwords($employee->status) }}</td>
                                 <td>
                                     <a href="{{ route('employee.edit', $employee->id) }}"
