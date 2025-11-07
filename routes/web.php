@@ -13,7 +13,10 @@ Route::get('/', function () {
 
 // Owner Route
 Route::middleware('auth')->group(function () {
-    // Dashboard
+    
+});
+
+// Dashboard
     Route::resource('/dashboard', DashboardController::class)->middleware(['roles:owner,admin,employee']);
 
     //Edit Profile
@@ -27,4 +30,3 @@ Route::middleware('auth')->group(function () {
 
     // Payroll
     Route::resource('/payroll', PayrollController::class)->middleware(['roles:owner,admin,employee']);
-});

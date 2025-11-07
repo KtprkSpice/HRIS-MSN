@@ -246,7 +246,7 @@
             </div>
         </div>
         <ul>
-            @if (auth()->check() && auth()->user()->role->name == 'owner')
+            {{-- @if (auth()->check() && auth()->user()->role->name == 'owner') --}}
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
@@ -258,8 +258,8 @@
                 <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
                 <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-            @endif
-            @if (auth()->check() && auth()->user()->role->name == 'hr')
+            {{-- @endif --}}
+            {{-- @if (auth()->check() && auth()->user()->role->name == 'hr')
                 <li><a href="{{ route('dashboard.index') }}"
                         class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
                         Dashboard</a></li>
@@ -271,7 +271,7 @@
                 <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
                 <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-            @endif
+            @endif --}}
         </ul>
     </aside>
 
@@ -316,7 +316,6 @@
 
     <!-- jQuery + DataTables -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
     <script src="{{ asset('js/dashboard.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>

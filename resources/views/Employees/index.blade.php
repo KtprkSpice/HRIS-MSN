@@ -29,7 +29,8 @@
                             <th>Divisi</th>
                             <th>Tanggal Lahir</th>
                             <th>Skor</th>
-                            <th>aksi</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,6 +43,10 @@
                                 <td>{{ ucwords($employee->division->name) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
                                 <td>1990</td>
+                                <td @class([
+                                    'badge bg-success text-white' => $employee->status == 'active', 
+                                    'badge bg-warning text-white' => $employee->status == 'inactive', 
+                                ])>{{ ucwords($employee->status) }}</td>
                                 <td>
                                     <a href="{{ route('employee.edit', $employee->id) }}"
                                         class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>

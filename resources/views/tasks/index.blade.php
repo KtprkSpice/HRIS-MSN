@@ -33,9 +33,9 @@
                     </select>
                 </div>
                 <div class="col-md-1 d-grid align-self-end">
-                    <button type="button" class="btn btn-primary">
+                    <a href="{{ route('task.create') }}" type="button" class="btn btn-primary">
                         <i class="fa-solid fa-plus"></i> Tambah
-                    </button>
+                    </a>
                 </div>
             </form>
         </div>
@@ -70,48 +70,28 @@
                 <table id="tugasTable" class="table table-striped table-hover align-middle">
                     <thead>
                         <tr>
-                            <th>Nama Karyawan</th>
-                            <th>Departemen</th>
                             <th>Nama Tugas</th>
-                            <th>Detail</th>
+                            <th>Deskripsi</th>
+                            <th>Tanggal Mulai</th>
+                            <th>Tanggal Selesai</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
+                       @foreach ($tasks as $task )
                         <tr>
-                            <td>Budi Santoso</td>
-                            <td>IT</td>
-                            <td>Maintenance Server</td>
-                            <td>Periksa dan backup sistem server</td>
-                            <td><span class="badge bg-warning text-dark">Sedang Dikerjakan</span></td>
+                            <td>{{ ucwords($task->name) }}</td>
+                            <td>{{ ucwords(Str::limit($task->description, 50)) }}</td>
+                            <td>{{ Carbon\Carbon::parse($task->start_time)->format('d F y') }}</td>
+                            <td>{{ Carbon\Carbon::parse($task->end_time)->format('d F y') }}</td>
+                            <td><span class="badge bg-warning text-dark">{{ $task->status }}</span></td>
                             <td>
                                 <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
                                 <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
                             </td>
                         </tr>
-                        <tr>
-                            <td>Siti Aminah</td>
-                            <td>HRD</td>
-                            <td>Rekap Absensi</td>
-                            <td>Mengumpulkan data kehadiran</td>
-                            <td><span class="badge bg-success">Selesai</span></td>
-                            <td>
-                                <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Rudi Hartono</td>
-                            <td>Security</td>
-                            <td>Patroli Malam</td>
-                            <td>Melakukan patroli area pabrik</td>
-                            <td><span class="badge bg-danger">Belum Selesai</span></td>
-                            <td>
-                                <button class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></button>
-                                <button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
+                       @endforeach
                     </tbody>
                 </table>
             </div>
