@@ -188,7 +188,7 @@
             background: linear-gradient(to right, #1a2b5f, #243b7c);
         }
 
-        .table tbody tr:hover {
+        /* .table tbody tr:hover {
             background: #f1f3f5;
             transform: translateX(3px);
             transition: all 0.3s ease;
@@ -196,7 +196,7 @@
 
         body.bg-dark .table tbody tr:hover {
             background: #3a3a4d;
-        }
+        } */
 
         /* ===== CAROUSEL ===== */
         .carousel-img-full {
@@ -254,7 +254,7 @@
                             class="fa-solid fa-tasks"></i> Tugas</a></li>
                 <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
                             class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
-                <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
+                <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
                 <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
                 <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>

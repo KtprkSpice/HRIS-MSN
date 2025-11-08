@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
@@ -12,21 +13,24 @@ Route::get('/', function () {
 });
 
 // Owner Route
-Route::middleware('auth')->group(function () {
-    
-});
-
-// Dashboard
-    Route::resource('/dashboard', DashboardController::class)->middleware(['roles:owner,admin,employee']);
+Route::middleware(['auth', 'roles:owner'])->group(function () {
+    // Dashboard
+    Route::resource('/dashboard', DashboardController::class);
 
     //Edit Profile
-    Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit')->middleware(['roles:owner,admin,employee']);
+    Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])
+        ->name('profile.edit')
+        ;
 
     // Employees
-    Route::resource('/employee', EmployeeController::class)->middleware(['roles:owner,admin,employee']);
+    Route::resource('/employee', EmployeeController::class);
 
     // Task
-    Route::resource('/task', TaskController::class)->middleware(['roles:owner,admin,employee']);
+    Route::resource('/task', TaskController::class);
 
     // Payroll
-    Route::resource('/payroll', PayrollController::class)->middleware(['roles:owner,admin,employee']);
+    Route::resource('/payroll', PayrollController::class);
+
+    // Leave Request
+    Route::resource('/leave-request',LeaveRequestController::class);
+});

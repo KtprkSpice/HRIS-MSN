@@ -46,8 +46,8 @@
                 <table id="tugasTable" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Nama Tugas</th>
-                            <th>Deskripsi</th>
+                            <th>Nama Karyawan</th>
+                            <th>Jenis Cuti</th>
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
@@ -55,28 +55,28 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($tasks as $task)
+                        @foreach ($leaveRequests as $leave)
                             <tr>
-                                <td>{{ ucwords($task->name) }}</td>
-                                <td>{{ ucwords(Str::limit($task->description, 50)) }}</td>
-                                <td>{{ Carbon\Carbon::parse($task->start_time)->format('d F Y') }}</td>
-                                <td>{{ Carbon\Carbon::parse($task->end_time)->format('d F Y') }}</td>
+                                <td>{{ ucwords($leave->employee->fullname) }}</td>
+                                <td>{{ ucwords($leave->leave_type) }}</td>
+                                <td>{{ Carbon\Carbon::parse($leave->start_time)->format('d F Y') }}</td>
+                                <td>{{ Carbon\Carbon::parse($leave->end_time)->format('d F Y') }}</td>
                                 <td><span @class([
-                                    'badge bg-success text-white text-center p-2' => $task->status == 'done',
+                                    'badge bg-danger text-white text-center p-2' => $leave->status == 'rejected',
                                     'badge bg-info text-white text-center p-2' =>
-                                        $task->status == 'on duty',
+                                        $leave->status == 'confirmed',
                                     'badge bg-warning text-white text-center p-2' =>
-                                        $task->status == 'pending',
-                                ])>{{ ucwords($task->status) }}</span> </td>
+                                        $leave->status == 'pending',
+                                ])>{{ ucwords($leave->status) }}</span> </td>
                                 <td>
-                                    <a href="{{ route('task.edit', $task->id) }}" class="btn btn-warning btn-sm"><i
+                                    <a href="{{ route('task.edit', $leave->id) }}" class="btn btn-warning btn-sm"><i
                                             class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('task.destroy', $task->id) }}" method="POST" class="d-inline"
-                                        id="deleteForm{{ $task->id }}">
+                                    <form action="{{ route('task.destroy', $leave->id) }}" method="POST" class="d-inline"
+                                        id="deleteForm{{ $leave->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-danger btn-sm" type="button"
-                                            onclick="confirmDelete({{ $task->id }})"><i
+                                            onclick="confirmDelete({{ $leave->id }})"><i
                                                 class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>

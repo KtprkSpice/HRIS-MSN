@@ -154,7 +154,7 @@
                 is-invalid
             @enderror" id="address"
                 placeholder="Jl.Kenari...." name="address" required value="{{ old('address') }}">
-            @error('npwp')
+            @error('address')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>

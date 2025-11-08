@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,9 @@ class TaskSeeder extends Seeder
             'description' => $faker->text(),
             'start_time' => $task_start,
             'end_time' => $task_end,
-            'status' => $faker->randomElement(['pending', 'on duty', 'done']),
+            'status' => $faker->randomElement(['done', 'on duty', 'pending']),
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
             ]);
         };
     }
