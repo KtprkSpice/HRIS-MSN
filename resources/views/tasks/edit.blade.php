@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Tugas')
+@section('header', 'Edit Tugas')
 
 @section('content')
     @if ($errors->any())

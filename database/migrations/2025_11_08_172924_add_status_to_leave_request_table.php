@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('leave_request', function (Blueprint $table) {
+        Schema::table('leave_requests', function (Blueprint $table) {
             $table->enum('status', ['pending', 'confirmed', 'rejected']);
         });
     }

@@ -13,7 +13,7 @@ Route::get('/', function () {
 });
 
 // Owner Route
-Route::middleware(['auth', 'roles:owner'])->group(function () {
+Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     // Dashboard
     Route::resource('/dashboard', DashboardController::class);
 
