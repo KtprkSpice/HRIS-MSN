@@ -57,7 +57,6 @@
                         <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                             <div class="accordion-body">
                                 <p>5 laporan tugas baru telah diunggah.</p>
-                                </p>
                             </div>
                         </div>
                     </div>

@@ -12,7 +12,6 @@
 
     <!-- Bootstrap 5 -->
     <link href="{{ asset('bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.js') }}"></script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('fontawesome-free-7.1.0-web/css/all.min.css') }}" crossorigin="anonymous"
@@ -20,9 +19,6 @@
 
     <!-- DataTables -->
     <link rel="stylesheet" href="{{ asset('DataTables/datatables.min.css') }}">
-
-    <!-- ApexCharts -->
-    <script src="{{ asset('js/apexcharts.js') }}"></script>
 
     {{-- Sweet Alert --}}
     <link rel="stylesheet" href="{{ asset('css/sweetalert2.min.css') }}">
@@ -247,17 +243,17 @@
         </div>
         <ul>
             {{-- @if (auth()->check() && auth()->user()->role->name == 'owner') --}}
-                <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
-                            class="fa-solid fa-house"></i> Dashboard</a></li>
-                <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
-                <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
-                            class="fa-solid fa-tasks"></i> Tugas</a></li>
-                <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
-                            class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
-                <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
-                <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
-                <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
-                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
+                        class="fa-solid fa-house"></i> Dashboard</a></li>
+            <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
+            <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
+                        class="fa-solid fa-tasks"></i> Tugas</a></li>
+            <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
+                        class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
+            <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
+            <li><a href="{{ route('presence.index') }}"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+            <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
+            <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             {{-- @endif --}}
             {{-- @if (auth()->check() && auth()->user()->role->name == 'hr')
                 <li><a href="{{ route('dashboard.index') }}"
@@ -288,24 +284,27 @@
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://i.pravatar.cc/40" alt="User" class="me-2 rounded-circle">
-                        <div><strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong><br><small class="text-muted">{{ucwords(auth()->user()->role->name)}}</small></div>
+                        <div><strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong><br><small
+                                class="text-muted">{{ ucwords(auth()->user()->role->name) }}</small></div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
                         <li>
-                            <a class="dropdown-item" href="{{ route('profile.edit', auth()->user()->employee->id) }}"><i class="fa-solid fa-user me-2"></i> Edit
+                            <a class="dropdown-item"
+                                href="{{ route('profile.edit', auth()->user()->employee->id) }}"><i
+                                    class="fa-solid fa-user me-2"></i> Edit
                                 Profile</a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                           <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            @method('POST')
-                            <button type="submit"  class="dropdown-item text-danger"><i
-                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
-                        </button>
-                           </form>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                @method('POST')
+                                <button type="submit" class="dropdown-item text-danger"><i
+                                        class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>
@@ -317,9 +316,20 @@
     <!-- jQuery + DataTables -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+
+    {{-- Script --}}
     <script src="{{ asset('js/dashboard.js') }}"></script>
     <script src="{{ asset('js/app.js') }}"></script>
+
+    {{-- Swal --}}
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+
+    {{-- Bootsrap --}}
+    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.js') }}"></script>
+
+     <!-- ApexCharts -->
+    <script src="{{ asset('js/apexcharts.js') }}"></script>
+
 
 
 </body>
