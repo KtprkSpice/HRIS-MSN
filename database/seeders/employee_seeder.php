@@ -27,7 +27,7 @@ class employee_seeder extends Seeder
                 'division_id' => 1,
                 'address' => $faker->address,
                 'email' => $faker->unique()->safeEmail(),
-                'user_id' => 1,
+                'user_id' => 6,
                 'phone' => $faker->unique()->numerify('+62###########'),
                 'hire_date' => $hire_date,
                 'born_date' => $born_date,

@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Data Kehadiran Manual')
+@section('header', 'Edit Data Kehadiran')
 
 @section('content')
     @if ($errors->any())
@@ -12,17 +12,17 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('presence.store') }}" method="post">
+    <form class="row g-3" action="{{ route('presence.update', $presence->id) }}" method="post">
         @csrf
+        @method('PUT')
         <div class="col-md-6">
             <label for="fullname" class="form-label">Nama Karyawan</label>
             <select name="employee_id"
                 class="form-select @error('employee_id')
                 is-invalid
             @enderror">
-                <option>Choose..</option>
                 @foreach ($employees as $employee)
-                    <option value="{{ $employee->id }}">{{ ucwords($employee->fullname) }}</option>
+                    <option value="{{ $employee->id }}" {{ $employee->id == $presence->employee_id ? 'selected' : '' }}>{{ ucwords($employee->fullname) }}</option>
                 @endforeach
                 @error('employee_id')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -34,7 +34,7 @@
             <input type="date" class="form-control @error('date')
                 is-invalid
             @enderror"
-                id="date" name="date" required value="{{ old('date') }}">
+                id="date" name="date" required value="{{ old('date', $presence->date) }}">
             @error('date')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -45,7 +45,7 @@
                 class="form-control @error('check_in')
                 is-invalid
             @enderror" id="check_in"
-                name="check_in" required value="{{ old('check_in') }}">
+                name="check_in" required value="{{ old('check_in', $presence->check_in) }}">
             @error('check_in')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -56,7 +56,7 @@
                 class="form-control @error('check_out')
                 is-invalid
             @enderror" id="check_out"
-                name="check_out" required value="{{ old('check_out') }}">
+                name="check_out" required value="{{ old('check_out', $presence->check_out) }}">
             @error('check_out')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
