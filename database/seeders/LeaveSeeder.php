@@ -20,7 +20,7 @@ class LeaveSeeder extends Seeder
         $leave_end = $faker->dateTimeBetween($leave_start, 'now')->format('Y-m-d');
         foreach(range(1,10) as $i ) {
             DB::table('leave_requests')->insert([
-                'employee_id' => $faker->numberBetween(19, 28),
+                'employee_id' => $faker->numberBetween(1, 10),
                 'start_date' => $leave_start,
                 'end_date' => $leave_end,
                 'leave_type' => $faker->randomElement(['sick', 'vacation']),

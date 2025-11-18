@@ -21,12 +21,14 @@ class Employee extends Model
             $employee->leaveRequest()->delete();
             $employee->user()->delete();
             $employee->presence()->delete();
+            $employee->salary()->delete();
         });
 
         static::restoring(function ($employee) {
             $employee->leaveRequest()->restore();
             $employee->user()->restore();
             $employee->presence()->restore();
+            $employee->salary()->restore();
         });
     }
 
@@ -48,4 +50,9 @@ class Employee extends Model
     public function presence() {
         return $this->hasMany(Presence::class, 'employee_id');
     }
+
+    public function salary() {
+        return $this->belongsTo(Salary::class, 'employee_id');
+    }
+
 }

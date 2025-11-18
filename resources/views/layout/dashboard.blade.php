@@ -248,7 +248,7 @@
             <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
             <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
                         class="fa-solid fa-tasks"></i> Tugas</a></li>
-            <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
+            <li><a href="{{ route('salary.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
                         class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
             <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
             <li><a href="{{ route('presence.index') }}"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>

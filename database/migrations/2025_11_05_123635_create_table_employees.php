@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('phone', 20)->unique();
             $table->date('hire_date');
             $table->date('born_date');
+            $table->enum('gender', ['laki-laki','perempuan']);
             $table->string('bpjs_kesehatan',20)->nullable();
             $table->string('bpjs_ketenagakerjaan', 20)->nullable();
             $table->string('npwp', 20);

@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('divisions', function (Blueprint $table) {
+        Schema::create('salaries', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('description')->nullable();
-            $table->enum('status', ['active', 'inactive']);
+            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+            $table->decimal('net_salary', 15,2);
+            $table->decimal('cuts', 15,2);
+            $table->decimal('bonus', 15,2);
+            $table->date('date');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('division');
+        Schema::dropIfExists('salary');
     }
 };

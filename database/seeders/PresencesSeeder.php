@@ -18,7 +18,7 @@ class PresencesSeeder extends Seeder
         $faker = faker::create();
         foreach(range(1,10) as $i ) {
             DB::table('presences')->insert([
-                'employee_id' => $faker->numberBetween(19, 28),
+                'employee_id' => $faker->numberBetween(1, 10),
                 'date' => $faker->dateTimeBetween('-10 days', '-5 days')->format('Y-m-d'),
                 'check_in' => $faker->dateTimeBetween('-10 hour', '+1 hour'),
                 'check_out' => $faker->dateTimeBetween('-3 hour', '+2 hour'),

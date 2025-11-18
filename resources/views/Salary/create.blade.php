@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Edit Tugas')
+@section('header', 'Tambah Gaji Manual')
 
 @section('content')
     @if ($errors->any())
@@ -12,25 +12,28 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('task.update', $task->id) }}" method="post">
-        @method('PUT')
+    <form class="row g-3" action="{{ route('task.store') }}" method="post">
         @csrf
         <div class="col-md-6">
-            <label for="name" class="form-label">Nama Tugas</label>
-            <input type="text" class="form-control @error('name')
+            <label for="name" class="form-label">Nama Karyawan</label>
+            <select name="employee_id" class="form-select @error('employee_id')
                 is-invalid
-            @enderror"
-                id="name" name="name" required value="{{ old('name', $task->name) }}">
-            @error('name')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
+            @enderror">
+                <option>Choose...</option>
+                @foreach ($employees as $employee)
+                    <option value="{{ $employee->id }}">{{ ucwords($employee->fullname) }}</option>
+                @endforeach
+                @error('employee_id')
+                    <span class="invalid-feedback">{{ $message }}</span>
+                @enderror
+            </select>
         </div>
         <div class="col-md-6">
-            <label for="start_time" class="form-label">Tanggal Mulai</label>
-            <input type="date" class="form-control @error('start_time')
+            <label for="net_salary" class="form-label">Gaji</label>
+            <input type="input" class="form-control @error('net_salary')
                 is-invalid
             @enderror"
-                id="start_time" name="start_time" required value="{{ old('start_time', $task->start_time) }}">
+                id="net_salary" name="net_salary" required value="{{ old('net_salary') }}">
             @error('start_time')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -40,17 +43,18 @@
             <input type="date" class="form-control @error('end_time')
                 is-invalid
             @enderror"
-                id="end_time" name="end_time" required value="{{ old('end_time', $task->end_time) }}">
+                id="end_time" name="end_time" required value="{{ old('end_time') }}">
             @error('end_time')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
         <div class="col-12">
             <label for="description" class="form-label">Deskripsi</label>
-            <input type="text" class="form-control @error('description')
+            <input type="textarea"
+                class="form-control @error('description')
                 is-invalid
-            @enderror"
-                id="description" placeholder="" name="description" required value="{{ old('description', $task->description) }}">
+            @enderror" id="description"
+                placeholder="" name="description" required value="{{ old('description') }}">
             @error('description')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror

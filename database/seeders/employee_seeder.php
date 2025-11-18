@@ -24,10 +24,10 @@ class employee_seeder extends Seeder
             DB::table('employees')->insert([
                 'fullname' => $faker->name(),
                 'nik' => $faker->numerify('##########'),
-                'division_id' => 1,
+                'division_id' => $faker->numberBetween(1,3),
                 'address' => $faker->address,
                 'email' => $faker->unique()->safeEmail(),
-                'user_id' => 6,
+                'user_id' => 1,
                 'phone' => $faker->unique()->numerify('+62###########'),
                 'hire_date' => $hire_date,
                 'born_date' => $born_date,

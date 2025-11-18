@@ -6,6 +6,7 @@ use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -29,8 +30,8 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     // Task
     Route::resource('/task', TaskController::class);
 
-    // Payroll
-    Route::resource('/payroll', PayrollController::class);
+    // Salary
+    Route::resource('/salary', SalaryController::class);
 
     // Leave Request
     Route::resource('/leave-request',LeaveRequestController::class);
