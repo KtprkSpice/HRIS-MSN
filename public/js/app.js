@@ -47,3 +47,14 @@ function confirmDelete(id) {
         }
     });
 }
+
+const salary = document.getElementById("salary");
+
+salary.addEventListener("input", function () {
+    let value = this.value.replace(/\D/g, "");
+    this.value = new Intl.NumberFormat("id-ID").format(value);
+});
+
+form.addEventListener("submit", function () {
+    salary.value = salary.value.replace(/\./g, "");
+});

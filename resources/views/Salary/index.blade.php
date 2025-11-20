@@ -51,6 +51,7 @@
                             <th>Gaji</th>
                             <th>Potongan</th>
                             <th>Bonus</th>
+                            <th>Total</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -62,6 +63,7 @@
                                 <td>Rp. {{ number_format($salary->net_salary) }}</td>
                                 <td>Rp. {{ number_format($salary->cuts) }}</td>
                                 <td>Rp. {{ number_format($salary->bonus) }}</td>
+                                <td>Rp. {{ number_format($salary->total) }}</td>
                                 <td>
                                     <a href="{{ route('salary.edit', $salary->id) }}" class="btn btn-warning btn-sm"><i
                                             class="fa-solid fa-pen"></i></a>

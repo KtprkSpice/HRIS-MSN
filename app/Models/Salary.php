@@ -15,6 +15,8 @@ class Salary extends Model
         'net_salary',
         'cuts',
         'bonus',
+        'date',
+        'total'
     ];
 
     public function employee() {

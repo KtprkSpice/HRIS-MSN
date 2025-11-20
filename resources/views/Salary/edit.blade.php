@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Gaji Manual')
+@section('header', 'Edit Gaji Manual')
 
 @section('content')
     @if ($errors->any())
@@ -12,7 +12,8 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('salary.store') }}" method="post">
+    <form class="row g-3" action="{{ route('salary.update', $salary->id) }}" method="post">
+        @method('PUT')
         @csrf
         <div class="col-md-6">
             <label for="name" class="form-label">Nama Karyawan</label>
@@ -22,7 +23,9 @@
             @enderror">
                 <option>Choose...</option>
                 @foreach ($employees as $employee)
-                    <option value="{{ $employee->id }}">{{ ucwords($employee->fullname) }}</option>
+                    <option value="{{ $employee->id }}"
+                        {{ old('employee_id', $salary->employee_id == $employee->id ? 'selected' : '') }}>
+                        {{ ucwords($employee->fullname) }}</option>
                 @endforeach
                 @error('employee_id')
                     <span class="invalid-feedback">{{ $message }}</span>
@@ -31,30 +34,33 @@
         </div>
         <div class="col-md-6">
             <label for="net_salary" class="form-label">Gaji</label>
-            <input type="input" id="salary" class="form-control @error('net_salary')
+            <input type="input" id="salary"
+                class="form-control @error('net_salary')
                 is-invalid
-            @enderror"
-                id="net_salary" name="net_salary" required value="{{ old('net_salary') }}">
+            @enderror" id="net_salary"
+                name="net_salary" required value="{{ old('net_salary', number_format($salary->net_salary, 0, ',', '.')) }}">
             @error('net_salary')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
         <div class="col-md-6">
             <label for="cuts" class="form-label">Potongan</label>
-            <input type="input" id="salary" class="form-control @error('cuts')
+            <input type="input" id="salary"
+                class="form-control @error('cuts')
                 is-invalid
-            @enderror"
-                id="cuts" name="cuts" required value="{{ old('cuts') }}">
+            @enderror" id="cuts"
+                name="cuts" required value="{{ old('cuts', number_format($salary->cuts, 0, ',', '.')) }}">
             @error('cuts')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
         <div class="col-md-6">
             <label for="bonus" class="form-label">Bonus</label>
-            <input type="input" id="salary" class="form-control @error('bonus')
+            <input type="input" id="salary"
+                class="form-control @error('bonus')
                 is-invalid
-            @enderror"
-                id="bonus" name="bonus" required value="{{ old('bonus') }}">
+            @enderror" id="bonus"
+                name="bonus" required value="{{ old('bonus', number_format($salary->bonus, 0, ',', '.')) }}">
             @error('bonus')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
@@ -64,7 +70,7 @@
             <input type="date" class="form-control @error('date')
                 is-invalid
             @enderror"
-                id="date" name="date" required value="{{ old('date') }}">
+                id="date" name="date" required value="{{ old('date', $salary->date) }}">
             @error('date')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
