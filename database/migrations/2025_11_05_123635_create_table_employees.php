@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('fullname');
             $table->string('nik', 16)->unique();
-            $table->foreignId('division_id')->nullable()->constrained('division')->onDelete('cascade');
+            $table->foreignId('division_id')->nullable()->constrained('divisions')->onDelete('cascade');
             $table->string('address')->nullable();
             $table->string('email')->unique();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('salary', function (Blueprint $table) {
+        Schema::create('allowances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
-            $table->decimal('net_salary', 15,2);
-            $table->decimal('cuts', 15,2);
-            $table->decimal('bonus', 15,2);
-            $table->date('date');
+            $table->string('allowance_type');
+            $table->enum('calculation_type', ['fixed', 'percentage']);
+            $table->decimal('amount',10,2)->nullable();
+            $table->decimal('percentage_value', 5,2)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('salary');
+        Schema::dropIfExists('allowances');
     }
 };

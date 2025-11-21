@@ -14,7 +14,7 @@ class division_seeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('division')->insert([
+        DB::table('divisions')->insert([
             [
                 'name' => 'hr',
                 'status' => 'active',
