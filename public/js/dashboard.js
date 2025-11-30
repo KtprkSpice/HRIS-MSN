@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // 🧾 DataTables (jika tabel ada)
     const table = document.getElementById("karyawanTable");
     if (table) {
-        $('#karyawanTable').DataTable({
+        ('#karyawanTable').DataTable({
             pageLength: 5,
             lengthMenu: [5, 10, 25, 50],
             language: {

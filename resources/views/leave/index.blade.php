@@ -43,7 +43,7 @@
         <div class="card-body">
             <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Tugas</h5>
             <div class="table-responsive">
-                <table id="tugasTable" class="table table-bordered">
+                <table id="myTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Nama Karyawan</th>

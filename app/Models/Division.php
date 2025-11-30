@@ -10,7 +10,6 @@ class division extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'division';
     protected $fillable = [
         'nama',
         'description',

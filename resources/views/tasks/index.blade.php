@@ -3,7 +3,7 @@
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru
+            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru 
         </div>
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>
@@ -51,6 +51,8 @@
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
+                            <th>Presensi</th>
+                            <th>Opsi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -63,11 +65,50 @@
                                 <td>{{ Carbon\Carbon::parse($task->end_time)->format('d F Y') }}</td>
                                 <td><span @class([
                                     'badge bg-success text-white text-center p-2' => $task->status == 'done',
-                                    'badge bg-info text-white text-center p-2' =>
-                                        $task->status == 'on duty',
-                                    'badge bg-warning text-white text-center p-2' =>
-                                        $task->status == 'pending',
-                                ])>{{ ucwords($task->status) }}</span> </td>
+                                    'badge bg-info text-white text-center p-2' => $task->status == 'on duty',
+                                    'badge bg-warning text-white text-center p-2' => $task->status == 'pending',
+                                ])>{{ ucwords($task->status) }}</span>
+                                </td>
+                                <td>
+                                    @if ($task->status == 'on duty')
+                                        <a href="" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-qrcode"></i> Presensi</a>
+                                    @elseif ($task->status == 'done')
+                                        <button onclick="done({{ $task->id }})"
+                                            class="btn btn-sm btn-secondary">Presensi</button>
+                                    @else
+                                        <button onclick="pending({{ $task->id }})"
+                                            class="btn btn-sm btn-secondary">Presensi</button>
+                                    @endif
+                                </td>
+                                <td>
+                                    <select name="" id="" class="form-select"
+                                        onchange="window.location.href=this.value">
+                                        <option value="">Pilih...</option>
+                                        @if ($task->status == 'done')
+                                        <option value="{{ route('task.onduty', $task->id) }}">
+                                                On duty
+                                            </option>
+                                            <option value="{{ route('task.pending', $task->id) }}">
+                                                Pending
+                                            </option>
+                                        @elseif ($task->status == 'pending')
+                                        <option value="{{ route('task.onduty', $task->id) }}">
+                                                On duty
+                                            </option>
+                                            <option value="{{ route('task.done', $task->id) }}">
+                                                Done
+                                            </option>
+                                        @else
+                                            <option value="{{ route('task.done', $task->id) }}">
+                                                Done
+                                            </option>
+                                            <option value="{{ route('task.pending', $task->id) }}">
+                                                Pending
+                                            </option>
+                                        @endif
+                                    </select>
+
+                                </td>
                                 <td>
                                     <a href="{{ route('task.edit', $task->id) }}" class="btn btn-warning btn-sm"><i
                                             class="fa-solid fa-pen"></i></a>
@@ -87,5 +128,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function pending(id) {
+            Swal.fire({
+                title: "Gagal!",
+                text: "Anda sudah melewati batas waktu absen",
+                icon: "error",
+            })
+        };
+
+        function done(id) {
+            Swal.fire({
+                title: "warning",
+                text: "Tugas sudah selesai!",
+                icon: "error",
+            })
+        };
+    </script>
 
 @endsection

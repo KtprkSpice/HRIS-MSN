@@ -11,6 +11,7 @@ class Presence extends Model
     use HasFactory, SoftDeletes;
     protected $fillable = [
         'employee_id',
+        'task_id',
         'date',
         'check_in',
         'check_out',
@@ -18,5 +19,9 @@ class Presence extends Model
 
     public function employee() {
         return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function task() {
+        return $this->belongsTo(Task::class, 'task_id');
     }
 }
