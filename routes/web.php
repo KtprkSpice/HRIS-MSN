@@ -42,5 +42,6 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     // Presences
     Route::resource('/presence', PresecesController::class)->except(['show']);
     Route::get('/presence/{id}' ,[PresecesController::class, 'scan'])->name('presences.scan');
+    Route::post('/presence/qr/store', [PresecesController::class, 'storeQr'])->name('presences.storeQr');
 
 });

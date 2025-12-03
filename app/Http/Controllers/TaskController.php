@@ -10,7 +10,7 @@ class TaskController extends Controller
 {
     public function index()
     {
-        $presences = Presence::get('id');
+        $presences = Presence::find('id');
         $tasks = Task::all();
         return view('tasks.index', compact('tasks', 'presences'));
     }
@@ -89,4 +89,5 @@ class TaskController extends Controller
 
         return redirect()->route('task.index')->with('success', "Tugas $taskName telah diupdate menjadi On Duty");
     }
+
 }

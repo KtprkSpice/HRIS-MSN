@@ -71,7 +71,7 @@
                                 </td>
                                 <td>
                                     @if ($task->status == 'on duty')
-                                        <a href="" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-qrcode"></i> Presensi</a>
+                                        <a href="{{ route('presences.scan', $task->id) }}" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-qrcode"></i> Presensi</a>
                                     @elseif ($task->status == 'done')
                                         <button onclick="done({{ $task->id }})"
                                             class="btn btn-sm btn-secondary">Presensi</button>
