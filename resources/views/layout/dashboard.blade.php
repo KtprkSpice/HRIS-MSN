@@ -248,7 +248,7 @@
             <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
             <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
                         class="fa-solid fa-tasks"></i> Tugas</a></li>
-            <li><a href="{{ route('salary.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
+            <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
                         class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
             <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
             <li><a href="{{ route('presence.index') }}"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
@@ -325,13 +325,50 @@
     <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
 
     {{-- Bootsrap --}}
-    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.js') }}"></script>
+    <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
 
-     <!-- ApexCharts -->
+    <!-- ApexCharts -->
     <script src="{{ asset('js/apexcharts.js') }}"></script>
 
+    {{-- Data Table Logic --}}
+    <script>
+        $(document).ready(function() {
+            let table = new DataTable('#tugasTable', {
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                    paginate: {
+                        previous: "Sebelumnya",
+                        next: "Berikutnya",
+                    },
+                }
+            });
 
+            // Custom filtering
+            DataTable.ext.search.push(function(settings, data, dataIndex) {
 
+                let filterKaryawan = $("#filterKaryawan").val();
+                let filterStatus = $("#filterStatus").val();
+
+                let namaKaryawan = data[0]; // kolom nama karyawan
+                let status = data[4]; // kolom status (cek index tabel kamu)
+
+                if (
+                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
+                    (filterStatus === "" || status.includes(filterStatus))
+                ) {
+                    return true;
+                }
+                return false;
+            });
+
+            // Re-draw table on dropdown change
+            $("#filterKaryawan, #filterStatus").on("change", function() {
+                table.draw();
+            });
+        });
+    </script>
 </body>
 
 </html>

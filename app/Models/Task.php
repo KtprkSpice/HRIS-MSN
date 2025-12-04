@@ -17,4 +17,8 @@ class Task extends Model
         'end_time',
         'status',
     ];
+
+    public function presences() {
+        return $this->hasMany(Presence::class);
+    }
 }

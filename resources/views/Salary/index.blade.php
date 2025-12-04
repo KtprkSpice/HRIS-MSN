@@ -83,10 +83,4 @@
             </div>
         </div>
     </div>
-
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
-    <script src="P{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.js') }}"></script>
-
-
 @endsection

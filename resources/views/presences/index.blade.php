@@ -22,7 +22,8 @@
                 <table id="tugasTable" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Nama</th>
+                            <th>Nama Karyawan</th>
+                            <th>Nama Tugas</th>
                             <th>Tanggal</th>
                             <th>Waktu Masuk</th>
                             <th>Waktu Keluar</th>
@@ -33,6 +34,7 @@
                         @foreach ($presences as $presence)
                             <tr>
                                 <td>{{ ucwords($presence->employee->fullname) }}</td>
+                                <td>{{ ucwords($presence->task->name) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->date)->format('d F Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->check_out)->format('H:i') }}</td>
@@ -56,5 +58,6 @@
             </div>
         </div>
     </div>
+
 
 @endsection
