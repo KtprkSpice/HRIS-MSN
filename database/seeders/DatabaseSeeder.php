@@ -24,16 +24,16 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        //  $this->call([
-        //     division_seeder::class,
-        //     employee_seeder::class,
-        //     RoleSeeder::class,
-        //     LeaveSeeder::class,
-        //     SalarySeeder::class,
-        //     TaskSeeder::class,
-        //     PresencesSeeder::class,
-        //     AllowanceSeeder::class,
-        //     AllowanceEmployeeSeeder::class,
-        // ]);
+         $this->call([
+            division_seeder::class,
+            employee_seeder::class,
+            RoleSeeder::class,
+            LeaveSeeder::class,
+            SalarySeeder::class,
+            TaskSeeder::class,
+            PresencesSeeder::class,
+            AllowanceSeeder::class,
+            AllowanceEmployeeSeeder::class,
+        ]);
     }
 }

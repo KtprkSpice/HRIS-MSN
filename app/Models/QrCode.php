@@ -6,23 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Presence extends Model
+class QrCode extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $table = 'presences';
     protected $fillable = [
-        'employee_id',
+        'token',
         'task_id',
         'date',
-        'check_in',
-        'check_out',
-    ];
+        'generated_at',
+        'expires_at',
+        'is_active',
+     ];
 
-    public function employee() {
-        return $this->belongsTo(Employee::class, 'employee_id');
-    }
-
-    public function task() {
+     public function task() {
         return $this->belongsTo(Task::class, 'task_id');
-    }
+     }
 }

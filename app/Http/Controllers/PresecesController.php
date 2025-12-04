@@ -74,41 +74,47 @@ class PresecesController extends Controller
         return view('presences.scan', compact('presences', 'task'));
     }
 
-    public function storeQr(Request $request)
-    {
-        $user = auth()->user();
+   public function storeQr(Request $request)
+{
+    $user = auth()->user(); 
+    $employee = $user->employee; 
 
-        $task = Task::with('employees')->findOrFail($request->task->id);
+    $task = Task::with('employees')->findOrFail($request->task_id);
 
-        if (! $task->employees->contains($user->id)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Anda tidak terdaftar pada task ini.',
-            ]);
-            $already = Presence::where('task_id', $task->id)
-                ->where('user_id', $user->id)
-                ->whereDate('time_in', now()->toDateString())
-                ->first();
-
-            if ($already) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Anda sudah melakukan presensi hari ini.',
-                ]);
-            }
-
-            // Simpan presensi dari QR
-            Presence::create([
-                'task_id' => $task->id,
-                'user_id' => $user->id,
-                'qr_data' => $request->qr_data,
-                'time_in' => now(),
-            ]);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Presensi berhasil dicatat!',
-            ]);
-        }
+    // Validasi pegawai apakah terdaftar pada task
+    if (! $task->employees->contains($employee->id)) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Anda tidak terdaftar pada task ini.',
+        ]);
     }
+
+    // Cek apakah sudah presensi hari ini
+    $already = Presence::where('task_id', $task->id)
+        ->where('employee_id', $employee->id)
+        ->whereDate('date', today())
+        ->first();
+
+    if ($already) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Anda sudah melakukan presensi hari ini.',
+        ]);
+    }
+
+    // Simpan presensi (CHECK IN)
+    Presence::create([
+        'employee_id' => $employee->id,
+        'task_id' => $task->id,
+        'date' => today(),
+        'check_in' => now(),
+        'check_out' => null,
+    ]);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Presensi berhasil dicatat!',
+    ]);
+}
+
 }

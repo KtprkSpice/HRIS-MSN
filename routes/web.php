@@ -5,6 +5,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\QrController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\TaskController;
 use App\Models\Task;
@@ -20,9 +21,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/dashboard', DashboardController::class);
 
     //Edit Profile
-    Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])
-        ->name('profile.edit')
-        ;
+    Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 
     // Employees
     Route::resource('/employee', EmployeeController::class);
@@ -36,12 +35,14 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     // Salary
     Route::resource('/salary', SalaryController::class);
 
+    // Qr
+    Route::get('/qr/{taskId}', [QrController::class, 'show'])->name('qr.show');
+
     // Leave Request
-    Route::resource('/leave-request',LeaveRequestController::class);
+    Route::resource('/leave-request', LeaveRequestController::class);
 
     // Presences
     Route::resource('/presence', PresecesController::class)->except(['show']);
-    Route::get('/presence/{id}' ,[PresecesController::class, 'scan'])->name('presences.scan');
+    Route::get('/presence/{id}', [PresecesController::class, 'scan'])->name('presences.scan');
     Route::post('/presence/qr/store', [PresecesController::class, 'storeQr'])->name('presences.storeQr');
-
 });

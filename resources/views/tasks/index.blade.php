@@ -3,7 +3,7 @@
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru 
+            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru
         </div>
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>
@@ -52,6 +52,7 @@
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
                             <th>Presensi</th>
+                            <th>QR</th>
                             <th>Opsi</th>
                             <th>Aksi</th>
                         </tr>
@@ -71,12 +72,23 @@
                                 </td>
                                 <td>
                                     @if ($task->status == 'on duty')
-                                        <a href="{{ route('presences.scan', $task->id) }}" class="btn btn-sm btn-info text-white"><i class="fa-solid fa-qrcode"></i> Presensi</a>
+                                        <a href="{{ route('presences.scan', $task->id) }}"
+                                            class="btn btn-sm btn-info text-white"><i class="fa-solid fa-qrcode"></i>
+                                            Presensi</a>
                                     @elseif ($task->status == 'done')
-                                        <button onclick="done({{ $task->id }})"
+                                        <button onclick="failed({{ $task->id }})"
                                             class="btn btn-sm btn-secondary">Presensi</button>
                                     @else
-                                        <button onclick="pending({{ $task->id }})"
+                                        <button onclick="warning({{ $task->id }})"
+                                            class="btn btn-sm btn-secondary">Presensi</button>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if ($task->status == 'on duty')
+                                        <a href="{{ route('qr.show', $task->id) }}"><i class="fa-solid fa-qrcode"></i>
+                                            Presensi</a>
+                                    @else
+                                        <button onclick="failed({{ $task->id }})"
                                             class="btn btn-sm btn-secondary">Presensi</button>
                                     @endif
                                 </td>
@@ -85,14 +97,14 @@
                                         onchange="window.location.href=this.value">
                                         <option value="">Pilih...</option>
                                         @if ($task->status == 'done')
-                                        <option value="{{ route('task.onduty', $task->id) }}">
+                                            <option value="{{ route('task.onduty', $task->id) }}">
                                                 On duty
                                             </option>
                                             <option value="{{ route('task.pending', $task->id) }}">
                                                 Pending
                                             </option>
                                         @elseif ($task->status == 'pending')
-                                        <option value="{{ route('task.onduty', $task->id) }}">
+                                            <option value="{{ route('task.onduty', $task->id) }}">
                                                 On duty
                                             </option>
                                             <option value="{{ route('task.done', $task->id) }}">
@@ -107,7 +119,6 @@
                                             </option>
                                         @endif
                                     </select>
-
                                 </td>
                                 <td>
                                     <a href="{{ route('task.edit', $task->id) }}" class="btn btn-warning btn-sm"><i
@@ -130,15 +141,15 @@
     </div>
 
     <script>
-        function pending(id) {
+        function failed(id) {
             Swal.fire({
                 title: "Gagal!",
-                text: "Anda sudah melewati batas waktu absen",
+                text: "Anda sudah tidak dapat melakukan absensi",
                 icon: "error",
             })
         };
 
-        function done(id) {
+        function warning(id) {
             Swal.fire({
                 title: "warning",
                 text: "Tugas sudah selesai!",
