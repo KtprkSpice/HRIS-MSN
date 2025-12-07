@@ -66,55 +66,84 @@ class PresecesController extends Controller
         return redirect()->route('presence.index')->with('success', 'Data Telah dihapus');
     }
 
-    public function scan($id)
+    public function scan(Task $task)
     {
-        $presences = Presence::find($id);
-        $task = Task::find($id);
+        $presences = Presence::find($task);
 
         return view('presences.scan', compact('presences', 'task'));
     }
 
-   public function storeQr(Request $request)
-{
-    $user = auth()->user(); 
-    $employee = $user->employee; 
+    public function storeQr(Request $request)
+    {
+        \Log::info('DATA QR MASUK:', $request->all());
 
-    $task = Task::with('employees')->findOrFail($request->task_id);
+        try {
 
-    // Validasi pegawai apakah terdaftar pada task
-    if (! $task->employees->contains($employee->id)) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Anda tidak terdaftar pada task ini.',
-        ]);
+            // Validasi QR
+            if (! $request->qr_data) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'QR tidak berisi data.',
+                ], 400);
+            }
+
+            // Validasi Task
+            if (! $request->task_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Task ID tidak ditemukan.',
+                ], 400);
+            }
+
+            // Ambil data user
+            $employee = auth()->user()->employee;
+
+            // Ambil task + pegawai yg terkait
+            $task = Task::with('employees')->findOrFail($request->task_id);
+
+            // Pastikan pegawai terdaftar pada task
+            if (! $task->employees->contains($employee->id)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda tidak terdaftar pada task ini.',
+                ]);
+            }
+
+            // Cek apakah sudah presensi hari ini
+            $already = Presence::where('task_id', $task->id)
+                ->where('employee_id', $employee->id)
+                ->whereDate('date', today())
+                ->first();
+
+            if ($already) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda sudah melakukan presensi hari ini.',
+                ]);
+            }
+
+            // Simpan presensi
+            Presence::create([
+                'employee_id' => $employee->id,
+                'task_id' => $task->id,
+                'date' => now()->toDateString(),
+                'check_in' => now(),
+                'check_out' => null,
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Presensi berhasil dicatat!',
+            ]);
+
+        } catch (\Throwable $e) {
+
+            \Log::error('ERROR PRESENSI: '.$e->getMessage());
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Server error: '.$e->getMessage(),
+            ], 500);
+        }
     }
-
-    // Cek apakah sudah presensi hari ini
-    $already = Presence::where('task_id', $task->id)
-        ->where('employee_id', $employee->id)
-        ->whereDate('date', today())
-        ->first();
-
-    if ($already) {
-        return response()->json([
-            'status' => 'error',
-            'message' => 'Anda sudah melakukan presensi hari ini.',
-        ]);
-    }
-
-    // Simpan presensi (CHECK IN)
-    Presence::create([
-        'employee_id' => $employee->id,
-        'task_id' => $task->id,
-        'date' => today(),
-        'check_in' => now(),
-        'check_out' => null,
-    ]);
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Presensi berhasil dicatat!',
-    ]);
-}
-
 }

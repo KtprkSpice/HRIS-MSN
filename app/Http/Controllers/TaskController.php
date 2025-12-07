@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\Presence;
 use App\Models\Task;
 use Illuminate\Http\Request;
@@ -39,7 +40,8 @@ class TaskController extends Controller
     }
 
     public function edit(Task $task) {
-        return view('tasks.edit', compact('task'));
+        $employees = Employee::all();
+        return view('tasks.edit', compact('task', 'employees'));
     }
 
     public function update(Request $request, Task $task) {

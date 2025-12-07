@@ -14,28 +14,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // 🧾 DataTables (jika tabel ada)
-    const table = document.getElementById("karyawanTable");
-    if (table) {
-        ('#karyawanTable').DataTable({
-            pageLength: 5,
-            lengthMenu: [5, 10, 25, 50],
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                paginate: {
-                    first: "Awal",
-                    last: "Akhir",
-                    next: "Berikutnya",
-                    previous: "Sebelumnya"
-                }
-            },
-            initComplete: function() {
-                $('#karyawanTable').fadeIn(500);
-            }
-        });
-    }
 
     // 📊 ApexCharts - Gender
     const genderChart = document.querySelector("#genderChart");

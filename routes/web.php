@@ -36,13 +36,13 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/salary', SalaryController::class);
 
     // Qr
-    Route::get('/qr/{taskId}', [QrController::class, 'show'])->name('qr.show');
+    Route::get('/qr/{task}', [QrController::class, 'show'])->name('qr.show');
 
     // Leave Request
     Route::resource('/leave-request', LeaveRequestController::class);
 
     // Presences
     Route::resource('/presence', PresecesController::class)->except(['show']);
-    Route::get('/presence/{id}', [PresecesController::class, 'scan'])->name('presences.scan');
+    Route::get('/presence/{task}', [PresecesController::class, 'scan'])->name('presences.scan');
     Route::post('/presence/qr/store', [PresecesController::class, 'storeQr'])->name('presences.storeQr');
 });

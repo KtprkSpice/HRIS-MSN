@@ -10,9 +10,8 @@ use Illuminate\Http\Request;
 
 class QrController extends Controller
 {
-    public function show($taskId)
+    public function show(Task $task)
     {
-        $task = Task::findOrFail($taskId);
         $qr = QrCode::where('task_id', $task->id)->where('date', today())->where('is_active', true)->firstOrFail();
 
         $qrText = $qr->token;

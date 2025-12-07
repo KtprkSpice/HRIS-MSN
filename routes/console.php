@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Str;
 
+// php artisan schedule:run
 Schedule::everyMinute()->call(function (){
     $tasks = Task::where('status', 'on duty')->get();
 

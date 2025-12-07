@@ -47,16 +47,53 @@
         </div>
         <div class="col-12">
             <label for="description" class="form-label">Deskripsi</label>
-            <input type="text" class="form-control @error('description')
+            <input type="text"
+                class="form-control @error('description')
                 is-invalid
-            @enderror"
-                id="description" placeholder="" name="description" required value="{{ old('description', $task->description) }}">
+            @enderror" id="description"
+                placeholder="" name="description" required value="{{ old('description', $task->description) }}">
             @error('description')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
+        </div>
+        <div class="table-responsive">
+            <table id="tugasTable" class="table table-bordered">
+                <thead>
+                    <th>
+                        <input type="checkbox" name="" id="selectAll">
+                    </th>
+                    <th>Nama Karyawan</th>
+                    <th>Divisi</th>
+                    <th>Posisi</th>
+                </thead>
+                <tbody>
+                    @foreach ($employees as $employee)
+                        <tr>
+                            <td>
+                                <input type="checkbox" name="employee_ids[]" value="{{ $employee->id }}" id="">
+                            </td>
+                            <td>{{ $employee->fullname }}</td>
+                            <td>{{ $employee->division->name }}</td>
+                            <td>Posisi</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+
+
+    <script>
+        document.getElementById('selectAll').addEventListener('click', function() {
+            const checkboxes = document.querySelectorAll('input[name="employee_ids[]"]');
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+
+
+    </script>
+
 @endsection

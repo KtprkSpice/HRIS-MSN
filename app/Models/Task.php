@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-
     use HasFactory, SoftDeletes;
+
     protected $fillable = [
         'name',
         'description',
@@ -18,7 +18,13 @@ class Task extends Model
         'status',
     ];
 
-    public function presences() {
+    public function presences()
+    {
         return $this->hasMany(Presence::class);
+    }
+
+    public function employees()
+    {
+        return $this->belongsToMany(Employee::class, 'employees_tasks', 'task_id', 'employee_id');
     }
 }

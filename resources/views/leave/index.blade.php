@@ -43,7 +43,7 @@
         <div class="card-body">
             <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Tugas</h5>
             <div class="table-responsive">
-                <table id="myTable" class="table table-bordered">
+                <table id="leaveTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Nama Karyawan</th>
@@ -62,17 +62,17 @@
                                 <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
                                 <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
                                 <td><span @class([
-                                    'badge bg-danger text-white text-center p-2' => $leave->status == 'rejected',
-                                    'badge bg-info text-white text-center p-2' =>
-                                        $leave->status == 'confirmed',
+                                    'badge bg-danger text-white text-center p-2' =>
+                                        $leave->status == 'rejected',
+                                    'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
                                     'badge bg-warning text-white text-center p-2' =>
                                         $leave->status == 'pending',
                                 ])>{{ ucwords($leave->status) }}</span> </td>
                                 <td>
-                                    <a href="{{ route('leave-request.edit', $leave->id) }}" class="btn btn-warning btn-sm"><i
-                                            class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST" class="d-inline"
-                                        id="deleteForm{{ $leave->id }}">
+                                    <a href="{{ route('leave-request.edit', $leave->id) }}"
+                                        class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+                                    <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
+                                        class="d-inline" id="deleteForm{{ $leave->id }}">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-danger btn-sm" type="button"
@@ -87,5 +87,51 @@
             </div>
         </div>
     </div>
+
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            let table = new DataTable('#leaveTable', {
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                    paginate: {
+                        previous: "Sebelumnya",
+                        next: "Berikutnya",
+                    },
+                },
+                columnDefs: [{
+                    targets: 5,
+                    orderable: false,
+                    searchable: false
+                }]
+            });
+
+            // Custom filtering
+            DataTable.ext.search.push(function(settings, data, dataIndex) {
+
+                let filterKaryawan = $("#filterKaryawan").val();
+                let filterStatus = $("#filterStatus").val();
+
+                let namaKaryawan = data[0]; // kolom nama karyawan
+                let status = data[4]; // kolom status (cek index tabel kamu)
+
+                if (
+                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
+                    (filterStatus === "" || status.includes(filterStatus))
+                ) {
+                    return true;
+                }
+                return false;
+            });
+
+            // Re-draw table on dropdown change
+            $("#filterKaryawan, #filterStatus").on("change", function() {
+                table.draw();
+            });
+        });
+    </script>
 
 @endsection

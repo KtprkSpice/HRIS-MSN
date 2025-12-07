@@ -313,9 +313,6 @@
         @yield('content')
     </div>
 
-    <!-- jQuery + DataTables -->
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     {{-- Script --}}
     <script src="{{ asset('js/dashboard.js') }}"></script>
@@ -331,44 +328,6 @@
     <script src="{{ asset('js/apexcharts.js') }}"></script>
 
     {{-- Data Table Logic --}}
-    <script>
-        $(document).ready(function() {
-            let table = new DataTable('#tugasTable', {
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                    paginate: {
-                        previous: "Sebelumnya",
-                        next: "Berikutnya",
-                    },
-                }
-            });
-
-            // Custom filtering
-            DataTable.ext.search.push(function(settings, data, dataIndex) {
-
-                let filterKaryawan = $("#filterKaryawan").val();
-                let filterStatus = $("#filterStatus").val();
-
-                let namaKaryawan = data[0]; // kolom nama karyawan
-                let status = data[4]; // kolom status (cek index tabel kamu)
-
-                if (
-                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
-                    (filterStatus === "" || status.includes(filterStatus))
-                ) {
-                    return true;
-                }
-                return false;
-            });
-
-            // Re-draw table on dropdown change
-            $("#filterKaryawan, #filterStatus").on("change", function() {
-                table.draw();
-            });
-        });
-    </script>
 </body>
 
 </html>
