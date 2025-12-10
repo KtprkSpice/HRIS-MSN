@@ -52,6 +52,17 @@ class TaskController extends Controller
             'end_time' => 'required|date',
         ]);
 
+        $task->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+        ]);
+
+        $employeeId = $request->selected_employee ?? [];
+
+        $task->employees()->sync($employeeId);
+
         $task->update($request->all());
         return redirect()->route('task.index')->with('success', 'Data Berhasil Diubah');
     }

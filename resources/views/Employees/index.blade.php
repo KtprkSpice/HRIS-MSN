@@ -28,6 +28,7 @@
                             <th>Jenis Kelamin</th>
                             <th>Divisi</th>
                             <th>Tanggal Lahir</th>
+                            <th>NPWP</th>
                             <th>Skor</th>
                             <th>Status</th>
                             <th>Aksi</th>
@@ -42,6 +43,7 @@
                                 <td>{{ ucwords($employee->gender) }}</td>
                                 <td>{{ ucwords($employee->division->name) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
+                                <td>{{ $employee->npwp }}</td>
                                 <td>1990</td>
                                 <td><span @class([
                                     'badge bg-success text-white text-center p-2' =>

@@ -70,10 +70,11 @@
                     @foreach ($employees as $employee)
                         <tr>
                             <td>
-                                <input type="checkbox" name="employee_ids[]" value="{{ $employee->id }}" id="">
+                                <input type="checkbox" name="selected_employee[]" value="{{ $employee->id }}"
+                                    {{ in_array($employee->id, $task->employees->pluck('id')->toArray()) ? 'checked' : '' }}>
                             </td>
-                            <td>{{ $employee->fullname }}</td>
-                            <td>{{ $employee->division->name }}</td>
+                            <td>{{ ucwords($employee->fullname) }}</td>
+                            <td>{{ ucwords($employee->division->name) }}</td>
                             <td>Posisi</td>
                         </tr>
                     @endforeach
@@ -88,12 +89,9 @@
 
     <script>
         document.getElementById('selectAll').addEventListener('click', function() {
-            const checkboxes = document.querySelectorAll('input[name="employee_ids[]"]');
+            const checkboxes = document.querySelectorAll('input[name="selected_employee[]"]');
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
-
-
-
     </script>
 
 @endsection
