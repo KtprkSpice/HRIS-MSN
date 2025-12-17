@@ -14,11 +14,17 @@ class LeaveRequest extends Model
         'employee_id',
         'start_date',
         'end_date',
-        'leave_type',
+        'leave_id',
         'status',
     ];
 
-    public function employee() {
+    public function employee()
+    {
         return $this->belongsTo(Employee::class, 'employee_id');
+    }
+
+    public function types()
+    {
+        return $this->belongsTo(LeaveType::class, 'leave_id');
     }
 }

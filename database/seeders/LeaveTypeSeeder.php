@@ -1,0 +1,47 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class LeaveTypeSeeder extends Seeder
+{
+    public function run(): void
+    {
+        DB::table('leave_types')->insert([
+            [
+                'name' => 'Cuti Tahunan',
+                'is_paid' => true,
+                'deduction' => 0,
+                'max_days' => 12,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Cuti Sakit',
+                'is_paid' => true,
+                'deduction' => 0,
+                'max_days' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Izin Pribadi',
+                'is_paid' => false,
+                'deduction' => 100000,
+                'max_days' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Cuti Tidak Dibayar',
+                'is_paid' => false,
+                'deduction' => 150000,
+                'max_days' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+    }
+}

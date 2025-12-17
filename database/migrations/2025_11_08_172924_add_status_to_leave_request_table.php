@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('leave_requests', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'confirmed', 'rejected']);
+            $table->enum('status', ['pending', 'confirmed', 'rejected'])->after('end_date')->default('pending');
         });
     }
 

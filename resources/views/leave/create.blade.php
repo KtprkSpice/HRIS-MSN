@@ -16,7 +16,8 @@
         @csrf
         <div class="col-md-6">
             <label for="employee_id" class="form-label">Nama Karyawan</label>
-            <select name="employee_id" id="employee_id" class="form-select @error('employee_id')
+            <select name="employee_id" id="employee_id"
+                class="form-select @error('employee_id')
                 is-invalid
             @enderror">
                 <option>Choose...</option>
@@ -50,13 +51,15 @@
         </div>
         <div class="col-md-6">
             <label for="employee_id" class="form-label">Jenis Cuti</label>
-            <select name="leave_type" id="employee_id" class="form-select @error('leave_type')
+            <select name="leave_id" id="employee_id"
+                class="form-select @error('leave_id')
                 is-invalid
             @enderror">
                 <option>Choose...</option>
-                <option value="sick" >Sick</option>
-                <option value="vacation">Vacation</option>
-                @error('leave_type')
+                @foreach ($types as $type)
+                    <option value="{{ $type->id }}">{{ $type->name }}</option>
+                @endforeach
+                @error('leave_id')
                     <span class="invalid-feedback">{{ $message }}</span>
                 @enderror
             </select>

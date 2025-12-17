@@ -76,46 +76,21 @@
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            let table = new DataTable('#employeeTable', {
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                    paginate: {
-                        previous: "Sebelumnya",
-                        next: "Berikutnya",
-                    },
+        let table = new DataTable('#employeeTable', {
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
                 },
-                columnDefs: [{
-                    targets: 8,
-                    orderable: false,
-                    searchable: false
-                }]
-            });
-
-            // Custom filtering
-            DataTable.ext.search.push(function(settings, data, dataIndex) {
-
-                let filterKaryawan = $("#filterKaryawan").val();
-                let filterStatus = $("#filterStatus").val();
-
-                let namaKaryawan = data[0]; // kolom nama karyawan
-                let status = data[4]; // kolom status (cek index tabel kamu)
-
-                if (
-                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
-                    (filterStatus === "" || status.includes(filterStatus))
-                ) {
-                    return true;
-                }
-                return false;
-            });
-
-            // Re-draw table on dropdown change
-            $("#filterKaryawan, #filterStatus").on("change", function() {
-                table.draw();
-            });
+            },
+            columnDefs: [{
+                targets: 9,
+                orderable: false,
+                searchable: false
+            }]
         });
     </script>
 

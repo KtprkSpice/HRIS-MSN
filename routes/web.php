@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
@@ -20,7 +21,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     // Dashboard
     Route::resource('/dashboard', DashboardController::class);
 
-    //Edit Profile
+    // Edit Profile
     Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
 
     // Employees
@@ -40,6 +41,8 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
 
     // Leave Request
     Route::resource('/leave-request', LeaveRequestController::class);
+    // Leave Type
+    Route::resource('/leave-type', LeaveTypeController::class);
 
     // Presences
     Route::resource('/presence', PresecesController::class)->except(['show']);

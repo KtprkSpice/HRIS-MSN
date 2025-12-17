@@ -11,18 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->after('email')->nullable()->constrained('roles')->onDelete('cascade');
+        Schema::table('leave_requests', function (Blueprint $table) {
+            $table->foreignId('leave_id')->after('employee_id')->constrained('leave_types')->onDelete('cascade');
+            $table->dropColumn('leave_type');
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
-    {
-        Schema::table('users', function (Blueprint $table) {
-            //
-        });
-    }
+    public function down(): void {}
 };

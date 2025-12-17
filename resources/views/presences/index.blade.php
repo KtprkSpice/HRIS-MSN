@@ -19,7 +19,7 @@
         <div class="card-header bg-primary text-white">Daftar Karyawan</div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tugasTable" class="table table-bordered">
+                <table id="presencesTable" class="table table-bordered">
                     <thead>
                         <tr>
                             <th>Nama Karyawan</th>
@@ -37,7 +37,8 @@
                                 <td>{{ ucwords($presence->task->name) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->date)->format('d F Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
-                                <td>{{$presence->check_out ?  \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}</td>
+                                <td>{{ $presence->check_out ? \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}
+                                </td>
                                 <td>
                                     <a href="{{ route('presence.edit', $presence->id) }}"
                                         class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
@@ -59,5 +60,26 @@
         </div>
     </div>
 
+    <!-- jQuery + DataTables -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+    <script>
+        let table = new DataTable('#presencesTable', {
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
+                },
+            },
+            columnDefs: [{
+                targets: 5,
+                orderable: false,
+                searchable: false
+            }]
+        });
+    </script>
 
 @endsection

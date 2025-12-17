@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('presences', function (Blueprint $table) {
-            $table->decimal('longitude', 10,7)->nullable();
-            $table->decimal('latitude', 10,7)->nullable();
+        Schema::table('leave_types', function (Blueprint $table) {
+            $table->string('description')->nullable()->after('max_days');
         });
     }
 
@@ -22,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('presences', function (Blueprint $table) {
+        Schema::table('leave_types', function (Blueprint $table) {
             //
         });
     }

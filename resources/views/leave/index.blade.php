@@ -58,7 +58,7 @@
                         @foreach ($leaveRequests as $leave)
                             <tr>
                                 <td>{{ ucwords($leave->employee->fullname) }}</td>
-                                <td>{{ ucwords($leave->leave_type) }}</td>
+                                <td>{{ ucwords($leave->types->name) }}</td>
                                 <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
                                 <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
                                 <td><span @class([
