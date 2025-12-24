@@ -53,8 +53,8 @@
                             <th>Status</th>
                             <th>Presensi</th>
                             <th>QR</th>
-                            <th>Opsi</th>
                             <th>Aksi</th>
+                            <th>Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,8 +93,7 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <select name="" id="" class="form-select"
-                                        onchange="window.location.href=this.value">
+                                    <select name="" id="" class="form-select" onchange="changeStatus(this)">
                                         <option value="">Pilih...</option>
                                         @if ($task->status == 'done')
                                             <option value="{{ route('task.onduty', $task->id) }}">
@@ -177,6 +176,12 @@
                 searchable: false
             }]
         });
+
+        function changeStatus(select) {
+            if (select.value) {
+                window.location.href = select.value
+            }
+        }
     </script>
 
 @endsection

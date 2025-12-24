@@ -71,4 +71,43 @@ class LeaveRequestController extends Controller
 
         return redirect()->route('leave-request.index')->with('success', 'Data Telah Dihapuss');
     }
+
+    public function pending($id)
+    {
+        $leaveRequest = LeaveRequest::find($id);
+
+        $name = $leaveRequest->employee->fullname;
+
+        $leaveRequest->update([
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('leave-request.index')->with('success', "Cuti Untuk $name menjadi pending");
+    }
+
+    public function confirmed($id)
+    {
+        $leaveRequest = LeaveRequest::find($id);
+
+        $name = $leaveRequest->employee->fullname;
+
+        $leaveRequest->update([
+            'status' => 'confirmed',
+        ]);
+
+        return redirect()->route('leave-request.index')->with('success', "Cuti untuk $name menjadi confirmed");
+    }
+
+    public function rejected($id)
+    {
+        $leaveRequest = LeaveRequest::find($id);
+
+        $name = $leaveRequest->employee->fullname;
+
+        $leaveRequest->update([
+            'status' => 'rejected',
+        ]);
+
+        return redirect()->route('leave-request.index')->with('success', "Cuti untuk $name telah diupdate menjadi rejected");
+    }
 }

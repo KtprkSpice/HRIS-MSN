@@ -52,6 +52,7 @@
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
                             <th>Aksi</th>
+                            <th>Opsi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -67,7 +68,28 @@
                                     'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
                                     'badge bg-warning text-white text-center p-2' =>
                                         $leave->status == 'pending',
-                                ])>{{ ucwords($leave->status) }}</span> </td>
+                                ])>{{ ucwords($leave->status) }}</span>
+                                </td>
+                                <td>
+                                    <select class="form-select" onchange="changeStatus(this)">
+                                        <option value="">Pilih...</option>
+                                        @if ($leave->status == 'pending')
+                                            <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
+                                            </option>
+                                            <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
+                                            </option>
+                                        @elseif ($leave->status == 'confirmed')
+                                            <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
+                                            </option>
+                                            <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
+                                            </option>
+                                        @else
+                                            <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
+                                            <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
+                                            </option>
+                                        @endif
+                                    </select>
+                                </td>
                                 <td>
                                     <a href="{{ route('leave-request.edit', $leave->id) }}"
                                         class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
@@ -132,6 +154,12 @@
                 table.draw();
             });
         });
+
+        function changeStatus(select) {
+            if (select.value) {
+                window.location.href = select.value
+            }
+        }
     </script>
 
 @endsection
