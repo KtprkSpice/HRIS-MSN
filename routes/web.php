@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LeaveTypeController;
@@ -52,4 +53,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/presence', PresecesController::class)->except(['show']);
     Route::get('/presence/{task}', [PresecesController::class, 'scan'])->name('presences.scan');
     Route::post('/presence/qr/store', [PresecesController::class, 'storeQr'])->name('presences.storeQr');
+
+    // Division
+    Route::resource('/division', DivisionController::class);
 });

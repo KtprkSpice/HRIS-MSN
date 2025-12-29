@@ -27,6 +27,8 @@
                             <th>Tanggal</th>
                             <th>Waktu Masuk</th>
                             <th>Waktu Keluar</th>
+                            <th>Status</th>
+                            <th>Tipe Absen</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -38,6 +40,8 @@
                                 <td>{{ \Carbon\Carbon::parse($presence->date)->format('d F Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
                                 <td>{{ $presence->check_out ? \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}
+                                <td>{{ ucwords($presence->status) }}
+                                <td>{{ ucwords($presence->type) }}
                                 </td>
                                 <td>
                                     <a href="{{ route('presence.edit', $presence->id) }}"

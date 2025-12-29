@@ -1,35 +1,35 @@
 @extends('layout.dashboard')
-@section('header', 'Data Karyawan')
+@section('header', 'Daftar Karyawan')
 @section('content')
-
-    {{-- Create Employees Button --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">Tambah Karyawan</div>
+    <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Jenis Cuti
+        </div>
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>
         @endif
         <div class="card-body">
-            <a href="{{ route('employee.create') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i>
-                Tambah Data Karyawan</a>
+            <div class="col-md-1 d-grid align-self-end">
+                <a href="{{ route('leave-type.create') }}" type="button" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Tambah
+                </a>
+            </div>
         </div>
     </div>
 
-    {{-- Employees DattaTables --}}
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">Daftar Karyawan</div>
+    <!-- Tabel Employee -->
+    <div class="card shadow">
         <div class="card-body">
+            <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Karyawan</h5>
             <div class="table-responsive">
-                <table id="employeeTable" class="table table-bordered">
+                <table id="leaveTable" class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>Nama</th>
+                            <th>Nama Karyawan</th>
+                            <th>No.Telpon</th>
                             <th>Email</th>
-                            <th>Telepon</th>
-                            <th>Jenis Kelamin</th>
                             <th>Divisi</th>
-                            <th>Tanggal Lahir</th>
-                            <th>NPWP</th>
-                            <th>Skor</th>
+                            <th>Gender</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -38,30 +38,29 @@
                         @foreach ($employees as $employee)
                             <tr>
                                 <td>{{ ucwords($employee->fullname) }}</td>
-                                <td>{{ $employee->email }}</td>
                                 <td>{{ $employee->phone }}</td>
-                                <td>{{ ucwords($employee->gender) }}</td>
+                                <td>{{ $employee->email }}</td>
                                 <td>{{ ucwords($employee->division->name) }}</td>
-                                <td>{{ \Carbon\Carbon::parse($employee->born_date)->translatedFormat('d F Y') }}</td>
-                                <td>{{ $employee->npwp }}</td>
-                                <td>1990</td>
-                                <td><span @class([
-                                    'badge bg-success text-white text-center p-2' =>
-                                        $employee->status == 'active',
-                                    'badge bg-warning text-white text-center p-2' =>
-                                        $employee->status == 'inactive',
-                                ])>{{ ucwords($employee->status) }}</span> </td>
+                                <td>{{ ucwords($employee->gender) }}</td>
                                 <td>
-                                    <a href="{{ route('employee.edit', $employee->id) }}"
-                                        class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('employee.destroy', $employee->id) }}" method="post"
+                                    <span @class([
+                                        'badge bg-success text-white text-center p-2' =>
+                                            $employee->status == 'active',
+                                        'badge bg-warning text-white text-center p-2' =>
+                                            $employee->status == 'inactive',
+                                    ])>{{ ucwords($employee->status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{ route('leave-type.edit', $employee->id) }}"
+                                        class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+                                    <form action="{{ route('leave-type.destroy', $employee->id) }}" method="POST"
                                         class="d-inline" id="deleteForm{{ $employee->id }}">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="button" class="btn btn-sm btn-danger"
-                                            onclick="confirmDelete({{ $employee->id }})">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
+                                        <button class="btn btn-danger btn-sm" type="button"
+                                            onclick="confirmDelete({{ $employee->id }})"><i
+                                                class="fa-solid fa-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -72,11 +71,10 @@
         </div>
     </div>
 
-    <!-- jQuery + DataTables -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
     <script>
-        let table = new DataTable('#employeeTable', {
+        let table = new DataTable('#leaveTable', {
             language: {
                 search: "Cari:",
                 lengthMenu: "Tampilkan _MENU_ data",
@@ -87,7 +85,7 @@
                 },
             },
             columnDefs: [{
-                targets: 9,
+                targets: 5,
                 orderable: false,
                 searchable: false
             }]

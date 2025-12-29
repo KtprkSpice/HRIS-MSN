@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Presence;
+use App\Models\QrCode;
 use App\Models\Task;
 use Illuminate\Http\Request;
+
+use function Illuminate\Support\now;
 
 class PresecesController extends Controller
 {
@@ -78,71 +81,99 @@ class PresecesController extends Controller
         \Log::info('DATA QR MASUK:', $request->all());
 
         try {
-
-            // Validasi QR
-            if (! $request->qr_data) {
+            if (! $request->qr_data || ! $request->task_id) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'QR tidak berisi data.',
+                    'message' => 'QR atau task tidak valid',
                 ], 400);
             }
 
-            // Validasi Task
-            if (! $request->task_id) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Task ID tidak ditemukan.',
-                ], 400);
-            }
-
-            // Ambil data user
             $employee = auth()->user()->employee;
-
-            // Ambil task + pegawai yg terkait
             $task = Task::with('employees')->findOrFail($request->task_id);
 
-            // Pastikan pegawai terdaftar pada task
             if (! $task->employees->contains($employee->id)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Anda tidak terdaftar pada task ini.',
+                    'message' => 'Anda tidak terdaftar pada tugas ini',
                 ]);
             }
 
-            // Cek apakah sudah presensi hari ini
-            $already = Presence::where('task_id', $task->id)
-                ->where('employee_id', $employee->id)
-                ->whereDate('date', today())
-                ->first();
+            $qr = QrCode::where('token', $request->qr_data)->where('task_id', $task->id)->whereDate('date', today())->where('is_active', true)->first();
 
-            if ($already) {
+            if (! $qr) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Anda sudah melakukan presensi hari ini.',
+                    'message' => 'Qr tidak valid atau ladaluarsa',
                 ]);
             }
 
-            // Simpan presensi
-            Presence::create([
-                'employee_id' => $employee->id,
-                'task_id' => $task->id,
-                'date' => now()->toDateString(),
-                'check_in' => now(),
-                'check_out' => null,
-            ]);
+            if (now()->greaterThan($qr->expires_at)) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Qr sudah kadaluarsa',
+                ]);
+            }
+
+            $presence = Presence::where('employee_id', $employee->id)->where('task_id', $task->id)->whereDate('date', today())->first();
+
+            if ($qr->type === 'check_in') {
+
+                if ($presence && $presence->check_in) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda sudah melakukan check-in',
+                    ]);
+                }
+
+                Presence::create([
+                    'employee_id' => $employee->id,
+                    'task_id' => $task->id,
+                    'date' => today(),
+                    'check_in' => now(),
+                    'check_out' => null,
+                ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Check-in berhasil',
+                ]);
+            }
+
+            if ($qr->type === 'check_out') {
+                if (! $presence || ! $presence->check_in) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda belum melakukan check-in',
+                    ]);
+                }
+
+                if ($presence->check_out) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Anda sudah melakukan check-out',
+                    ]);
+                }
+
+                $presence->update([
+                    'check_out' => now(),
+                ]);
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Check-out berhasil',
+                ]);
+            }
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Presensi berhasil dicatat!',
+                'status' => 'error',
+                'message' => 'Tipe Qr tidak dikenali',
             ]);
-
         } catch (\Throwable $e) {
-
             \Log::error('ERROR PRESENSI: '.$e->getMessage());
 
             return response()->json([
                 'status' => 'error',
-                'message' => 'Server error: '.$e->getMessage(),
+                'message' => 'server error.',
             ], 500);
         }
     }
