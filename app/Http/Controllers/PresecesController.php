@@ -131,6 +131,7 @@ class PresecesController extends Controller
                     'date' => today(),
                     'check_in' => now(),
                     'check_out' => null,
+                    'type' => 'outside',
                 ]);
 
                 return response()->json([
@@ -156,6 +157,7 @@ class PresecesController extends Controller
 
                 $presence->update([
                     'check_out' => now(),
+                    'type' => 'outside',
                 ]);
 
                 return response()->json([

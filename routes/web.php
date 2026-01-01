@@ -24,6 +24,9 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
 
     // Edit Profile
     Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('profile/password', function () {
+        return view('Profile.password');
+    })->name('profile.password');
 
     // Employees
     Route::resource('/employee', EmployeeController::class);
