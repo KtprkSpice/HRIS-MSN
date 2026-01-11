@@ -224,6 +224,12 @@
             color: #f39c12;
         }
 
+        /* Tabe leftg */
+        table thead th,
+        table tbody td {
+            text-align: start !important;
+        }
+
         @media (max-width:768px) {
             .carousel-img-full {
                 height: 300px;
@@ -248,11 +254,14 @@
             <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
             <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
                         class="fa-solid fa-tasks"></i> Tugas</a></li>
+            <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                        class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
             <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
                         class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
             <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
             <li><a href="{{ route('leave-type.index') }}"><i class="fa-solid fa-plane"></i> Jenis Cuti</a></li>
             <li><a href="{{ route('presence.index') }}"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+            <li><a href="{{ route('division.index') }}"><i class="fa-solid fa-user-check"></i> Divisi</a></li>
             <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
             <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
             {{-- @endif --}}

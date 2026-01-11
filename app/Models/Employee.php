@@ -62,4 +62,9 @@ class Employee extends Model
     {
         return $this->belongsToMany(Task::class, 'employees_tasks', 'employee_id', 'task_id');
     }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
 }

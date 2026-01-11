@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DivisionController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\LeaveTypeController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\TaskController;
 use App\Models\Task;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +25,9 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
 
     // Edit Profile
     Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('profile/password', function () {
+        return view('Profile.password');
+    })->name('profile.password');
 
     // Employees
     Route::resource('/employee', EmployeeController::class);
@@ -52,4 +57,10 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/presence', PresecesController::class)->except(['show']);
     Route::get('/presence/{task}', [PresecesController::class, 'scan'])->name('presences.scan');
     Route::post('/presence/qr/store', [PresecesController::class, 'storeQr'])->name('presences.storeQr');
+
+    // Division
+    Route::resource('/division', DivisionController::class);
+
+    // Schedules
+    Route::resource('/schedule', SchedulesController::class);
 });

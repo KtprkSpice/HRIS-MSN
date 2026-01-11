@@ -3,29 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\QrCode;
-use Endroid\QrCode\QrCode as qrGen;
 use App\Models\Task;
-use Endroid\QrCode\Writer\PngWriter;
-use Illuminate\Http\Request;
 
 class QrController extends Controller
 {
     public function show(Task $task)
     {
-        $qr = QrCode::where('task_id', $task->id)->where('date', today())->where('is_active', true)->firstOrFail();
 
-        $qrText = $qr->token;
+        $qrCheckin = QrCode::where('task_id', $task->id)->where('date', today())->where('type', 'check_in')->where('is_active', true)->first();
 
-        $qrCode = new qrGen($qrText);
+        $qrCheckout = QrCode::where('task_id', $task->id)->where('date', today())->where('type', 'check_out')->where('is_active', true)->first();
 
-        $writer = new PngWriter();
-        $result = $writer->write($qrCode);
-        $base64 = base64_encode($result->getString());
-
-        return view('presences.qr', [
-            'task' => $task,
-            'qr' => $qr,
-            'qrBase64' => $base64,
-        ]);
+        return view('presences.qr', compact('task', 'qrCheckin', 'qrCheckout'));
     }
 }

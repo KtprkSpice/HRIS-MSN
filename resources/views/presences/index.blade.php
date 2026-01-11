@@ -27,6 +27,8 @@
                             <th>Tanggal</th>
                             <th>Waktu Masuk</th>
                             <th>Waktu Keluar</th>
+                            <th>Tipe Absen</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -38,10 +40,20 @@
                                 <td>{{ \Carbon\Carbon::parse($presence->date)->format('d F Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
                                 <td>{{ $presence->check_out ? \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}
-                                </td>
+                                <td>{{ ucwords($presence->type) }}</td>
+                                <td><span @class([
+                                    'badge bg-danger text-white text-center p-2' =>
+                                        $presence->status == 'invalid',
+                                    'badge bg-warning text-white text-center p-2' =>
+                                        $presence->status == 'late',
+                                    'badge bg-info text-white text-center p-2' =>
+                                        $presence->status == 'on_time',
+                                ])>{{ ucwords($presence->status) }}</span></td>
                                 <td>
+                                    <a href="#" class="btn btn-sm btn-info text-white"><i><i
+                                                class="fa-solid fa-eye"></i></i></a>
                                     <a href="{{ route('presence.edit', $presence->id) }}"
-                                        class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
+                                        class="btn btn-sm btn-warning text-white"><i class="fa-solid fa-pen"></i></a>
                                     <form action="{{ route('presence.destroy', $presence->id) }}" method="post"
                                         class="d-inline" id="deleteForm{{ $presence->id }}">
                                         @csrf

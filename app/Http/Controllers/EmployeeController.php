@@ -23,6 +23,7 @@ class EmployeeController extends Controller
     {
         $divisions = Division::all();
         $roles = Role::all();
+
         return view('Employees.create', compact('divisions', 'roles'));
     }
 
@@ -46,9 +47,9 @@ class EmployeeController extends Controller
         DB::transaction(function () use ($validated) {
             $user = User::create([
                 'name' => $validated['fullname'],
-                'email' => strtolower(str_replace(' ', '', $validated['fullname'] . '@swatservice.com')),
-                'password' => Hash::make(strtolower(str_replace(' ', '', $validated['fullname'] . '@swatservice.com'))),
-                'role_id' => $validated['role_id']
+                'email' => strtolower(str_replace(' ', '', $validated['email'])),
+                'password' => Hash::make(strtolower(str_replace(' ', '', $validated['email']))),
+                'role_id' => $validated['role_id'],
             ]);
 
             Employee::create([
@@ -108,15 +109,16 @@ class EmployeeController extends Controller
             'hire_date' => $request->hire_date,
             'born_date' => $request->born_date,
             'bpjs_kesehatan' => $request->bpjs_kesehatan,
-            'bpjs_ketenagakerjaan' =>$request->bpjs_ketenagakerjaan,
+            'bpjs_ketenagakerjaan' => $request->bpjs_ketenagakerjaan,
             'npwp' => $request->npwp,
         ]);
 
-        if($employee->user) {
+        if ($employee->user) {
             $employee->user->update([
                 'role_id' => $request->role_id,
             ]);
         }
+
         return redirect()->route('employee.index')->with('success', "Data $nama Telah Diubah");
     }
 

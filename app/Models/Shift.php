@@ -6,22 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class QrCode extends Model
+class Shift extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'token',
-        'task_id',
-        'date',
-        'generated_at',
-        'expires_at',
-        'is_active',
-        'type',
+        'name',
+        'start_time',
+        'end_time',
+        'cross_day',
+        'late_tolerance_minutes',
     ];
 
-    public function task()
+    public function schedules()
     {
-        return $this->belongsTo(Task::class, 'task_id');
+        return $this->hasMany(Schedule::class);
     }
 }

@@ -25,6 +25,11 @@ class Task extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employees_tasks', 'task_id', 'employee_id');
+        return $this->belongsToMany(Employee::class, 'employees_tasks', 'task_id', 'employee_id')->withTimestamps()->wherePivotNull('deleted_at');
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
     }
 }

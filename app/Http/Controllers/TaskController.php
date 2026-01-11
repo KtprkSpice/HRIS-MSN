@@ -7,6 +7,8 @@ use App\Models\Presence;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
+use function Symfony\Component\Clock\now;
+
 class TaskController extends Controller
 {
     public function index()
@@ -18,11 +20,14 @@ class TaskController extends Controller
 
     public function create()
     {
-        return view('tasks.create');
+        $employees = Employee::all();
+
+        return view('tasks.create', compact('employees'));
     }
 
     public function store(Request $request)
     {
+
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable',
@@ -30,11 +35,16 @@ class TaskController extends Controller
             'end_time' => 'required|date',
         ]);
 
-        $request->merge([
-            'status' => 'pending'
+        $task = Task::create([
+            'name' => $request->name,
+            'description' => $request->description,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'status' => 'pending',
         ]);
 
-        Task::create($request->all());
+        $employeeId = $request->selected_employee ?? [];
+        $task->employees()->sync($employeeId);
 
         return redirect()->route('task.index')->with('success', "Tugas Telah Dibuat");
     }
@@ -59,11 +69,23 @@ class TaskController extends Controller
             'end_time' => $request->end_time,
         ]);
 
-        $employeeId = $request->selected_employee ?? [];
+        $selectedEmployeeId = $request->selected_employee ?? [];
 
-        $task->employees()->sync($employeeId);
+        $currentEmployeeId = $task->employees()->pluck('employees.id')->toArray();
 
-        $task->update($request->all());
+        $toRemove = array_diff($currentEmployeeId, $selectedEmployeeId);
+
+        if(!empty($toRemove)) {
+            $task->employees()->wherePivotIn('employee_id', $toRemove)->updateExistingPivot($toRemove, ['deleted_at' => now()]);
+        }
+
+        foreach($selectedEmployeeId as $employeeId) {
+            $task->employees()->syncWithoutDetaching([
+                $employeeId => ['deleted_at' => null]
+            ]);
+        }
+
+
         return redirect()->route('task.index')->with('success', 'Data Berhasil Diubah');
     }
 
