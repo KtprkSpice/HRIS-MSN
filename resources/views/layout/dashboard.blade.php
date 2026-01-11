@@ -224,6 +224,12 @@
             color: #f39c12;
         }
 
+        /* Tabe leftg */
+        table thead th,
+        table tbody td {
+            text-align: start !important;
+        }
+
         @media (max-width:768px) {
             .carousel-img-full {
                 height: 300px;
@@ -248,6 +254,8 @@
             <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
             <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
                         class="fa-solid fa-tasks"></i> Tugas</a></li>
+            <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                        class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
             <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
                         class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
             <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>

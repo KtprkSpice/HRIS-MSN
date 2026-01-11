@@ -9,6 +9,7 @@ use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
 use App\Http\Controllers\SalaryController;
+use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\TaskController;
 use App\Models\Task;
 use Illuminate\Support\Facades\Route;
@@ -59,4 +60,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
 
     // Division
     Route::resource('/division', DivisionController::class);
+
+    // Schedules
+    Route::resource('/schedule', SchedulesController::class);
 });

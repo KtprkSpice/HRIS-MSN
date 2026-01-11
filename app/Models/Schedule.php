@@ -2,10 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Schedules extends Model
+class Schedule extends Model
 {
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'schedules';
+
     protected $fillable = [
         'employee_id',
         'task_id',
@@ -26,6 +32,6 @@ class Schedules extends Model
 
     public function shift()
     {
-        return $this->belongsTo(Shifts::class);
+        return $this->belongsTo(Shift::class);
     }
 }

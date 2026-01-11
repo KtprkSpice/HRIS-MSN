@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Shifts extends Model
+class Shift extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,6 +20,6 @@ class Shifts extends Model
 
     public function schedules()
     {
-        return $this->hasMany(Schedules::class);
+        return $this->hasMany(Schedule::class);
     }
 }

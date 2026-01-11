@@ -30,6 +30,6 @@ class Task extends Model
 
     public function schedules()
     {
-        return $this->hasMany(Schedules::class);
+        return $this->hasMany(Schedule::class);
     }
 }

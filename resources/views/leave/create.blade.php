@@ -29,6 +29,7 @@
                 @enderror
             </select>
         </div>
+
         <div class="col-md-6">
             <label for="start_date" class="form-label">Tanggal Mulai</label>
             <input type="date" class="form-control @error('start_date')
@@ -39,6 +40,7 @@
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>
+
         <div class="col-md-6">
             <label for="end_date" class="form-label">Tanggal Selesai</label>
             <input type="date" class="form-control @error('end_date')
