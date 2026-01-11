@@ -3,14 +3,14 @@
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Jenis Cuti
+            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Data Karyawan
         </div>
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>
         @endif
         <div class="card-body">
             <div class="col-md-1 d-grid align-self-end">
-                <a href="{{ route('leave-type.create') }}" type="button" class="btn btn-primary">
+                <a href="{{ route('employee.create') }}" type="button" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Tambah
                 </a>
             </div>
@@ -52,9 +52,9 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('leave-type.edit', $employee->id) }}"
-                                        class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('leave-type.destroy', $employee->id) }}" method="POST"
+                                    <a href="{{ route('employee.edit', $employee->id) }}"
+                                        class="btn btn-warning btn-sm text-white"><i class="fa-solid fa-pen"></i></a>
+                                    <form action="{{ route('employee.destroy', $employee->id) }}" method="POST"
                                         class="d-inline" id="deleteForm{{ $employee->id }}">
                                         @csrf
                                         @method('DELETE')

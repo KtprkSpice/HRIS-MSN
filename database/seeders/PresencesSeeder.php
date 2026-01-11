@@ -19,6 +19,7 @@ class PresencesSeeder extends Seeder
             DB::table('presences')->insert([
                 'employee_id' => $faker->numberBetween(1, 10),
                 'task_id' => $faker->numberBetween(1, 10),
+                'schedule_id' => $faker->numberBetween(1, 3),
                 'date' => $faker->dateTimeBetween('-10 days', '-5 days')->format('Y-m-d'),
                 'status' => $faker->randomElement(['on_time', 'late', 'invalid']),
                 'type' => $faker->randomElement(['office', 'outside']),

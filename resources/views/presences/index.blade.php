@@ -50,8 +50,10 @@
                                         $presence->status == 'on_time',
                                 ])>{{ ucwords($presence->status) }}</span></td>
                                 <td>
+                                    <a href="#" class="btn btn-sm btn-info text-white"><i><i
+                                                class="fa-solid fa-eye"></i></i></a>
                                     <a href="{{ route('presence.edit', $presence->id) }}"
-                                        class="btn btn-sm btn-warning editBtn"><i class="fa-solid fa-pen"></i></a>
+                                        class="btn btn-sm btn-warning text-white"><i class="fa-solid fa-pen"></i></a>
                                     <form action="{{ route('presence.destroy', $presence->id) }}" method="post"
                                         class="d-inline" id="deleteForm{{ $presence->id }}">
                                         @csrf
