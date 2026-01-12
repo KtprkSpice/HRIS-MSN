@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Presence;
+use App\Models\Schedule;
 use App\Models\Task;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,16 @@ class TaskController extends Controller
     {
         $presences = Presence::find('id');
         $tasks = Task::all();
+
         return view('tasks.index', compact('tasks', 'presences'));
+    }
+
+    public function show(Task $task)
+    {
+        $employees = $task->employees()->with('division')->get();
+        $schedules = Schedule::where('task_id', $task->id)->with(['employee', 'shift'])->get()->groupBy('shift_id');
+
+        return view('tasks.show', compact('task', 'employees', 'schedules'));
     }
 
     public function create()
@@ -46,15 +56,18 @@ class TaskController extends Controller
         $employeeId = $request->selected_employee ?? [];
         $task->employees()->sync($employeeId);
 
-        return redirect()->route('task.index')->with('success', "Tugas Telah Dibuat");
+        return redirect()->route('task.index')->with('success', 'Tugas Telah Dibuat');
     }
 
-    public function edit(Task $task) {
+    public function edit(Task $task)
+    {
         $employees = Employee::all();
+
         return view('tasks.edit', compact('task', 'employees'));
     }
 
-    public function update(Request $request, Task $task) {
+    public function update(Request $request, Task $task)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable',
@@ -75,54 +88,56 @@ class TaskController extends Controller
 
         $toRemove = array_diff($currentEmployeeId, $selectedEmployeeId);
 
-        if(!empty($toRemove)) {
+        if (! empty($toRemove)) {
             $task->employees()->wherePivotIn('employee_id', $toRemove)->updateExistingPivot($toRemove, ['deleted_at' => now()]);
         }
 
-        foreach($selectedEmployeeId as $employeeId) {
+        foreach ($selectedEmployeeId as $employeeId) {
             $task->employees()->syncWithoutDetaching([
-                $employeeId => ['deleted_at' => null]
+                $employeeId => ['deleted_at' => null],
             ]);
         }
-
 
         return redirect()->route('task.index')->with('success', 'Data Berhasil Diubah');
     }
 
-    public function destroy(Task $task) {
+    public function destroy(Task $task)
+    {
         $task->delete();
 
         return redirect()->route('task.index')->with('success', "Data $task->name Telah Dihapus");
     }
 
-    public function done($id) {
+    public function done($id)
+    {
         $tasks = Task::find($id);
         $taskName = $tasks->name;
         $tasks->update([
             'status' => 'done',
         ]);
-        
+
         return redirect()->route('task.index')->with('success', "Tugas $taskName telah diupdate menjadi Done");
     }
 
-    public function pending($id) {
+    public function pending($id)
+    {
         $tasks = Task::find($id);
         $taskName = $tasks->name;
         $tasks->update([
-            'status' => 'pending'
+            'status' => 'pending',
         ]);
 
         return redirect()->route('task.index')->with('success', "Tugas $taskName telah diupdate menjadi Pending");
     }
 
-    public function onduty($id) {
+    public function onduty($id)
+    {
         $tasks = Task::find($id);
         $taskName = $tasks->name;
         $tasks->update([
-            'status' => 'on duty'
+            'status' => 'on duty',
         ]);
 
         return redirect()->route('task.index')->with('success', "Tugas $taskName telah diupdate menjadi On Duty");
     }
-
 }

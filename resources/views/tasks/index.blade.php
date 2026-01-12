@@ -120,8 +120,10 @@
                                     </select>
                                 </td>
                                 <td>
+                                    <a href="{{ route('task.show', $task->id) }}" class="btn btn-info btn-sm"><i
+                                            class="fa-solid fa-eye text-white"></i></a>
                                     <a href="{{ route('task.edit', $task->id) }}" class="btn btn-warning btn-sm"><i
-                                            class="fa-solid fa-pen"></i></a>
+                                            class="fa-solid fa-pen text-white"></i></a>
                                     <form action="{{ route('task.destroy', $task->id) }}" method="POST" class="d-inline"
                                         id="deleteForm{{ $task->id }}">
                                         @csrf

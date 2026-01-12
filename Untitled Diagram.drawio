@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.0">
   <diagram name="Page-1" id="DaRdVUsv3AzN7Twzkmm5">
-    <mxGraphModel dx="1426" dy="1885" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1783" dy="2081" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -470,6 +470,30 @@
         </mxCell>
         <mxCell id="TKoVK85fkS7K1WseBGrB-159" parent="TKoVK85fkS7K1WseBGrB-153" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" value="approved_by" vertex="1">
           <mxGeometry height="30" width="140" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Allur Jadwal" vertex="1">
+          <mxGeometry height="30" width="80" x="960" y="-780" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-2" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Task dibuat&lt;div&gt;1. select karyawan&lt;/div&gt;&lt;div&gt;2. select leader&lt;/div&gt;&lt;div&gt;2. set tanggal mulai&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="120" x="750" y="-700" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-6" edge="1" parent="1" source="alY62urmcKewIUDbUy4u-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="alY62urmcKewIUDbUy4u-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="Sistem&lt;br&gt;&lt;div&gt;1. create jadwal berdasarkan karyawan yang di select&lt;/div&gt;&lt;div&gt;2. auto reschedule per 1 minggu&lt;/div&gt;&lt;div&gt;3. jika minggu ini dia pagi, mingu depan dia ada kemungkinan masuk sore atau malam, yang pasiti gak munkin bisa pagi lagi untuk 1 minggu kemudian&amp;nbsp;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="250" x="970" y="-710" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-4" edge="1" parent="1" source="alY62urmcKewIUDbUy4u-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="alY62urmcKewIUDbUy4u-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-8" edge="1" parent="1" source="alY62urmcKewIUDbUy4u-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="alY62urmcKewIUDbUy4u-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="employee&lt;div&gt;1. mereka presensi berdasarkan jadwal mereka jadwal masuk hingga jadwal keluar&lt;/div&gt;&lt;div&gt;2. telat masuk penalti&lt;/div&gt;&lt;div&gt;3. telat keluar... who knows need data&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="250" x="1320" y="-710" as="geometry" />
+        </mxCell>
+        <mxCell id="alY62urmcKewIUDbUy4u-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;rounded=0;" value="role lain maybe leader atau dll&lt;div&gt;1. mereka bisa liat jadwal tugasnya dia dan jadwal tugas itu&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&amp;nbsp;&lt;/span&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="250" x="1615" y="-710" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Daftar Karyawan')
+@section('header', 'Jadwal')
 @section('content')
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white">
