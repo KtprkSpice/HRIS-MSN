@@ -99,11 +99,44 @@
             </div>
         </div>
 
+        <div class="card shadow mt-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fa-solid fa-location-dot"></i> Lokasi Tugas
+                </h5>
+
+                <div id="map" style="height: 400px;"></div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label>Latitude</label>
+                        <input type="text" id="latitude" name="latitude" class="form-control"
+                            value="{{ old('latitude', $locations->latitude) }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Longitude</label>
+                        <input type="text" id="longitude" name="longitude" class="form-control"
+                            value="{{ old('longitude', $locations->longitude) }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Radius (meter)</label>
+                        <input type="number" id="radius" name="radius" class="form-control"
+                            value="{{ old('radius', $locations->radius) }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
 
+    {{-- Maps --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    {{-- Jquery & datatables --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
@@ -123,6 +156,36 @@
                     next: "Berikutnya",
                 },
             },
+        });
+
+        let lat = {{ $locations?->latitude ?? -6.2 }};
+        let lng = {{ $locations?->longitude ?? 106.8 }};
+        let radius = {{ $locations?->radius ?? 50 }};
+
+        const map = L.map('map').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let marker = L.marker([lat, lng]).addTo(map);
+        let circle = L.circle([lat, lng], {
+            radius
+        }).addTo(map);
+
+        map.on('click', function(e) {
+            lat = e.latlng.lat;
+            lng = e.latlng.lng;
+
+            marker.setLatLng([lat, lng]);
+            circle.setLatLng([lat, lng]);
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+        });
+
+        document.getElementById('radius').addEventListener('input', function() {
+            circle.setRadius(this.value);
         });
     </script>
 

@@ -38,6 +38,17 @@ Schedule::everyMinute()->call(function () {
     }
 });
 
+Artisan::command('schedule:generate-weekly', function () {
+    $this->info('COMMAND MASUK');
+
+    app(\App\Actions\GenerateWeeklySchedule::class)->handle();
+
+    $this->info('COMMAND SELESAI');
+});
+
+Schedule::command('schedule:generate-weekly')
+    ->everyMinute();
+
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');

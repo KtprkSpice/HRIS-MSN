@@ -63,6 +63,7 @@
                 </div>
             </div>
         </div>
+
         {{-- Table tugas --}}
         <div class="card shadow">
             <div class="card-body">
@@ -152,7 +153,40 @@
             </div>
         </div>
 
+        <div class="card shadow mt-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fa-solid fa-location-dot"></i> Lokasi Tugas
+                </h5>
+
+                <div id="map" style="height: 400px;"></div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label>Latitude</label>
+                        <input type="text" id="latitude" name="latitude" class="form-control" readonly
+                            value="{{ old('latitude', $locations->latitude) }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Longitude</label>
+                        <input type="text" id="longitude" name="longitude" class="form-control" readonly
+                            value="{{ old('longitude', $locations->longitude) }}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Radius (meter)</label>
+                        <input type="number" id="radius" name="radius" class="form-control"
+                            value="{{ old('radius', $locations->radius) }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
+    {{-- Maps --}}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    {{-- Datatables & Jquery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
@@ -188,13 +222,29 @@
         });
 
         // Optional: Jika ingin menggunakan jQuery untuk toggle yang lebih smooth
-        // $(document).ready(function() {
-        //     $('input[name="shift"]').change(function() {
-        //         var selectedShift = $(this).val();
-        //         $('#pagi, #sore, #malam').hide();
-        //         $('#' + selectedShift).show();
-        //     });
-        // });
+        $(document).ready(function() {
+            $('input[name="shift"]').change(function() {
+                var selectedShift = $(this).val();
+                $('#pagi, #sore, #malam').hide();
+                $('#' + selectedShift).show();
+            });
+        });
+
+
+        const lat = {{ $locations?->latitude }};
+        const lng = {{ $locations?->longitude }};
+        const radius = {{ $locations?->radius }};
+
+        const map = L.map('map').setView([lat, lng], 15);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        L.marker([lat, lng]).addTo(map);
+        L.circle([lat, lng], {
+            radius
+        }).addTo(map);
     </script>
 
 @endsection

@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\Presence;
 use App\Models\Schedule;
 use App\Models\Task;
+use App\Models\Tasklocation;
 use Illuminate\Http\Request;
 
 use function Symfony\Component\Clock\now;
@@ -24,8 +25,9 @@ class TaskController extends Controller
     {
         $employees = $task->employees()->with('division')->get();
         $schedules = Schedule::where('task_id', $task->id)->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $locations = Tasklocation::where('task_id', $task->id)->first();
 
-        return view('tasks.show', compact('task', 'employees', 'schedules'));
+        return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
     }
 
     public function create()
@@ -37,33 +39,43 @@ class TaskController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable',
+            'name' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
+            'description' => 'required|string',
+
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'radius' => 'required|integer|min:10',
         ]);
 
         $task = Task::create([
             'name' => $request->name,
-            'description' => $request->description,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
-            'status' => 'pending',
+            'description' => $request->description,
         ]);
 
-        $employeeId = $request->selected_employee ?? [];
-        $task->employees()->sync($employeeId);
+        Tasklocation::create([
+            'task_id' => $task->id,
+            'name' => 'Lokasi Utama',
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'radius' => $request->radius,
+            'is_active' => true,
+        ]);
 
-        return redirect()->route('task.index')->with('success', 'Tugas Telah Dibuat');
+        return redirect()->route('task.index')
+            ->with('success', 'Task & lokasi berhasil disimpan');
     }
 
     public function edit(Task $task)
     {
         $employees = Employee::all();
+        $locations = Tasklocation::where('task_id', $task->id)->first();
 
-        return view('tasks.edit', compact('task', 'employees'));
+        return view('tasks.edit', compact('task', 'employees', 'locations'));
     }
 
     public function update(Request $request, Task $task)
@@ -73,6 +85,10 @@ class TaskController extends Controller
             'description' => 'nullable',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
+            // Locations
+            'latitude' => 'required|numeric',
+            'longitude' => 'required|numeric',
+            'radius' => 'required|integer|min:10',
         ]);
 
         $task->update([
@@ -80,6 +96,12 @@ class TaskController extends Controller
             'description' => $request->description,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
+        ]);
+
+        Tasklocation::where('task_id', $task->id)->update([
+            'latitude' => $request->latitude,
+            'longitude' => $request->longitude,
+            'radius' => $request->radius,
         ]);
 
         $selectedEmployeeId = $request->selected_employee ?? [];

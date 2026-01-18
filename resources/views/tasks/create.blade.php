@@ -95,11 +95,41 @@
             </div>
         </div>
 
+        <div class="card shadow mt-3">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fa-solid fa-location-dot"></i> Lokasi Tugas
+                </h5>
+
+                <div id="map" style="height: 400px;"></div>
+
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label>Latitude</label>
+                        <input type="text" id="latitude" name="latitude" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Longitude</label>
+                        <input type="text" id="longitude" name="longitude" class="form-control" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Radius (meter)</label>
+                        <input type="number" id="radius" name="radius" class="form-control" value="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
     </form>
+    {{-- Maps --}}
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
 
+    {{-- Jquery & datatables --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
@@ -119,6 +149,37 @@
                     next: "Berikutnya",
                 },
             },
+        });
+
+        const map = L.map('map').setView([-6.2, 106.8], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let marker, circle;
+
+        map.on('click', function(e) {
+            const lat = e.latlng.lat;
+            const lng = e.latlng.lng;
+            const radius = document.getElementById('radius').value || 50;
+
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+
+            if (marker) map.removeLayer(marker);
+            if (circle) map.removeLayer(circle);
+
+            marker = L.marker([lat, lng]).addTo(map);
+            circle = L.circle([lat, lng], {
+                radius
+            }).addTo(map);
+        });
+
+        document.getElementById('radius').addEventListener('input', function() {
+            if (circle) {
+                circle.setRadius(this.value);
+            }
         });
     </script>
 

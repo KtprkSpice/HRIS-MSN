@@ -32,4 +32,9 @@ class Task extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function location()
+    {
+        return $this->hasMany(Tasklocation::class);
+    }
 }

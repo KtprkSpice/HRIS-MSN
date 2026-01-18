@@ -31,8 +31,9 @@ class DatabaseSeeder extends Seeder
             LeaveSeeder::class,
             SalarySeeder::class,
             TaskSeeder::class,
-            SchedulesSeeder::class,
-            PresencesSeeder::class,
+            employeeTaskSeeder::class,
+            // SchedulesSeeder::class,
+            // PresencesSeeder::class,
             AllowanceSeeder::class,
             AllowanceEmployeeSeeder::class,
         ]);
