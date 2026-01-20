@@ -22,7 +22,8 @@
                 is-invalid
             @enderror">
                 @foreach ($employees as $employee)
-                    <option value="{{ $employee->id }}" {{ $employee->id == $presence->employee_id ? 'selected' : '' }}>{{ ucwords($employee->fullname) }}</option>
+                    <option value="{{ $employee->id }}" {{ $employee->id == $presence->employee_id ? 'selected' : '' }}>
+                        {{ ucwords($employee->fullname) }}</option>
                 @endforeach
                 @error('employee_id')
                     <span class="invalid-feedback">{{ $message }}</span>

@@ -34,4 +34,9 @@ class Schedule extends Model
     {
         return $this->belongsTo(Shift::class);
     }
+
+    public function qrCodes()
+    {
+        return $this->hasMany(QrCode::class);
+    }
 }

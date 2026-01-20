@@ -75,7 +75,7 @@
                 },
             },
             columnDefs: [{
-                targets: 4,
+                targets: 5,
                 orderable: false,
                 searchable: false
             }]

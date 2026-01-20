@@ -12,11 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('presences', function (Blueprint $table) {
-            $table->decimal('latitude', 10, 7)->nullable()->after('date');
-            $table->decimal('longitude', 10, 7)->nullable()->after('date');
-            $table->decimal('distance', 8, 2)->after('date')->nullable();
-            $table->enum('type', ['office', 'outside'])->after('date');
-            $table->enum('status', ['on time', 'late', 'absent'])->after('date');
+            $table->foreignId('shift_id')->after('schedule_id')->constrained('shifts')->onDelete('cascade');
         });
     }
 

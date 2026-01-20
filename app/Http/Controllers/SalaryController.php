@@ -18,12 +18,13 @@ class SalaryController extends Controller
     public function create()
     {
         $employees = Employee::all();
+
         return view('salary.create', compact('employees'));
     }
 
     public function store(Request $request)
     {
-       $request->validate([
+        $request->validate([
             'employee_id' => 'required',
             'net_salary' => 'required',
             'cuts' => 'nullable',
@@ -31,27 +32,31 @@ class SalaryController extends Controller
             'date' => 'nullable',
         ]);
 
-        $salary = (int) str_replace(".", '', $request->net_salary);
-        $bonus = (int) str_replace(".", '', $request->bonus);
-        $cuts = (int) str_replace(".", '', $request->cuts);
+        $salary = (int) str_replace('.', '', $request->net_salary);
+        $bonus = (int) str_replace('.', '', $request->bonus);
+        $cuts = (int) str_replace('.', '', $request->cuts);
 
         $request->merge([
             'net_salary' => $salary,
             'bonus' => $bonus,
             'cuts' => $cuts,
-            'total' => $salary + $bonus - $cuts
+            'total' => $salary + $bonus - $cuts,
         ]);
 
         Salary::create($request->all());
+
         return redirect()->route('salary.index')->with('success', 'Data Berhasil ditambahkan');
     }
 
-    public function edit(Salary $salary) {
+    public function edit(Salary $salary)
+    {
         $employees = Employee::all();
-        return view('salary.edit',compact('salary', 'employees'));
+
+        return view('salary.edit', compact('salary', 'employees'));
     }
 
-    public function update(Request $request, Salary $salary) {
+    public function update(Request $request, Salary $salary)
+    {
 
         $request->validate([
             'employee_id' => 'required',
@@ -61,10 +66,9 @@ class SalaryController extends Controller
             'date' => 'nullable',
         ]);
 
-        $net = (int) str_replace(".", '', $request->net_salary);
-        $cuts = (int) str_replace(".", '', $request->cuts);
-        $bonus = (int) str_replace(".", '', $request->bonus);
-
+        $net = (int) str_replace('.', '', $request->net_salary);
+        $cuts = (int) str_replace('.', '', $request->cuts);
+        $bonus = (int) str_replace('.', '', $request->bonus);
 
         $request->merge([
             'net_salary' => $net,
@@ -78,7 +82,8 @@ class SalaryController extends Controller
         return redirect()->route('salary.index')->with('success', 'Data Telah diubah');
     }
 
-    public function destroy (Salary $salary) {
+    public function destroy(Salary $salary)
+    {
         $salary->delete();
 
         return redirect()->route('salary.index')->with('success', 'Data Telah Dihapus');

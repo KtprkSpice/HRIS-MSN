@@ -7,6 +7,7 @@ use App\Models\Presence;
 use App\Models\Schedule;
 use App\Models\Task;
 use App\Models\Tasklocation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use function Symfony\Component\Clock\now;
@@ -23,8 +24,10 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
+        $weekStart = Carbon::now()->startOfWeek();
+        $weekEnd = Carbon::now()->endOfWeek();
         $employees = $task->employees()->with('division')->get();
-        $schedules = Schedule::where('task_id', $task->id)->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $schedules = Schedule::where('task_id', $task->id)->whereBetween('date', [$weekStart, $weekEnd])->with(['employee', 'shift'])->get()->groupBy('shift_id');
         $locations = Tasklocation::where('task_id', $task->id)->first();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
@@ -44,7 +47,7 @@ class TaskController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date',
             'description' => 'required|string',
-
+            // Locations
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'radius' => 'required|integer|min:10',

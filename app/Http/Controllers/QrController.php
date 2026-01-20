@@ -3,17 +3,28 @@
 namespace App\Http\Controllers;
 
 use App\Models\QrCode;
+use App\Models\Shift;
 use App\Models\Task;
 
 class QrController extends Controller
 {
     public function show(Task $task)
     {
+        $startOfWeek = now()->startOfWeek();
+        $endOfWeek = now()->endOfWeek();
 
-        $qrCheckin = QrCode::where('task_id', $task->id)->where('date', today())->where('type', 'check_in')->where('is_active', true)->first();
+        // Ambil shift yang memang punya schedule di task ini (minggu ini)
+        $shifts = Shift::whereHas('schedules', function ($q) use ($task, $startOfWeek, $endOfWeek) {
+            $q->where('task_id', $task->id)
+                ->whereBetween('date', [$startOfWeek, $endOfWeek]);
+        })->get();
 
-        $qrCheckout = QrCode::where('task_id', $task->id)->where('date', today())->where('type', 'check_out')->where('is_active', true)->first();
+        // Ambil QR per shift (minggu ini)
+        $qrCodes = QrCode::where('task_id', $task->id)
+            ->whereBetween('date', [$startOfWeek, $endOfWeek])
+            ->get()
+            ->groupBy('shift_id');
 
-        return view('presences.qr', compact('task', 'qrCheckin', 'qrCheckout'));
+        return view('presences.qr', compact('task', 'shifts', 'qrCodes'));
     }
 }

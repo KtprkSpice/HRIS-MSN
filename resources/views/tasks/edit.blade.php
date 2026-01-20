@@ -68,7 +68,7 @@
             <div class="card-body">
                 <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Karyawan</h5>
                 <div class="table-responsive">
-                    <table id="tugasTable" class="table table-bordered">
+                    <table id="employeeTable" class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>
@@ -134,8 +134,8 @@
     </form>
 
     {{-- Maps --}}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{{ asset('leaflet/leaflet.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('leaflet/leaflet.css') }}">
     {{-- Jquery & datatables --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
@@ -146,6 +146,7 @@
             checkboxes.forEach(cb => cb.checked = this.checked);
         });
 
+        // Table
         let table = new DataTable('#employeeTable', {
             language: {
                 search: "Cari:",
@@ -156,6 +157,11 @@
                     next: "Berikutnya",
                 },
             },
+            columnDefs: [{
+                targets: 0,
+                orderable: false,
+                searchable: false
+            }]
         });
 
         let lat = {{ $locations?->latitude ?? -6.2 }};

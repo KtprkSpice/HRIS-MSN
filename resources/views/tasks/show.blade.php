@@ -69,7 +69,7 @@
             <div class="card-body">
                 <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Karyawan</h5>
                 <div class="table-responsive">
-                    <table id="tugasTable" class="table table-bordered">
+                    <table class="table table-bordered" id="EmployeeTable">
                         <thead>
                             <tr>
                                 <th>Nama Karyawan</th>
@@ -174,7 +174,7 @@
                     </div>
                     <div class="col-md-4">
                         <label>Radius (meter)</label>
-                        <input type="number" id="radius" name="radius" class="form-control"
+                        <input type="number" id="radius" name="radius" class="form-control" readonly
                             value="{{ old('radius', $locations->radius) }}">
                     </div>
                 </div>
@@ -184,13 +184,26 @@
 
     </div>
     {{-- Maps --}}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="{{ asset('leaflet/leaflet.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('leaflet/leaflet.css') }}">
     {{-- Datatables & Jquery --}}
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
+        // Table
+        let table = new DataTable('#EmployeeTable', {
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
+                },
+            }
+        });
+
         // PERBAIKAN: Fungsi untuk menampilkan shift yang sesuai
         function showShift(shiftId) {
             // Sembunyikan semua tbody

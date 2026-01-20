@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\QrCode;
-use App\Models\Task;
+use App\Models\Schedule as ScheduleModel;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -9,30 +9,49 @@ use Illuminate\Support\Str;
 
 // php artisan schedule:run
 Schedule::everyMinute()->call(function () {
-    $tasks = Task::where('status', 'on duty')->get();
 
-    foreach ($tasks as $task) {
-        if (! QrCode::where('task_id', $task->id)->where('type', 'check_in')->whereDate('date', today())->exists()) {
+    \Log::info('QR SCHEDULER START');
+
+    $workDate = today();
+
+    // Ambil shift yang dipakai hari ini (tidak peduli employee)
+    $rows = ScheduleModel::select('task_id', 'shift_id')
+        ->whereBetween('date', [
+            now()->startOfWeek(),
+            now()->endOfWeek(),
+        ])
+        ->groupBy('task_id', 'shift_id')
+        ->get();
+
+    foreach ($rows as $row) {
+        foreach (['check_in', 'check_out'] as $type) {
+
+            $exists = QrCode::where('task_id', $row->task_id)
+                ->where('shift_id', $row->shift_id)
+                ->where('date', $workDate)
+                ->where('type', $type)
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
             QrCode::create([
-                'task_id' => $task->id,
+                'task_id' => $row->task_id,
+                'shift_id' => $row->shift_id,
+                'date' => $workDate, // 🔥 HARI KERJA
                 'token' => Str::uuid(),
-                'date' => today(),
                 'generated_at' => now(),
-                'expires_at' => now()->addMinutes(50),
+                'expires_at' => now()->addMinutes(30),
                 'is_active' => true,
-                'type' => 'check_in',
+                'type' => $type,
             ]);
-        }
 
-        if (! QrCode::where('task_id', $task->id)->where('type', 'check_out')->whereDate('date', today())->exists()) {
-            QrCode::create([
-                'task_id' => $task->id,
-                'token' => Str::uuid(),
-                'date' => today(),
-                'generated_at' => today(),
-                'expires_at' => now()->addMinutes(50),
-                'is_active' => true,
-                'type' => 'check_out',
+            \Log::info('QR TERBUAT', [
+                'task_id' => $row->task_id,
+                'shift_id' => $row->shift_id,
+                'date' => $workDate,
+                'type' => $type,
             ]);
         }
     }

@@ -17,6 +17,7 @@ class Presence extends Model
         'task_id',
         'date',
         'schedule_id',
+        'shift_id',
         'latitude',
         'longitude',
         'distance',
@@ -25,6 +26,8 @@ class Presence extends Model
         'status',
         'type',
     ];
+
+    
 
     public function employee()
     {
@@ -38,6 +41,11 @@ class Presence extends Model
 
     public function schedule()
     {
-        return $this->belongsTo(Schedules::class);
+        return $this->belongsTo(Schedule::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 }

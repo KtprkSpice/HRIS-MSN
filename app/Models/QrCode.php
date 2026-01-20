@@ -13,6 +13,7 @@ class QrCode extends Model
     protected $fillable = [
         'token',
         'task_id',
+        'shift_id',
         'date',
         'generated_at',
         'expires_at',
@@ -23,5 +24,10 @@ class QrCode extends Model
     public function task()
     {
         return $this->belongsTo(Task::class, 'task_id');
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
     }
 }

@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EmployeeTask extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
     protected $table = 'employee_task';
 
-     protected $fillable = [
+    protected $fillable = [
         'employee_id',
         'task_id',
-        'deleted_at'
+        'deleted_at',
     ];
-
-    
 }
