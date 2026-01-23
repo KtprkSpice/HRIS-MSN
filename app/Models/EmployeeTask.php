@@ -15,6 +15,5 @@ class EmployeeTask extends Model
     protected $fillable = [
         'employee_id',
         'task_id',
-        'deleted_at',
     ];
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
             $table->foreignId('shift_id')->nullable()->constrained('shifts')->onDelete('cascade');
             $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
-            $table->date('work_date');
+            $table->date('date');
             $table->enum('source', ['manual', 'system', 'swap']);
             $table->timestamps();
             $table->softDeletes();

@@ -7,21 +7,23 @@ use faker\Factory as faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class SchedulesSeeder extends Seeder
+class TaskLocationSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $faker = Faker::create();
+
+        $faker = faker::create();
         foreach (range(1, 10) as $i) {
-            DB::table('schedules')->insert([
-                'employee_id' => $faker->numberBetween(1, 10),
-                'shift_id' => $faker->numberBetween(1, 3),
+            DB::table('task_location')->insert([
                 'task_id' => $i,
-                'work_date' => $faker->dateTimeBetween('-1 years', '-5 days')->format('Y-m-d'),
-                'source' => $faker->randomElement(['manual', 'system', 'swap']),
+                'name' => 'task location',
+                'latitude' => -6.301015,
+                'longitude' => 106.739563,
+                'is_active' => true,
+                'radius' => 100,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('qr_codes', function (Blueprint $table) {
-            $table->foreignId('shift_id')->constrained('shifts')->onDelete('cascade');
+        Schema::table('employee_off_days', function (Blueprint $table) {
+            $table->unsignedInteger('day_of_week');
         });
     }
 
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('employee_off_days', function (Blueprint $table) {
+            //
+        });
     }
 };

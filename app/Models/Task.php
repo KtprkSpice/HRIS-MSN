@@ -37,4 +37,19 @@ class Task extends Model
     {
         return $this->hasMany(Tasklocation::class);
     }
+
+    public function weeklyShiftAssginments()
+    {
+        return $this->hasMany(WeeklyShiftAssignment::class);
+    }
+
+    public function EmployeeOffDays()
+    {
+        return $this->hasMany(EmployeeOffDay::class);
+    }
+
+    public function TaskShiftRules()
+    {
+        return $this->hasMany(TaskShiftRule::class);
+    }
 }

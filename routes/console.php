@@ -1,8 +1,11 @@
 <?php
 
+use App\Actions\GenerateWeeklyShiftAssignment;
 use App\Models\QrCode;
 use App\Models\Schedule as ScheduleModel;
+use App\Models\Task;
 use Illuminate\Foundation\Inspiring;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Str;
@@ -58,11 +61,25 @@ Schedule::everyMinute()->call(function () {
 });
 
 Artisan::command('schedule:generate-weekly', function () {
-    $this->info('COMMAND MASUK');
+    $this->info('Generate weekly shift assignment...');
 
-    app(\App\Actions\GenerateWeeklySchedule::class)->handle();
+    $weekStart = Carbon::now()->startOfWeek();
 
-    $this->info('COMMAND SELESAI');
+    Task::where('status', 'on duty')
+        ->each(function ($task) use ($weekStart) {
+
+            try {
+                app(GenerateWeeklyShiftAssignment::class)
+                    ->handle($task, $weekStart);
+
+                $this->info("✓ Task {$task->name} selesai");
+
+            } catch (\Throwable $e) {
+                $this->error("✗ Task {$task->name}: {$e->getMessage()}");
+            }
+        });
+
+    $this->info('SEMUA TASK SELESAI');
 });
 
 Schedule::command('schedule:generate-weekly')

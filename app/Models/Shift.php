@@ -22,4 +22,14 @@ class Shift extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function weeklyShiftAssginments()
+    {
+        return $this->hasMany(WeeklyShiftAssignment::class);
+    }
+
+    public function TaskShiftRules()
+    {
+        return $this->hasMany(TaskShiftRule::class);
+    }
 }
