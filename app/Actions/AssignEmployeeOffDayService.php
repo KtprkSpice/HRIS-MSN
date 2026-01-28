@@ -11,7 +11,6 @@ class AssignEmployeeOffDayService
 {
     public function assign(Employee $employee, Task $task)
     {
-        // Cegah dobel
         if (
             EmployeeOffDay::where('employee_id', $employee->id)
                 ->where('task_id', $task->id)
@@ -20,7 +19,9 @@ class AssignEmployeeOffDayService
             return;
         }
 
-        $totalEmployees = $task->employees()->count();
+        $totalEmployees = $task->employees()
+            ->wherePivotNull('deleted_at')
+            ->count();
 
         $minPerShift = TaskShiftRule::where('task_id', $task->id)
             ->sum('min_employee');
@@ -31,14 +32,16 @@ class AssignEmployeeOffDayService
             throw new \Exception('Tidak ada slot libur tersedia');
         }
 
-        // Hitung off per hari
+        // Hitung off day per hari
         $offCount = EmployeeOffDay::where('task_id', $task->id)
             ->selectRaw('day_of_week, COUNT(*) as total')
             ->groupBy('day_of_week')
             ->pluck('total', 'day_of_week');
 
-        // Cari hari paling sepi
-        for ($day = 1; $day <= 7; $day++) {
+        // 🔥 KUNCI: shuffle hari
+        $days = collect(range(0, 6))->shuffle();
+
+        foreach ($days as $day) {
             $current = $offCount[$day] ?? 0;
 
             if ($current < $maxOffPerDay) {

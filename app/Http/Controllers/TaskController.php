@@ -34,7 +34,7 @@ class TaskController extends Controller
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
         $employees = $task->employees()->with('division')->get();
-        $schedules = Schedule::where('task_id', $task->id)->where('date', [$today])->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $schedules = Schedule::where('task_id', $task->id)->whereBetween('date', [$weekStart, $weekEnd])->with(['employee', 'shift'])->get()->groupBy('shift_id');
         $locations = Tasklocation::where('task_id', $task->id)->first();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
@@ -54,94 +54,50 @@ class TaskController extends Controller
             'start_time' => 'required|date',
             'end_time' => 'required|date',
             'description' => 'required|string',
-
-            // Locations
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'radius' => 'required|integer|min:10',
-
-            // Employees
-            'selected_employee' => 'array',
-        ]);
+            'selected_employee' => 'array', ]);
 
         DB::transaction(function () use ($request) {
-
-            // =========================
-            // 1️⃣ CREATE TASK
-            // =========================
-            $task = Task::create([
-                'name' => $request->name,
+            $task = Task::create(['name' => $request->name,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'description' => $request->description,
-                'status' => 'on duty',
-            ]);
-
-            // =========================
-            // 2️⃣ CREATE LOCATION
-            // =========================
-            Tasklocation::create([
-                'task_id' => $task->id,
+                'status' => 'on duty']);
+            Tasklocation::create(['task_id' => $task->id,
                 'name' => 'Lokasi Utama',
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'radius' => $request->radius,
-                'is_active' => true,
-            ]);
-
-            // =========================
-            // 3️⃣ HANDLE EMPLOYEE ASSIGNMENT
-            // =========================
+                'is_active' => true]);
             $selectedEmployeeIds = $request->selected_employee ?? [];
 
             if (empty($selectedEmployeeIds)) {
                 return;
             }
 
-            $existingEmployeeIds = $task->employees()
-                ->withPivot('deleted_at')
-                ->pluck('employees.id')
-                ->toArray();
-
+            $existingEmployeeIds = $task->employees()->withPivot('deleted_at')->pluck('employees.id')->toArray();
             $newEmployeeIds = array_diff($selectedEmployeeIds, $existingEmployeeIds);
 
             foreach ($selectedEmployeeIds as $employeeId) {
-                $task->employees()->syncWithoutDetaching([
-                    $employeeId => ['deleted_at' => null],
-                ]);
+                $task->employees()->syncWithoutDetaching([$employeeId => ['deleted_at' => null]]);
             }
-
-            // =========================
-            // 4️⃣ AUTO ASSIGN OFF DAY
-            // =========================
             foreach ($newEmployeeIds as $employeeId) {
                 $employee = Employee::findOrFail($employeeId);
-
-                app(AssignEmployeeOffDayService::class)
-                    ->assign($employee, $task);
+                app(AssignEmployeeOffDayService::class)->assign($employee, $task);
             }
 
-            // =========================
-            // 5️⃣ AUTO CREATE / UPDATE TASK SHIFT RULE
-            // =========================
-            app(GenerateTaskShiftRule::class)
-                ->handle($task);
+            app(GenerateTaskShiftRule::class)->handle($task);
 
-            // =========================
-            // 6️⃣ GENERATE WEEKLY + DAILY SCHEDULE
-            // =========================
             $weekStart = Carbon::now()->startOfWeek();
 
-            app(GenerateWeeklyShiftAssignment::class)
-                ->handle($task, $weekStart);
+            app(GenerateWeeklyShiftAssignment::class)->handle($task, $weekStart);
 
-            app(GenerateDailySchedule::class)
-                ->handle($task, $weekStart);
+            app(GenerateDailySchedule::class)->handle($task, $weekStart);
         });
 
-        return redirect()
-            ->route('task.index')
-            ->with('success', 'Task, lokasi, dan jadwal berhasil dibuat');
+        return redirect()->route('task.index')->with('success', 'Task, lokasi, dan jadwal berhasil dibuat');
     }
 
     public function edit(Task $task)

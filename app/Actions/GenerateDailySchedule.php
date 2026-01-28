@@ -37,7 +37,7 @@ class GenerateDailySchedule
                     ->where('task_id', $task->id)
                     ->value('day_of_week');
 
-                if ($offDay !== null && $offDay == $date->dayOfWeek) {
+                if ($offDay === $date->dayOfWeek) {
                     continue;
                 }
 
