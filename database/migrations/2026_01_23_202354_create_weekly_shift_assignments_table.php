@@ -11,32 +11,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('weekly_shift_assignments', function (Blueprint $table) {
-            $table->id();
+        // Schema::create('weekly_shift_assignments', function (Blueprint $table) {
+        //     $table->id();
 
-            $table->foreignId('employee_id')
-                ->constrained('employees')
-                ->cascadeOnDelete();
+        //     $table->foreignId('employee_id')
+        //         ->constrained('employees')
+        //         ->cascadeOnDelete();
 
-            $table->foreignId('task_id')
-                ->constrained('tasks')
-                ->cascadeOnDelete();
+        //     $table->foreignId('task_id')
+        //         ->constrained('tasks')
+        //         ->cascadeOnDelete();
 
-            $table->foreignId('shift_id')
-                ->constrained('shifts')
-                ->cascadeOnDelete();
+        //     $table->foreignId('shift_id')
+        //         ->constrained('shifts')
+        //         ->cascadeOnDelete();
 
-            $table->date('week_start_date');
+        //     $table->date('week_start_date');
 
-            $table->timestamps();
-            $table->softDeletes();
+        //     $table->timestamps();
+        //     $table->softDeletes();
 
-            // 🔒 CUSTOM INDEX NAME (PENTING)
-            $table->unique(
-                ['employee_id', 'task_id', 'week_start_date'],
-                'uq_weekly_shift_employee_task_week'
-            );
-        });
+        //     // 🔒 CUSTOM INDEX NAME (PENTING)
+        //     $table->unique(
+        //         ['employee_id', 'task_id', 'week_start_date'],
+        //         'uq_weekly_shift_employee_task_week'
+        //     );
+        // });
 
     }
 

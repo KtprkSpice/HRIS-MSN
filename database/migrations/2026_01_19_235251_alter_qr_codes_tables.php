@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('qr_codes', function (Blueprint $table) {
-            $table->foreignId('shift_id')->constrained('shifts')->onDelete('cascade');
+            $table->foreignId('shift_id')->after('type')->constrained('shifts')->onDelete('cascade');
         });
     }
 

@@ -25,7 +25,10 @@ class Task extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employee::class, 'employees_tasks', 'task_id', 'employee_id')->withTimestamps()->wherePivotNull('deleted_at');
+        return $this->belongsToMany(Employee::class, 'employees_tasks')
+            ->withTimestamps()
+            ->withPivot('deleted_at')
+            ->wherePivotNull('deleted_at');
     }
 
     public function schedules()
@@ -49,6 +52,18 @@ class Task extends Model
     }
 
     public function TaskShiftRules()
+    {
+        return $this->hasMany(TaskShiftRule::class);
+    }
+
+    public function employeesWithTrashed()
+    {
+        return $this->belongsToMany(Employee::class, 'employees_tasks')
+            ->withTimestamps()
+            ->withPivot('deleted_at');
+    }
+
+    public function shiftRules()
     {
         return $this->hasMany(TaskShiftRule::class);
     }

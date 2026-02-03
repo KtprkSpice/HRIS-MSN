@@ -151,8 +151,6 @@ class PresecesController extends Controller
             // 3️⃣ Ambil QR (per hari + per shift)
             $qr = QrCode::where('token', $request->qr_data)
                 ->where('task_id', $task->id)
-                ->whereDate('date', today())
-                ->where('is_active', true)
                 ->first();
 
             if (! $qr) {
@@ -169,7 +167,6 @@ class PresecesController extends Controller
                 ->where('employee_id', $employee->id)
                 ->where('task_id', $task->id)
                 ->where('shift_id', $qr->shift_id)
-                ->whereDate('date', [$startOfWeek, $endOfWeek])
                 ->first();
 
             if (! $schedule) {

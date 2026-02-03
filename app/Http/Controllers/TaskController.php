@@ -2,16 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\AssignEmployeeOffDayService;
-use App\Actions\GenerateDailySchedule;
-use App\Actions\GenerateTaskShiftRule;
-use App\Actions\GenerateWeeklyShiftAssignment;
 use App\Models\Employee;
 use App\Models\Presence;
 use App\Models\Schedule;
 use App\Models\Task;
 use App\Models\Tasklocation;
-use App\Models\WeeklyShiftAssignment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +29,7 @@ class TaskController extends Controller
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
         $employees = $task->employees()->with('division')->get();
-        $schedules = Schedule::where('task_id', $task->id)->whereBetween('date', [$weekStart, $weekEnd])->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $schedules = Schedule::where('task_id', $task->id)->where('date', $today)->with(['employee', 'shift'])->get()->groupBy('shift_id');
         $locations = Tasklocation::where('task_id', $task->id)->first();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
@@ -57,7 +52,8 @@ class TaskController extends Controller
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'radius' => 'required|integer|min:10',
-            'selected_employee' => 'array', ]);
+            'selected_employee' => 'array',
+        ]);
 
         DB::transaction(function () use ($request) {
             $task = Task::create(['name' => $request->name,
@@ -65,36 +61,20 @@ class TaskController extends Controller
                 'end_time' => $request->end_time,
                 'description' => $request->description,
                 'status' => 'on duty']);
+
             Tasklocation::create(['task_id' => $task->id,
                 'name' => 'Lokasi Utama',
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
                 'radius' => $request->radius,
                 'is_active' => true]);
-            $selectedEmployeeIds = $request->selected_employee ?? [];
 
-            if (empty($selectedEmployeeIds)) {
-                return;
+            foreach ($request->selected_employee ?? [] as $employeeId) {
+                $task->employees()->attach($employeeId, [
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
             }
-
-            $existingEmployeeIds = $task->employees()->withPivot('deleted_at')->pluck('employees.id')->toArray();
-            $newEmployeeIds = array_diff($selectedEmployeeIds, $existingEmployeeIds);
-
-            foreach ($selectedEmployeeIds as $employeeId) {
-                $task->employees()->syncWithoutDetaching([$employeeId => ['deleted_at' => null]]);
-            }
-            foreach ($newEmployeeIds as $employeeId) {
-                $employee = Employee::findOrFail($employeeId);
-                app(AssignEmployeeOffDayService::class)->assign($employee, $task);
-            }
-
-            app(GenerateTaskShiftRule::class)->handle($task);
-
-            $weekStart = Carbon::now()->startOfWeek();
-
-            app(GenerateWeeklyShiftAssignment::class)->handle($task, $weekStart);
-
-            app(GenerateDailySchedule::class)->handle($task, $weekStart);
         });
 
         return redirect()->route('task.index')->with('success', 'Task, lokasi, dan jadwal berhasil dibuat');
@@ -111,86 +91,98 @@ class TaskController extends Controller
     public function update(Request $request, Task $task)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable',
+            'name' => 'required|string',
             'start_time' => 'required|date',
             'end_time' => 'required|date',
-
+            'description' => 'required|string',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
             'radius' => 'required|integer|min:10',
-
             'selected_employee' => 'array',
         ]);
 
         DB::transaction(function () use ($request, $task) {
 
-            // =========================
-            // 1️⃣ UPDATE TASK
-            // =========================
+            /* =======================
+             * 1. UPDATE TASK
+             * ======================= */
             $task->update([
                 'name' => $request->name,
-                'description' => $request->description,
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
+                'description' => $request->description,
+                'status' => 'pending',
             ]);
 
-            Tasklocation::where('task_id', $task->id)->update([
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'radius' => $request->radius,
-            ]);
+            /* =======================
+             * 2. UPDATE / CREATE LOCATION
+             * ======================= */
+            Tasklocation::updateOrCreate(
+                ['task_id' => $task->id],
+                [
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
+                    'radius' => $request->radius,
+                    'is_active' => true,
+                ]
+            );
 
-            // =========================
-            // 2️⃣ HANDLE EMPLOYEE UPDATE
-            // =========================
+            /* =======================
+             * 3. SYNC EMPLOYEES (SOFT DELETE AWARE)
+             * ======================= */
+
             $selectedEmployeeIds = $request->selected_employee ?? [];
 
-            $currentEmployeeIds = $task->employees()
+            // employee AKTIF sekarang
+            $activeEmployeeIds = $task->employees()
                 ->pluck('employees.id')
                 ->toArray();
 
-            $toRemove = array_diff($currentEmployeeIds, $selectedEmployeeIds);
+            // employee SOFT DELETED
+            $trashedEmployeeIds = $task->employeesWithTrashed()
+                ->wherePivotNotNull('deleted_at')
+                ->pluck('employees.id')
+                ->toArray();
 
-            if (! empty($toRemove)) {
-                $task->employees()
-                    ->wherePivotIn('employee_id', $toRemove)
-                    ->updateExistingPivot($toRemove, ['deleted_at' => now()]);
+            /* -------- REMOVE (soft delete) -------- */
+            $toDetach = array_diff($activeEmployeeIds, $selectedEmployeeIds);
+
+            if (! empty($toDetach)) {
+                DB::table('employees_tasks')
+                    ->where('task_id', $task->id)
+                    ->whereIn('employee_id', $toDetach)
+                    ->update(['deleted_at' => now()]);
             }
 
-            foreach ($selectedEmployeeIds as $employeeId) {
-                $task->employees()->syncWithoutDetaching([
-                    $employeeId => ['deleted_at' => null],
+            /* -------- RESTORE -------- */
+            $toRestore = array_intersect($trashedEmployeeIds, $selectedEmployeeIds);
+
+            foreach ($toRestore as $employeeId) {
+                DB::table('employees_tasks')
+                    ->where('task_id', $task->id)
+                    ->where('employee_id', $employeeId)
+                    ->update(['deleted_at' => null]);
+            }
+
+            /* -------- ATTACH BARU -------- */
+            $toAttach = array_diff(
+                $selectedEmployeeIds,
+                array_merge($activeEmployeeIds, $trashedEmployeeIds)
+            );
+
+            foreach ($toAttach as $employeeId) {
+                DB::table('employees_tasks')->insert([
+                    'task_id' => $task->id,
+                    'employee_id' => $employeeId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ]);
             }
-
-            // =========================
-            // 3️⃣ REGENERATE RULE + SCHEDULE
-            // =========================
-            app(GenerateTaskShiftRule::class)
-                ->handle($task);
-
-            $weekStart = Carbon::now()->startOfWeek();
-
-            // Hapus weekly & daily lama (minggu ini)
-            WeeklyShiftAssignment::where('task_id', $task->id)
-                ->where('week_start_date', $weekStart)
-                ->delete();
-
-            Schedule::where('task_id', $task->id)
-                ->whereBetween('date', [$weekStart, $weekStart->copy()->endOfWeek()])
-                ->delete();
-
-            app(GenerateWeeklyShiftAssignment::class)
-                ->handle($task, $weekStart);
-
-            app(GenerateDailySchedule::class)
-                ->handle($task, $weekStart);
         });
 
         return redirect()
             ->route('task.index')
-            ->with('success', 'Task dan jadwal berhasil diperbarui');
+            ->with('success', 'Task berhasil diperbarui');
     }
 
     public function destroy(Task $task)

@@ -11,7 +11,6 @@ use App\Http\Controllers\QrController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\TaskController;
-use App\Models\Task;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -42,6 +41,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/salary', SalaryController::class);
 
     // Qr
+    Route::get('qr/generate', [QrController::class, 'generate'])->name('qr.generate');
     Route::get('/qr/{task}', [QrController::class, 'show'])->name('qr.show');
 
     // Leave Request
@@ -62,5 +62,6 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::resource('/division', DivisionController::class);
 
     // Schedules
+    Route::get('/schedule/generate', [SchedulesController::class, 'generate'])->name('schedule.generate');
     Route::resource('/schedule', SchedulesController::class);
 });

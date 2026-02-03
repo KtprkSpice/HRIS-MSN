@@ -61,25 +61,44 @@ Schedule::everyMinute()->call(function () {
 });
 
 Artisan::command('schedule:generate-weekly', function () {
-    $this->info('Generate weekly shift assignment...');
+    \Log::info('COMMAND MASUK');
+    $this->info('=== GENERATE WEEKLY & DAILY SCHEDULE ===');
 
     $weekStart = Carbon::now()->startOfWeek();
 
-    Task::where('status', 'on duty')
-        ->each(function ($task) use ($weekStart) {
+    Task::where('status', 'on duty')->each(function ($task) use ($weekStart) {
 
-            try {
-                app(GenerateWeeklyShiftAssignment::class)
-                    ->handle($task, $weekStart);
+        $this->line("▶ Task: {$task->name}");
 
-                $this->info("✓ Task {$task->name} selesai");
+        try {
+            // 1️⃣ Weekly (jika belum ada)
+            app(GenerateWeeklyShiftAssignment::class)
+                ->handle($task, $weekStart);
 
-            } catch (\Throwable $e) {
-                $this->error("✗ Task {$task->name}: {$e->getMessage()}");
+            $this->info('  ✓ Weekly shift generated');
+        } catch (\Throwable $e) {
+
+            if ($e->getMessage() === 'Weekly shift sudah digenerate') {
+                $this->warn('  ⚠ Weekly already exists, skip generate');
+            } else {
+                $this->error("  ✗ Weekly error: {$e->getMessage()}");
+
+                return;
             }
-        });
+        }
 
-    $this->info('SEMUA TASK SELESAI');
+        // 2️⃣ DAILY (WAJIB JALAN, APA PUN KONDISINYA)
+        try {
+            app(GenerateDailySchedule::class)
+                ->handle($task, $weekStart);
+
+            $this->info('  ✓ Daily schedule generated');
+        } catch (\Throwable $e) {
+            $this->error("  ✗ Daily error: {$e->getMessage()}");
+        }
+    });
+
+    $this->info('=== SELESAI ===');
 });
 
 Schedule::command('schedule:generate-weekly')

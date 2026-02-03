@@ -3,26 +3,26 @@
 namespace App\Actions;
 
 use App\Models\EmployeeOffDay;
-use App\Models\Schedule as ScheduleModel;
+use App\Models\Schedule;
 use App\Models\Task;
-use App\Models\WeeklyShiftAssignment;
 use Carbon\Carbon;
 
 class GenerateDailySchedule
 {
     public function handle(Task $task, Carbon $weekStart): void
     {
+        $employees = $task->employees()
+            ->wherePivotNull('deleted_at')
+            ->pluck('employees.id')
+            ->toArray();
 
-        \Log::info('DAILY GENERATOR DIPANGGIL', [
-            'task_id' => $task->id,
-            'week' => $weekStart->toDateString(),
-        ]);
+        if (empty($employees)) {
+            return;
+        }
 
-        $weeklyAssignments = WeeklyShiftAssignment::where('task_id', $task->id)
-            ->where('week_start_date', $weekStart->toDateString())
-            ->get();
+        $shiftRules = $task->shiftRules()->with('shift')->get();
 
-        if ($weeklyAssignments->isEmpty()) {
+        if ($shiftRules->isEmpty()) {
             return;
         }
 
@@ -30,28 +30,49 @@ class GenerateDailySchedule
         for ($i = 0; $i < 7; $i++) {
             $date = $weekStart->copy()->addDays($i);
 
-            foreach ($weeklyAssignments as $assign) {
+            if (
+                $date->lt(Carbon::parse($task->start_time)) ||
+                $date->gt(Carbon::parse($task->end_time))
+            ) {
+                continue;
+            }
 
-                // Cek off day
-                $offDay = EmployeeOffDay::where('employee_id', $assign->employee_id)
-                    ->where('task_id', $task->id)
-                    ->value('day_of_week');
+            $availableEmployees = collect($employees)->shuffle();
 
-                if ($offDay === $date->dayOfWeek) {
-                    continue;
+            foreach ($shiftRules as $rule) {
+                $assigned = 0;
+
+                foreach ($availableEmployees as $key => $employeeId) {
+
+                    // Cek off day
+                    $offDays = EmployeeOffDay::where('employee_id', $employeeId)
+                        ->where('task_id', $task->id)
+                        ->pluck('day_of_week')
+                        ->toArray();
+
+                    if (in_array($date->dayOfWeek, $offDays)) {
+                        continue;
+                    }
+
+                    Schedule::updateOrCreate(
+                        [
+                            'employee_id' => $employeeId,
+                            'task_id' => $task->id,
+                            'date' => $date->toDateString(),
+                        ],
+                        [
+                            'shift_id' => $rule->shift_id,
+                            'source' => 'system',
+                        ]
+                    );
+
+                    $availableEmployees->forget($key);
+                    $assigned++;
+
+                    if ($assigned >= $rule->min_employee) {
+                        break;
+                    }
                 }
-
-                ScheduleModel::updateOrCreate(
-                    [
-                        'employee_id' => $assign->employee_id,
-                        'task_id' => $task->id,
-                        'date' => $date->toDateString(),
-                    ],
-                    [
-                        'shift_id' => $assign->shift_id,
-                        'source' => 'system',
-                    ]
-                );
             }
         }
     }

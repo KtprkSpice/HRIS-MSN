@@ -8,10 +8,20 @@
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>
         @endif
-        <div class="card-body">
+        <div class="card-body d-flex gap-2">
             <div class="col-md-1 d-grid align-self-end">
                 <a href="{{ route('task.create') }}" type="button" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Tambah
+                </a>
+            </div>
+            <div class="col-md-1 d-grid align-self-end">
+                <a href="{{ route('qr.generate') }}" type="button" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Generate QR
+                </a>
+            </div>
+            <div class="col-md-1 d-grid align-self-end">
+                <a href="{{ route('schedule.generate') }}" type="button" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Generate jadwal
                 </a>
             </div>
         </div>

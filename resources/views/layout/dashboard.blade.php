@@ -321,6 +321,10 @@
             </div>
         </header>
         @yield('content')
+
+
+        {{-- Footer --}}
+        {{-- <footer></footer> --}}
     </div>
 
 
