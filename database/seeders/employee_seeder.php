@@ -2,11 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use faker\factory as faker;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class employee_seeder extends Seeder
 {
@@ -24,7 +23,8 @@ class employee_seeder extends Seeder
             DB::table('employees')->insert([
                 'fullname' => $faker->name(),
                 'nik' => $faker->numerify('##########'),
-                'division_id' => $faker->numberBetween(1,3),
+                'position_id' => $faker->numberBetween(1, 7),
+                'division_id' => $faker->numberBetween(1, 3),
                 'address' => $faker->address,
                 'email' => $faker->unique()->safeEmail(),
                 'user_id' => 1,
@@ -32,7 +32,7 @@ class employee_seeder extends Seeder
                 'hire_date' => $hire_date,
                 'born_date' => $born_date,
                 'bpjs_kesehatan' => $faker->numerify('##########'),
-                'bpjs_ketenagakerjaan' => $faker->numerify('##########' ),
+                'bpjs_ketenagakerjaan' => $faker->numerify('##########'),
                 'npwp' => $faker->numerify('##.###.###.#-###.###'),
                 'status' => $faker->randomElement(['active', 'inactive']),
                 'gender' => $faker->randomElement(['laki-laki', 'perempuan']),

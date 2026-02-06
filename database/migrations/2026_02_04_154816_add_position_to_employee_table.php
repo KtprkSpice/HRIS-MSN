@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::table('qr_codes', function (Blueprint $table) {
-        //     $table->foreignId('shift_id')->after('type')->constrained('shifts')->onDelete('cascade');
-        // });
+        Schema::table('employees', function (Blueprint $table) {
+            $table->foreignId('position_id')->after('division_id')->constrained('positions')->cascadeOnDelete();
+        });
     }
 
     /**
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('employees', function (Blueprint $table) {
+            //
+        });
     }
 };

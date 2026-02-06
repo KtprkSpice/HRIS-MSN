@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             division_seeder::class,
+            positionSeeder::class,
             employee_seeder::class,
             RoleSeeder::class,
             shiftSeeder::class,

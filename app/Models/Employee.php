@@ -11,7 +11,22 @@ class Employee extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['fullname', 'nik', 'division_id', 'address', 'email', 'user_id', 'phone', 'hire_date', 'born_date', 'bpjs_kesehatan', 'bpjs_ketenagakerjaan', 'npwp', 'status'];
+    protected $fillable = [
+        'fullname',
+        'nik',
+        'division_id',
+        'position_id',
+        'address',
+        'email',
+        'user_id',
+        'phone',
+        'hire_date',
+        'born_date',
+        'bpjs_kesehatan',
+        'bpjs_ketenagakerjaan',
+        'npwp',
+        'status',
+    ];
 
     protected static function booted()
     {
@@ -76,5 +91,10 @@ class Employee extends Model
     public function EmployeeOffDays()
     {
         return $this->hasMany(EmployeeOffDay::class);
+    }
+
+    public function position()
+    {
+        return $this->belongsTo(Position::class);
     }
 }

@@ -62,7 +62,7 @@ class SchedulesController extends Controller
     {
         $employees = Employee::select('fullname', 'id')->orderBy('fullname')->get();
         $shifts = Shift::select('id', 'name')->orderBy('id')->get();
-        $tasks = Task::select('id', 'name')->where('status', 'pending')->orderBy('name')->get();
+        $tasks = Task::select('id', 'name')->whereIn('status', ['pending', 'on duty'])->orderBy('name')->get();
 
         return view('Schedules.edit', compact('employees', 'shifts', 'tasks', 'schedule'));
     }
@@ -100,19 +100,34 @@ class SchedulesController extends Controller
     {
         DB::transaction(function () {
 
-            $tasks = Task::whereIn('status', ['on_duty', 'pending'])->get();
-
-            if ($tasks->isEmpty()) {
-                throw new \Exception('Tidak ada task aktif');
-            }
-
             $weekStart = Carbon::now()->startOfWeek();
             $weekEnd = Carbon::now()->endOfWeek();
+
+            // ================================
+            // 0. Validasi jadwal existing
+            // ================================
+            if (
+                Schedule::whereBetween('date', [
+                    $weekStart->toDateString(),
+                    $weekEnd->toDateString(),
+                ])->exists()
+            ) {
+                throw new \Exception('Masih ada jadwal minggu ini. Hapus dulu sebelum generate ulang.');
+            }
+
+            // ================================
+            // 1. Ambil task aktif
+            // ================================
+            $tasks = Task::whereIn('status', ['on duty', 'pending'])->get();
+
+            if ($tasks->isEmpty()) {
+                throw new \Exception('Tidak ada task aktif.');
+            }
 
             foreach ($tasks as $task) {
 
                 // ================================
-                // 1. Ambil employee task
+                // 2. Ambil employee task
                 // ================================
                 $employees = Employee::whereHas('tasks', function ($q) use ($task) {
                     $q->where('task_id', $task->id);
@@ -123,18 +138,30 @@ class SchedulesController extends Controller
                 }
 
                 // ================================
-                // 2. Ambil shift rules
+                // 3. Ambil / buat shift rule
                 // ================================
                 $rules = TaskShiftRule::where('task_id', $task->id)
                     ->get()
                     ->keyBy('shift_id');
 
                 if ($rules->isEmpty()) {
-                    throw new \Exception("Task {$task->name} belum punya shift rule");
+                    foreach ([1, 2, 3] as $shiftId) {
+                        TaskShiftRule::create([
+                            'task_id' => $task->id,
+                            'shift_id' => $shiftId,
+                            'min_employee' => 1,
+                        ]);
+                    }
+
+                    $rules = TaskShiftRule::where('task_id', $task->id)
+                        ->get()
+                        ->keyBy('shift_id');
                 }
 
+                $shiftCount = $rules->count();
+
                 // ================================
-                // 3. Pastikan libur 1 hari / minggu
+                // 4. Pastikan 1 hari libur / minggu
                 // ================================
                 foreach ($employees as $employee) {
                     EmployeeOffDay::firstOrCreate(
@@ -149,47 +176,45 @@ class SchedulesController extends Controller
                 }
 
                 // ================================
-                // 4. Loop per hari
+                // 5. Loop per hari
                 // ================================
                 for ($date = $weekStart->copy(); $date <= $weekEnd; $date->addDay()) {
 
                     $dayOfWeek = $date->dayOfWeek;
 
-                    // employee yang libur hari ini
                     $offEmployeeIds = EmployeeOffDay::where('task_id', $task->id)
                         ->where('day_of_week', $dayOfWeek)
                         ->pluck('employee_id');
 
-                    // employee yang tersedia
                     $availableEmployees = $employees
                         ->whereNotIn('id', $offEmployeeIds)
                         ->shuffle()
                         ->values();
 
-                    // simpan employee yg sudah dipakai hari ini
+                    if ($availableEmployees->isEmpty()) {
+                        continue;
+                    }
+
                     $usedEmployeeIds = collect();
 
                     // ================================
-                    // 5. Generate per shift (PRIORITAS)
+                    // 6. Hitung distribusi ideal
                     // ================================
-                    foreach ([1, 2, 3] as $shiftId) {
+                    $idealPerShift = max(
+                        1,
+                        floor($availableEmployees->count() / $shiftCount)
+                    );
 
-                        if (! isset($rules[$shiftId])) {
-                            continue;
-                        }
+                    // ================================
+                    // 7. Generate per shift (FAIR)
+                    // ================================
+                    foreach ($rules as $shiftId => $rule) {
 
-                        $minEmployee = $rules[$shiftId]->min_employee;
+                        $needed = max($rule->min_employee, $idealPerShift);
 
                         $candidates = $availableEmployees
                             ->whereNotIn('id', $usedEmployeeIds)
-                            ->values();
-
-                        if ($candidates->isEmpty()) {
-                            continue; // benar-benar tidak ada orang
-                        }
-
-                        // ambil sebanyak mungkin, max = min_employee
-                        $candidates = $candidates->take($minEmployee);
+                            ->take($needed);
 
                         foreach ($candidates as $employee) {
                             Schedule::create([
@@ -207,6 +232,6 @@ class SchedulesController extends Controller
             }
         });
 
-        return redirect()->back()->with('success', 'Jadwal berhasil digenerate otomatis');
+        return redirect()->back()->with('success', 'Jadwal 1 minggu berhasil digenerate secara profesional');
     }
 }

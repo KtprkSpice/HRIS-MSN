@@ -7,7 +7,6 @@ use App\Models\Presence;
 use App\Models\QrCode;
 use App\Models\Schedule;
 use App\Models\Task;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 use function Illuminate\Support\now;
@@ -78,54 +77,16 @@ class PresecesController extends Controller
         return view('presences.scan', compact('presences', 'task'));
     }
 
-    private function resolveStatus($shift, $checkInTime)
-    {
-        $shiftStart = Carbon::parse(
-            $checkInTime->toDateString().' '.$shift->start_time
-        );
-
-        if ($shift->cross_day && $shiftStart->greaterThan($checkInTime)) {
-            $shiftStart->subDay();
-        }
-
-        $deadline = $shiftStart->addMinutes($shift->late_tolerance_minutes);
-
-        return $checkInTime->lessThanOrEqualTo($deadline) ? 'on time' : 'late';
-
-    }
-
-    private function isWithinShiftTime($shift)
-    {
-        $now = now();
-
-        $start = Carbon::parse(
-            $now->toDateString().' '.$shift->start_time
-        );
-
-        $end = Carbon::parse(
-            $now->toDateString().' '.$shift->end_time
-        );
-
-        if ($shift->cross_day && $end->lessThan($start)) {
-            $end->addDay();
-        }
-
-        return $now->between(
-            $start->subMinutes($shift->early_tolerance_minutes ?? 0),
-            $end
-        );
-    }
-
     public function storeQr(Request $request)
     {
-        \Log::info('DATA QR MASUK', $request->all());
+        \Log::info('Data Qr Masuk', $request->all());
 
         try {
-            // 1️⃣ Validasi request
+            //  VALIDASI REQUEST
             if (! $request->qr_data || ! $request->task_id) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'QR atau task tidak valid',
+                    'message' => 'QR atau Task tidak valid',
                 ], 400);
             }
 
@@ -134,57 +95,58 @@ class PresecesController extends Controller
             if (! $employee) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'User tidak terhubung ke employee',
+                    'message' => 'Harap login terlebih dahulu',
                 ], 403);
             }
 
-            // 2️⃣ Ambil task & validasi employee
             $task = Task::with('employees')->findOrFail($request->task_id);
 
             if (! $task->employees->contains($employee->id)) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Anda tidak terdaftar pada tugas ini',
+                    'message' => 'Anda tidak terdaftar pada task ini',
                 ], 403);
             }
 
-            // 3️⃣ Ambil QR (per hari + per shift)
+            //  AMBIL QR (TANPA SHIFT)
             $qr = QrCode::where('token', $request->qr_data)
                 ->where('task_id', $task->id)
+                ->whereDate('date', today())
+                ->where('is_active', true)
                 ->first();
 
             if (! $qr) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'QR tidak valid atau sudah tidak aktif',
+                    'message' => 'QR tidak valid atau tidak aktif',
                 ]);
             }
 
-            $startOfWeek = now()->startOfWeek();
-            $endOfWeek = now()->endOfWeek();
-            // 4️⃣ Ambil schedule employee UNTUK SHIFT QR INI
+            //  AMBIL SCHEDULE HARI INI
             $schedule = Schedule::with('shift')
                 ->where('employee_id', $employee->id)
                 ->where('task_id', $task->id)
-                ->where('shift_id', $qr->shift_id)
+                ->whereDate('date', today())
                 ->first();
 
             if (! $schedule) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Ini bukan jadwal Anda',
+                    'message' => 'Anda tidak memiliki jadwal hari ini',
                 ]);
             }
 
-            // 5️⃣ Ambil presence BERDASARKAN schedule_id (KUNCI)
+            //  AMBIL PRESENCE
             $presence = Presence::where('employee_id', $employee->id)
                 ->where('schedule_id', $schedule->id)
                 ->whereDate('date', today())
                 ->first();
 
-            // ======================
+            $now = now();
+            $shiftStart = today()->setTimeFromTimeString($schedule->shift->start_time);
+            $shiftEnd = today()->setTimeFromTimeString($schedule->shift->end_time);
+
             // CHECK IN
-            // ======================
             if ($qr->type === 'check_in') {
 
                 if ($presence && $presence->check_in) {
@@ -193,29 +155,30 @@ class PresecesController extends Controller
                         'message' => 'Anda sudah melakukan check-in',
                     ]);
                 }
-
-                $now = now();
-
-                $shiftStart = now()->setTimeFromTimeString($schedule->shift->start_time);
-                $shiftEnd = now()->setTimeFromTimeString($schedule->shift->end_time);
-
-                // ⛔ Shift sudah lewat
-                if ($now->greaterThan($shiftEnd)) {
+                // Presesnbsi telat
+                if ($now->greaterThan($shiftStart->copy()->subMinutes(30))) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Shift Anda sudah selesai',
-                    ], 403);
+                        'message' => 'Anda sudah melewati batas jadwal anda',
+                    ]);
                 }
 
-                // ⛔ Terlalu awal (opsional)
-                if ($now->lessThan($shiftStart->subMinutes(30))) {
+                // Presensi lebih awal
+                if ($now->lessThan($shiftStart->copy()->subMinutes(30))) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Check-in belum dibuka',
-                    ], 403);
+                        'message' => 'Presensi belum dibuka',
+                    ]);
                 }
 
-                $status = $this->resolveStatus($schedule->shift, now());
+                $status = 'on time';
+                $lateMinutes = 0;
+
+                if ($now->greaterThan($shiftStart)) {
+                    $lateRaw = $shiftStart->diffInMinutes($now);
+                    $lateMinutes = (int) ceil($lateRaw / 10) * 10;
+                    $status = 'late';
+                }
 
                 Presence::create([
                     'employee_id' => $employee->id,
@@ -224,22 +187,18 @@ class PresecesController extends Controller
                     'shift_id' => $schedule->shift_id,
                     'date' => today(),
                     'check_in' => now(),
-                    'check_out' => null,
+                    'late_minutes' => $lateMinutes,
                     'status' => $status,
                 ]);
 
                 return response()->json([
                     'status' => 'success',
                     'message' => 'Check-in berhasil',
-                    'data' => [
-                        'status' => $status,
-                    ],
+                    'data' => compact('status'),
                 ]);
             }
 
-            // ======================
             // CHECK OUT
-            // ======================
             if ($qr->type === 'check_out') {
 
                 if (! $presence || ! $presence->check_in) {
@@ -256,16 +215,11 @@ class PresecesController extends Controller
                     ]);
                 }
 
-                // 🔒 PASTI SHIFT SAMA
-                if ($presence->shift_id !== $qr->shift_id) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'QR check-out tidak sesuai dengan shift check-in',
-                    ]);
-                }
+                $workMinutes = $presence->check_in->diffInMinutes($now);
 
                 $presence->update([
                     'check_out' => now(),
+                    'work_minutes' => $workMinutes,
                 ]);
 
                 return response()->json([
@@ -280,7 +234,7 @@ class PresecesController extends Controller
             ]);
 
         } catch (\Throwable $e) {
-            \Log::error('ERROR PRESENSI QR', [
+            \Log::error('Error Presensi QR', [
                 'message' => $e->getMessage(),
             ]);
 

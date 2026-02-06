@@ -29,7 +29,7 @@ class TaskController extends Controller
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
         $employees = $task->employees()->with('division')->get();
-        $schedules = Schedule::where('task_id', $task->id)->where('date', $today)->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $schedules = Schedule::where('task_id', $task->id)->where('date', [$today])->with(['employee', 'shift'])->get()->groupBy('shift_id');
         $locations = Tasklocation::where('task_id', $task->id)->first();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
@@ -60,7 +60,8 @@ class TaskController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'description' => $request->description,
-                'status' => 'on duty']);
+                'status' => 'pending',
+            ]);
 
             Tasklocation::create(['task_id' => $task->id,
                 'name' => 'Lokasi Utama',
@@ -111,14 +112,15 @@ class TaskController extends Controller
                 'start_time' => $request->start_time,
                 'end_time' => $request->end_time,
                 'description' => $request->description,
-                'status' => 'pending',
             ]);
 
             /* =======================
              * 2. UPDATE / CREATE LOCATION
              * ======================= */
             Tasklocation::updateOrCreate(
-                ['task_id' => $task->id],
+                [
+                    'task_id' => $task->id,
+                ],
                 [
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,

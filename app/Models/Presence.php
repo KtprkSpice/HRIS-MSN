@@ -12,11 +12,19 @@ class Presence extends Model
 
     protected $table = 'presences';
 
+    protected $casts = [
+        'date' => 'date',
+        'check_in' => 'datetime',
+        'check_out' => 'datetime',
+    ];
+
     protected $fillable = [
         'employee_id',
         'task_id',
         'date',
         'schedule_id',
+        'work_minutes',
+        'late_minutes',
         'shift_id',
         'latitude',
         'longitude',
@@ -26,8 +34,6 @@ class Presence extends Model
         'status',
         'type',
     ];
-
-    
 
     public function employee()
     {

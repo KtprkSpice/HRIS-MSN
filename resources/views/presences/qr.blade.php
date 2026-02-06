@@ -9,46 +9,62 @@
             QR Presensi - {{ $task->name }}
         </h3>
 
-        @foreach ($shifts as $shift)
-            @php
-                $qr = $qrCodes[$shift->id] ?? collect();
-                $checkin = $qr->where('type', 'check_in')->first();
-                $checkout = $qr->where('type', 'check_out')->first();
-            @endphp
+        <p class="text-center text-muted mb-4">
+            QR ini berlaku untuk <b>SEMUA SHIFT</b> Pada <b>{{ Carbon\Carbon::parse($qr->date)->format('d F Y') }}</b>
+        </p>
 
-            <div class="card mb-3">
-                <div class="card-header">
-                    Shift {{ $shift->name }}
-                </div>
+        <div class="row justify-content-center">
 
-                <div class="card-body row text-center">
-                    <div class="col-md-6">
-                        <h6>Check-in</h6>
-                        @if ($checkin)
-                            <p><b>Expires At :</b> {{ $checkin->expires_at }}</p>
-                            <img src="data:image/png;base64,{{ base64_encode(
-                                new \Endroid\QrCode\Writer\PngWriter()->write(new \Endroid\QrCode\QrCode($checkin->token))->getString(),
-                            ) }}"
-                                width="180">
-                        @else
-                            <span class="text-danger">Belum ada QR</span>
-                        @endif
+            {{-- CHECK IN --}}
+            <div class="col-md-5">
+                <div class="card mb-3">
+                    <div class="card-header text-center">
+                        Check-in
                     </div>
 
-                    <div class="col-md-6">
-                        <h6>Check-out</h6>
-                        @if ($checkout)
-                            <p><b>Expires At :</b> {{ $checkin->expires_at }}</p>
+                    <div class="card-body text-center">
+                        @if (isset($qrCodes['check_in']))
+                            <p>
+                                <b>Expires At :</b>
+                                {{ $qrCodes['check_in']->expires_at }}
+                            </p>
+
                             <img src="data:image/png;base64,{{ base64_encode(
-                                new \Endroid\QrCode\Writer\PngWriter()->write(new \Endroid\QrCode\QrCode($checkout->token))->getString(),
+                                new \Endroid\QrCode\Writer\PngWriter()->write(new \Endroid\QrCode\QrCode($qrCodes['check_in']->token))->getString(),
                             ) }}"
-                                width="180">
+                                width="200">
                         @else
-                            <span class="text-danger">Belum ada QR</span>
+                            <span class="text-danger">QR Check-in belum dibuat</span>
                         @endif
                     </div>
                 </div>
             </div>
-        @endforeach
+
+            {{-- CHECK OUT --}}
+            <div class="col-md-5">
+                <div class="card mb-3">
+                    <div class="card-header text-center">
+                        Check-out
+                    </div>
+
+                    <div class="card-body text-center">
+                        @if (isset($qrCodes['check_out']))
+                            <p>
+                                <b>Expires At :</b>
+                                {{ $qrCodes['check_out']->expires_at }}
+                            </p>
+
+                            <img src="data:image/png;base64,{{ base64_encode(
+                                new \Endroid\QrCode\Writer\PngWriter()->write(new \Endroid\QrCode\QrCode($qrCodes['check_out']->token))->getString(),
+                            ) }}"
+                                width="200">
+                        @else
+                            <span class="text-danger">QR Check-out belum dibuat</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 @endsection

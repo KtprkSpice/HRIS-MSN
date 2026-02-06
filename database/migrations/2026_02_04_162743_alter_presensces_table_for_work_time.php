@@ -11,9 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Schema::table('qr_codes', function (Blueprint $table) {
-        //     $table->foreignId('shift_id')->after('type')->constrained('shifts')->onDelete('cascade');
-        // });
+        Schema::table('presences', function (Blueprint $table) {
+            $table->integer('late_minutes')->after('shift_id')->default(0);
+            $table->integer('work_minutes')->after('shift_id')->default(0);
+        });
     }
 
     /**
@@ -21,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('presences', function (Blueprint $table) {
+            //
+        });
     }
 };

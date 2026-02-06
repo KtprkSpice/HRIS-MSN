@@ -55,7 +55,8 @@
                 'is-invalid'
             @enderror">
                 @foreach ($tasks as $task)
-                    <option value="{{ $task->id }}" {{ old('task_id', $schedule->task_id) == $task->id }}>
+                    <option value="{{ $task->id }}"
+                        {{ old('task_id', $schedule->task_id) == $task->id ? 'selected' : '' }}>
                         {{ ucwords($task->name) }}</option>
                 @endforeach
             </select>
