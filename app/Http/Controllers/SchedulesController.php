@@ -31,7 +31,7 @@ class SchedulesController extends Controller
     {
         $employees = Employee::select('id', 'fullname')->orderBy('fullname')->get();
         $shifts = Shift::select('name', 'id')->orderBy('id')->get();
-        $tasks = Task::select('name', 'id')->where('status', 'pending')->orderBy('name')->get();
+        $tasks = Task::select('name', 'id')->whereIn('status', ['pending', 'on duty'])->orderBy('name')->get();
 
         return view('Schedules.create', compact('employees', 'shifts', 'tasks'));
     }
@@ -103,9 +103,7 @@ class SchedulesController extends Controller
             $weekStart = Carbon::now()->startOfWeek();
             $weekEnd = Carbon::now()->endOfWeek();
 
-            // ================================
             // 0. Validasi jadwal existing
-            // ================================
             if (
                 Schedule::whereBetween('date', [
                     $weekStart->toDateString(),
@@ -115,9 +113,7 @@ class SchedulesController extends Controller
                 throw new \Exception('Masih ada jadwal minggu ini. Hapus dulu sebelum generate ulang.');
             }
 
-            // ================================
             // 1. Ambil task aktif
-            // ================================
             $tasks = Task::whereIn('status', ['on duty', 'pending'])->get();
 
             if ($tasks->isEmpty()) {
@@ -126,9 +122,7 @@ class SchedulesController extends Controller
 
             foreach ($tasks as $task) {
 
-                // ================================
                 // 2. Ambil employee task
-                // ================================
                 $employees = Employee::whereHas('tasks', function ($q) use ($task) {
                     $q->where('task_id', $task->id);
                 })->get();
@@ -137,9 +131,7 @@ class SchedulesController extends Controller
                     continue;
                 }
 
-                // ================================
                 // 3. Ambil / buat shift rule
-                // ================================
                 $rules = TaskShiftRule::where('task_id', $task->id)
                     ->get()
                     ->keyBy('shift_id');
@@ -160,9 +152,7 @@ class SchedulesController extends Controller
 
                 $shiftCount = $rules->count();
 
-                // ================================
                 // 4. Pastikan 1 hari libur / minggu
-                // ================================
                 foreach ($employees as $employee) {
                     EmployeeOffDay::firstOrCreate(
                         [
@@ -175,9 +165,7 @@ class SchedulesController extends Controller
                     );
                 }
 
-                // ================================
                 // 5. Loop per hari
-                // ================================
                 for ($date = $weekStart->copy(); $date <= $weekEnd; $date->addDay()) {
 
                     $dayOfWeek = $date->dayOfWeek;
@@ -197,17 +185,13 @@ class SchedulesController extends Controller
 
                     $usedEmployeeIds = collect();
 
-                    // ================================
                     // 6. Hitung distribusi ideal
-                    // ================================
                     $idealPerShift = max(
                         1,
                         floor($availableEmployees->count() / $shiftCount)
                     );
 
-                    // ================================
                     // 7. Generate per shift (FAIR)
-                    // ================================
                     foreach ($rules as $shiftId => $rule) {
 
                         $needed = max($rule->min_employee, $idealPerShift);

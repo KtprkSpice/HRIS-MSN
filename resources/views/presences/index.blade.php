@@ -28,6 +28,7 @@
                             <th>Waktu Masuk</th>
                             <th>Waktu Keluar</th>
                             <th>Tipe Absen</th>
+                            <th>Menit Telat</th>
                             <th>Status</th>
                             <th>Aksi</th>
                         </tr>
@@ -41,6 +42,7 @@
                                 <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
                                 <td>{{ $presence->check_out ? \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}
                                 <td>{{ ucwords($presence->type) }}</td>
+                                <td>{{ $presence->late_minutes ? $presence->late_minutes : '-' }}</td>
                                 <td><span @class([
                                     'badge bg-danger text-white text-center p-2' =>
                                         $presence->status == 'invalid',
@@ -87,7 +89,7 @@
                 },
             },
             columnDefs: [{
-                targets: 5,
+                targets: 8,
                 orderable: false,
                 searchable: false
             }]

@@ -156,12 +156,12 @@ class PresecesController extends Controller
                     ]);
                 }
                 // Presesnbsi telat
-                if ($now->greaterThan($shiftStart->copy()->subMinutes(30))) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Anda sudah melewati batas jadwal anda',
-                    ]);
-                }
+                // if ($now->greaterThan($shiftStart->copy()->subMinutes(30))) {
+                //     return response()->json([
+                //         'status' => 'error',
+                //         'message' => 'Anda sudah melewati batas jadwal anda',
+                //     ]);
+                // }
 
                 // Presensi lebih awal
                 if ($now->lessThan($shiftStart->copy()->subMinutes(30))) {

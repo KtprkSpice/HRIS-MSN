@@ -38,6 +38,7 @@ Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
     Route::get('/task/{id}/onduty', [TaskController::class, 'onduty'])->name('task.onduty');
 
     // Salary
+    Route::get('/salary/generate', [SalaryController::class, 'generate'])->name('salary.generate');
     Route::resource('/salary', SalaryController::class);
 
     // Qr
