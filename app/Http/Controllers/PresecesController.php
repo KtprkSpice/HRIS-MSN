@@ -176,7 +176,7 @@ class PresecesController extends Controller
 
                 if ($now->greaterThan($shiftStart)) {
                     $lateRaw = $shiftStart->diffInMinutes($now);
-                    $lateMinutes = (int) ceil($lateRaw / 10) * 10;
+                    $lateMinutes = (int) ceil($lateRaw / 5) * 5;
                     $status = 'late';
                 }
 

@@ -29,7 +29,7 @@ class TaskController extends Controller
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
         $employees = $task->employees()->with('division')->get();
-        $schedules = Schedule::where('task_id', $task->id)->where('date', [$today])->with(['employee', 'shift'])->get()->groupBy('shift_id');
+        $schedules = Schedule::where('task_id', $task->id)->whereBetween('date', [$weekStart, $weekEnd])->with(['employee', 'shift'])->get()->groupBy('shift_id');
         $locations = Tasklocation::where('task_id', $task->id)->first();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));

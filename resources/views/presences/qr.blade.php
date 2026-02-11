@@ -10,7 +10,8 @@
         </h3>
 
         <p class="text-center text-muted mb-4">
-            QR ini berlaku untuk <b>SEMUA SHIFT</b> Pada <b>{{ Carbon\Carbon::parse($qr->date)->format('d F Y') }}</b>
+            QR ini berlaku untuk <b>SEMUA SHIFT</b> Pada
+            <b>{{ optional($qr)->date ? Carbon\Carbon::parse($qr->date)->format('d F Y') : '-' }}</b>
         </p>
 
         <div class="row justify-content-center">
