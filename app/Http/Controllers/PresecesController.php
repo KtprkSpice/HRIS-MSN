@@ -7,6 +7,7 @@ use App\Models\Presence;
 use App\Models\QrCode;
 use App\Models\Schedule;
 use App\Models\Task;
+use App\Models\Tasklocation;
 use Illuminate\Http\Request;
 
 use function Illuminate\Support\now;
@@ -77,6 +78,23 @@ class PresecesController extends Controller
         return view('presences.scan', compact('presences', 'task'));
     }
 
+    // Location Validation backend
+    private function calculatedDistance($lat1, $lng1, $lat2, $lng2)
+    {
+        $earthRadius = 6371000;
+
+        $dLat = deg2rad($lat2 - $lat1);
+        $dlng = deg2rad($lng2 - $lng1);
+
+        $a = sin($dLat / 2) * sin($dLat / 2) +
+        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+        sin($dlng / 2) * sin($dlng / 2);
+
+        $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
+
+        return $earthRadius * $c;
+    }
+
     public function storeQr(Request $request)
     {
         \Log::info('Data Qr Masuk', $request->all());
@@ -92,6 +110,32 @@ class PresecesController extends Controller
 
             $employee = auth()->user()->employee;
 
+            // Get Task Location
+            $taskLocation = Tasklocation::where('task_id', $request->task_id)
+                ->where('is_active', true)
+                ->first();
+
+            if (! $taskLocation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Harap Nyalakan GPS',
+                ]);
+            }
+
+            $distance = $this->calculatedDistance(
+                $request->latitude,
+                $request->longitude,
+                $taskLocation->latitude,
+                $taskLocation->longitude,
+            );
+
+            if ($distance > $taskLocation->radius) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda berada di luar radius',
+                ]);
+            }
+
             if (! $employee) {
                 return response()->json([
                     'status' => 'error',
@@ -100,6 +144,14 @@ class PresecesController extends Controller
             }
 
             $task = Task::with('employees')->findOrFail($request->task_id);
+            $assignedEmployee = $task->employees()->where('employee_id', $employee->id)->exists();
+
+            if (! $assignedEmployee) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Anda tidak terdaftar pada task ini',
+                ]);
+            }
 
             if (! $task->employees->contains($employee->id)) {
                 return response()->json([
@@ -185,6 +237,8 @@ class PresecesController extends Controller
                     'task_id' => $task->id,
                     'schedule_id' => $schedule->id,
                     'shift_id' => $schedule->shift_id,
+                    'latitude' => $request->latitude,
+                    'longitude' => $request->longitude,
                     'date' => today(),
                     'check_in' => now(),
                     'late_minutes' => $lateMinutes,

@@ -38,6 +38,18 @@
             resultBox.classList.remove('d-none');
             resultBox.innerHTML = "QR terbaca: <strong>" + decodedText + "</strong>";
 
+            let testing = true;
+
+            if (testing) {
+                var lat = -6.301028;
+                var lng = 106.739556
+            } else {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    let lat = position.coords.latitude;
+                    let lng = position.coords.longitude;
+                })
+            }
+
             // Kirim ke route presensi
             fetch("{{ route('presences.storeQr') }}", {
                     method: "POST",
@@ -48,6 +60,8 @@
                     body: JSON.stringify({
                         task_id: "{{ $task->id }}",
                         qr_data: decodedText,
+                        latitude: lat,
+                        longitude: lng,
                     })
                 })
                 .then(response => response.json())

@@ -79,7 +79,7 @@ class SchedulesController extends Controller
             'date' => 'required|date',
         ]);
 
-        $validated['source'] = 'manual';
+        $validated['source'] = 'swap';
 
         $schedule->update($validated);
 
