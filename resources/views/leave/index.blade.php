@@ -131,7 +131,7 @@
                     },
                 },
                 columnDefs: [{
-                    targets: 5,
+                    targets: 6,
                     orderable: false,
                     searchable: false
                 }]
