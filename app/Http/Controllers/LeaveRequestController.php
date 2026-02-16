@@ -27,40 +27,74 @@ class LeaveRequestController extends Controller
 
     public function store(Request $request)
     {
-
-        $request->validate([
+        $validated = $request->validate([
             'employee_id' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'leave_id' => 'required',
+            'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $request->merge([
-            'status' => 'pending',
-        ]);
+        // dd(
+        //     $request->hasFile('document_file'),
+        //     $request->file('document_file'),
+        //     $request->file('document_file')?->getPathname()
+        // );
 
-        LeaveRequest::create($request->all());
+        if ($request->file('document_file')) {
 
-        return redirect()->route('leave-request.index')->with('success', 'Data Cuti Berasil Dibuat');
+            $file = $request->file('document_file');
+
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            $file->move(storage_path('app/public/surat_dokter'), $filename);
+
+            $validated['document_file'] = 'surat_dokter/'.$filename;
+        }
+
+        LeaveRequest::create($validated);
+
+        return redirect()->route('leave-request.index')
+            ->with('success', 'Data Cuti Berhasil Dibuat');
     }
 
     public function edit(LeaveRequest $leaveRequest)
     {
         $employees = Employee::all();
+        $types = LeaveType::all();
 
-        return view('leave.edit', compact('employees', 'leaveRequest'));
+        return view('leave.edit', compact('employees', 'leaveRequest', 'types'));
     }
 
     public function update(Request $request, LeaveRequest $leaveRequest)
     {
-        $request->validate([
+        $validated = $request->validate([
             'employee_id' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'leave_id' => 'required',
+            'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
-        $leaveRequest->update($request->all());
+        if ($request->file('document_file')) {
+
+            // hapus file lama
+            if ($leaveRequest->document_file &&
+                file_exists(storage_path('app/public/'.$leaveRequest->document_file))) {
+                unlink(storage_path('app/public/'.$leaveRequest->document_file));
+            }
+
+            // Create file baru
+            $file = $request->file('document_file');
+
+            $filename = time().'_'.$file->getClientOriginalName();
+
+            $file->move(storage_path('app/public/surat_dokter'), $filename);
+
+            $validated['document_file'] = 'surat_dokter/'.$filename;
+        }
+
+        $leaveRequest->update($validated);
 
         return redirect()->route('leave-request.index')->with('success', 'Data telah Diubah');
     }

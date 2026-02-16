@@ -16,6 +16,7 @@ class LeaveRequest extends Model
         'end_date',
         'leave_id',
         'status',
+        'document_file',
     ];
 
     public function employee()

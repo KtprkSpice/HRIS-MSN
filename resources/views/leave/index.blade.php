@@ -91,8 +91,14 @@
                                     </select>
                                 </td>
                                 <td>
+                                    @if ($leave->document_file)
+                                        <a class="btn btn-info btn-sm text-white"
+                                            href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
+                                            <i class="fa-solid fa-file"></i>
+                                        </a>
+                                    @endif
                                     <a href="{{ route('leave-request.edit', $leave->id) }}"
-                                        class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+                                        class="btn btn-warning btn-sm text-white"><i class="fa-solid fa-pen"></i></a>
                                     <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
                                         class="d-inline" id="deleteForm{{ $leave->id }}">
                                         @csrf

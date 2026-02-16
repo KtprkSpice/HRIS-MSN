@@ -15,5 +15,6 @@ class LeaveType extends Model
         'is_paid',
         'deduction',
         'max_days',
+        'document',
     ];
 }

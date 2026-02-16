@@ -17,26 +17,6 @@
         </div>
     </div>
 
-    <!-- Filter -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="me-2 fw-bold">Filter Status:</label>
-        <select id="filterStatus" class="form-select w-auto me-3">
-            <option value="">Semua</option>
-            <option value="Belum Selesai">Belum Selesai</option>
-            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-            <option value="Selesai">Selesai</option>
-            <option value="Menunggu ACC HRD">Menunggu ACC HRD</option>
-            <option value="Ditolak HRD">Ditolak HRD</option>
-        </select>
-
-        <label class="me-2 fw-bold">Filter Karyawan:</label>
-        <select id="filterKaryawan" class="form-select w-auto">
-            <option value="">Semua Karyawan</option>
-            <option value="Budi Santoso">Budi Santoso</option>
-            <option value="Siti Aminah">Siti Aminah</option>
-            <option value="Rudi Hartono">Rudi Hartono</option>
-        </select>
-    </div>
 
     <!-- Tabel Tugas -->
     <div class="card shadow">
@@ -59,7 +39,7 @@
                                 <td>Rp. {{ number_format($leaveType->deduction) }}</td>
                                 <td>
                                     @if ($leaveType->max_days)
-                                        {{ $leaveType->max_days }} Days
+                                        {{ $leaveType->max_days }} Hari
                                     @else
                                         -
                                     @endif

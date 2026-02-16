@@ -25,7 +25,7 @@
             @enderror
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-3">
             <label class="form-label d-block">Dibayar</label>
 
             <div class="form-check form-check-inline">
@@ -41,6 +41,27 @@
             </div>
 
             @error('is_paid')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
+        {{-- Document radio --}}
+        <div class="col-md-3">
+            <label class="form-label d-block">Wajib Dokumen</label>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="document" id="document_yes" value="1"
+                    {{ old('document', '1') == '1' ? 'checked' : '' }}>
+                <label class="form-check-label" for="document_yes">Ya</label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="document" id="document_no" value="0"
+                    {{ old('document') == '0' ? 'checked' : '' }}>
+                <label class="form-check-label" for="document_no">Tidak</label>
+            </div>
+
+            @error('document')
                 <div class="text-danger">{{ $message }}</div>
             @enderror
         </div>
