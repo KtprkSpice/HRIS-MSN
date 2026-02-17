@@ -34,16 +34,31 @@
         }
     </style>
 
-    <div class='alert alert-success'>msg</div>
+    @if (session('success'))
+        <div class='alert alert-success'>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+    @if ($errors->any())
+        <div class='alert alert-danger'>
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <span>{{ $error }}</span>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="card card-profile p-5">
-        <form method="POST" enctype="multipart/form-data">
+        <form method="POST" enctype="multipart/form-data" action="{{ route('profile.update', $employee->id) }}">
+            @csrf
+            @method('PUT')
             <div class="text-center mb-4">
                 <img src="" alt="Foto Profil" class="profile-img">
             </div>
 
             <h5 class="mb-3">Data Profil</h5>
             <div class="mb-3"><label>Nama</label>
-                <input type="text" name="nama" class="form-control" value="{{ old('name', $employee->fullname) }}"
+                <input type="text" name="fullname" class="form-control" value="{{ old('name', $employee->fullname) }}"
                     required>
             </div>
             <div class="mb-3"><label>Email</label>

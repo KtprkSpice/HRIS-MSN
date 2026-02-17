@@ -153,33 +153,35 @@
             </div>
         </div>
 
-        <div class="card shadow mt-3">
-            <div class="card-body">
-                <h5 class="card-title">
-                    <i class="fa-solid fa-location-dot"></i> Lokasi Tugas
-                </h5>
+        @if (in_array($userRole, ['hr', 'owner']))
+            <div class="card shadow mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fa-solid fa-location-dot"></i> Lokasi Tugas
+                    </h5>
 
-                <div id="map" style="height: 400px;"></div>
+                    <div id="map" style="height: 400px;"></div>
 
-                <div class="row mt-3">
-                    <div class="col-md-4">
-                        <label>Latitude</label>
-                        <input type="text" id="latitude" name="latitude" class="form-control" readonly
-                            value="{{ old('latitude', $locations->latitude) }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Longitude</label>
-                        <input type="text" id="longitude" name="longitude" class="form-control" readonly
-                            value="{{ old('longitude', $locations->longitude) }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label>Radius (meter)</label>
-                        <input type="number" id="radius" name="radius" class="form-control" readonly
-                            value="{{ old('radius', $locations->radius) }}">
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <label>Latitude</label>
+                            <input type="text" id="latitude" name="latitude" class="form-control" readonly
+                                value="{{ old('latitude', $locations->latitude) }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Longitude</label>
+                            <input type="text" id="longitude" name="longitude" class="form-control" readonly
+                                value="{{ old('longitude', $locations->longitude) }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label>Radius (meter)</label>
+                            <input type="number" id="radius" name="radius" class="form-control" readonly
+                                value="{{ old('radius', $locations->radius) }}">
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
 
 
     </div>

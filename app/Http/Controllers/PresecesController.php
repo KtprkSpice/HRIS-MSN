@@ -16,7 +16,14 @@ class PresecesController extends Controller
 {
     public function index()
     {
-        $presences = Presence::all();
+        $user = auth()->user();
+        $roles = $user->role->name;
+        if ($roles === 'employee') {
+            $presences = Presence::where('employee_id', $user->employee->id)->get();
+        } else {
+            $presences = Presence::all();
+
+        }
 
         return view('presences.index', compact('presences'));
     }

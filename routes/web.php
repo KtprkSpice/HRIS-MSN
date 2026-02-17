@@ -18,12 +18,13 @@ Route::get('/', function () {
 });
 
 // Owner Route
-Route::middleware(['auth', 'roles:owner,employee,hr'])->group(function () {
+Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
     // Dashboard
     Route::resource('/dashboard', DashboardController::class);
 
     // Edit Profile
     Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('profile/{id}/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('profile/password', function () {
         return view('Profile.password');
     })->name('profile.password');

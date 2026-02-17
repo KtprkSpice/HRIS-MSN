@@ -38,6 +38,12 @@
         </select>
     </div>
 
+    @php
+        $hasDocument = $leaveRequests->contains(function ($leave) {
+            return !empty($leave->document_file);
+        });
+    @endphp
+
     <!-- Tabel Tugas -->
     <div class="card shadow">
         <div class="card-body">
@@ -45,70 +51,115 @@
             <div class="table-responsive">
                 <table id="leaveTable" class="table table-bordered">
                     <thead>
-                        <tr>
-                            <th>Nama Karyawan</th>
-                            <th>Jenis Cuti</th>
-                            <th>Tanggal Mulai</th>
-                            <th>Tanggal Selesai</th>
-                            <th>Status</th>
-                            <th>Aksi</th>
-                            <th>Opsi</th>
-                        </tr>
+                        {{-- Th Owner and Hr --}}
+                        @if (in_array($userRole, ['hr', 'owner']))
+                            <tr>
+                                <th>Nama Karyawan</th>
+                                <th>Jenis Cuti</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Status</th>
+                                <th>Aksi</th>
+                                <th>Opsi</th>
+                            </tr>
+                        @else
+                            {{-- TR for Employee --}}
+                            <tr>
+                                <th>Nama Karyawan</th>
+                                <th>Jenis Cuti</th>
+                                <th>Tanggal Mulai</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Status</th>
+                                @if ($hasDocument)
+                                    <th>Dokumen</th>
+                                @endif
+                            </tr>
+                        @endif
                     </thead>
                     <tbody>
                         @foreach ($leaveRequests as $leave)
-                            <tr>
-                                <td>{{ ucwords($leave->employee->fullname) }}</td>
-                                <td>{{ ucwords($leave->types->name) }}</td>
-                                <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
-                                <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
-                                <td><span @class([
-                                    'badge bg-danger text-white text-center p-2' =>
-                                        $leave->status == 'rejected',
-                                    'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
-                                    'badge bg-warning text-white text-center p-2' =>
-                                        $leave->status == 'pending',
-                                ])>{{ ucwords($leave->status) }}</span>
-                                </td>
-                                <td>
-                                    <select class="form-select" onchange="changeStatus(this)">
-                                        <option value="">Pilih...</option>
-                                        @if ($leave->status == 'pending')
-                                            <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
-                                            </option>
-                                            <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
-                                            </option>
-                                        @elseif ($leave->status == 'confirmed')
-                                            <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
-                                            </option>
-                                            <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
-                                            </option>
-                                        @else
-                                            <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
-                                            <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
-                                            </option>
+                            {{-- TR for Owener and HR --}}
+                            @if (in_array($userRole, ['hr', 'owner']))
+                                <tr>
+                                    <td>{{ ucwords($leave->employee->fullname) }}</td>
+                                    <td>{{ ucwords($leave->types->name) }}</td>
+                                    <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
+                                    <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
+                                    <td><span @class([
+                                        'badge bg-danger text-white text-center p-2' =>
+                                            $leave->status == 'rejected',
+                                        'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
+                                        'badge bg-warning text-white text-center p-2' =>
+                                            $leave->status == 'pending',
+                                    ])>{{ ucwords($leave->status) }}</span>
+                                    </td>
+                                    <td>
+                                        <select class="form-select" onchange="changeStatus(this)">
+                                            <option value="">Pilih...</option>
+                                            @if ($leave->status == 'pending')
+                                                <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
+                                                </option>
+                                                <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
+                                                </option>
+                                            @elseif ($leave->status == 'confirmed')
+                                                <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
+                                                </option>
+                                                <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
+                                                </option>
+                                            @else
+                                                <option value="{{ route('leave-request.confirmed', $leave->id) }}">
+                                                    Confirmed
+                                                <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
+                                                </option>
+                                            @endif
+                                        </select>
+                                    </td>
+                                    <td>
+                                        @if ($leave->document_file)
+                                            <a class="btn btn-info btn-sm text-white"
+                                                href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
+                                                <i class="fa-solid fa-file"></i>
+                                            </a>
                                         @endif
-                                    </select>
-                                </td>
-                                <td>
-                                    @if ($leave->document_file)
-                                        <a class="btn btn-info btn-sm text-white"
-                                            href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
-                                            <i class="fa-solid fa-file"></i>
-                                        </a>
+                                        <a href="{{ route('leave-request.edit', $leave->id) }}"
+                                            class="btn btn-warning btn-sm text-white"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
+                                            class="d-inline" id="deleteForm{{ $leave->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" type="button"
+                                                onclick="confirmDelete({{ $leave->id }})"><i
+                                                    class="fa-solid fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @else
+                                {{-- Tr for Employee --}}
+                                <tr>
+                                    <td>{{ ucwords($leave->employee->fullname) }}</td>
+                                    <td>{{ ucwords($leave->types->name) }}</td>
+                                    <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
+                                    <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
+                                    <td><span @class([
+                                        'badge bg-danger text-white text-center p-2' =>
+                                            $leave->status == 'rejected',
+                                        'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
+                                        'badge bg-warning text-white text-center p-2' =>
+                                            $leave->status == 'pending',
+                                    ])>{{ ucwords($leave->status) }}</span>
+                                    </td>
+                                    @if ($hasDocument)
+                                        <td>
+                                            @if ($leave->document_file)
+                                                <a class="btn btn-info btn-sm text-white"
+                                                    href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
+                                                    <i class="fa-solid fa-file"></i>
+                                                </a>
+                                            @endif
+                                        </td>
                                     @endif
-                                    <a href="{{ route('leave-request.edit', $leave->id) }}"
-                                        class="btn btn-warning btn-sm text-white"><i class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
-                                        class="d-inline" id="deleteForm{{ $leave->id }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" type="button"
-                                            onclick="confirmDelete({{ $leave->id }})"><i
-                                                class="fa-solid fa-trash"></i></button>
-                                    </form>
-                                </td>
-                            </tr>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -130,42 +181,22 @@
                         next: "Berikutnya",
                     },
                 },
-                columnDefs: [{
-                    targets: 6,
-                    orderable: false,
-                    searchable: false
-                }]
+                @if (in_array($userRole, ['hr', 'owner']))
+                    columnDefs: [{
+                        targets: 6,
+                        orderable: false,
+                        searchable: false
+                    }]
+                @elseif ($hasDocument)
+                    columnDefs: [{
+                        targets: 5,
+                        orderable: false,
+                        searchable: false
+                    }]
+                @endif
             });
 
-            // Custom filtering
-            DataTable.ext.search.push(function(settings, data, dataIndex) {
-
-                let filterKaryawan = $("#filterKaryawan").val();
-                let filterStatus = $("#filterStatus").val();
-
-                let namaKaryawan = data[0]; // kolom nama karyawan
-                let status = data[4]; // kolom status (cek index tabel kamu)
-
-                if (
-                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
-                    (filterStatus === "" || status.includes(filterStatus))
-                ) {
-                    return true;
-                }
-                return false;
-            });
-
-            // Re-draw table on dropdown change
-            $("#filterKaryawan, #filterStatus").on("change", function() {
-                table.draw();
-            });
         });
-
-        function changeStatus(select) {
-            if (select.value) {
-                window.location.href = select.value
-            }
-        }
     </script>
 
 @endsection

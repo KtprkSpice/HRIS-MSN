@@ -14,69 +14,97 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::all();
+        $user = auth()->user();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $employees = Employee::all();
+
+        }
 
         return view('Employees.index', compact('employees'));
+
     }
 
     public function create()
     {
-        $divisions = Division::all();
-        $roles = Role::all();
+        $user = auth()->user();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $divisions = Division::all();
+            $roles = Role::all();
+        }
 
         return view('Employees.create', compact('divisions', 'roles'));
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'fullname' => 'required|string|max:255',
-            'nik' => 'required|digits_between:1,20|unique:employees,nik',
-            'division_id' => 'required',
-            'address' => 'nullable|string',
-            'email' => 'required|unique:employees,email|string',
-            'phone' => 'required|unique:employees,phone|digits_between:1,20|max:20',
-            'hire_date' => 'required|date',
-            'born_date' => 'required|date',
-            'bpjs_kesehatan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_kesehatan',
-            'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_ketenagakerjaan',
-            'npwp' => 'required|max:30|unique:employees,npwp',
-            'role_id' => 'required|exists:roles,id',
-        ]);
+        $roles = auth()->user()->role->name;
 
-        DB::transaction(function () use ($validated) {
-            $user = User::create([
-                'name' => $validated['fullname'],
-                'email' => strtolower(str_replace(' ', '', $validated['email'])),
-                'password' => Hash::make(strtolower(str_replace(' ', '', $validated['email']))),
-                'role_id' => $validated['role_id'],
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $validated = $request->validate([
+                'fullname' => 'required|string|max:255',
+                'nik' => 'required|digits_between:1,20|unique:employees,nik',
+                'division_id' => 'required',
+                'address' => 'nullable|string',
+                'email' => 'required|unique:employees,email|string',
+                'phone' => 'required|unique:employees,phone|digits_between:1,20|max:20',
+                'hire_date' => 'required|date',
+                'born_date' => 'required|date',
+                'bpjs_kesehatan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_kesehatan',
+                'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20|unique:employees,bpjs_ketenagakerjaan',
+                'npwp' => 'required|max:30|unique:employees,npwp',
+                'role_id' => 'required|exists:roles,id',
             ]);
 
-            Employee::create([
-                'fullname' => $validated['fullname'],
-                'nik' => $validated['nik'],
-                'division_id' => $validated['division_id'],
-                'address' => $validated['address'] ?? null,
-                'email' => $validated['email'],
-                'phone' => $validated['phone'],
-                'hire_date' => $validated['hire_date'],
-                'born_date' => $validated['born_date'],
-                'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
-                'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'],
-                'npwp' => $validated['npwp'],
-                'status' => 'active',
-                'user_id' => $user->id,
-            ]);
-        });
+            DB::transaction(function () use ($validated) {
+                $user = User::create([
+                    'name' => $validated['fullname'],
+                    'email' => strtolower(str_replace(' ', '', $validated['email'])),
+                    'password' => Hash::make(strtolower(str_replace(' ', '', $validated['email']))),
+                    'role_id' => $validated['role_id'],
+                ]);
+
+                Employee::create([
+                    'fullname' => $validated['fullname'],
+                    'nik' => $validated['nik'],
+                    'division_id' => $validated['division_id'],
+                    'address' => $validated['address'] ?? null,
+                    'email' => $validated['email'],
+                    'phone' => $validated['phone'],
+                    'hire_date' => $validated['hire_date'],
+                    'born_date' => $validated['born_date'],
+                    'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
+                    'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'],
+                    'npwp' => $validated['npwp'],
+                    'status' => 'active',
+                    'user_id' => $user->id,
+                ]);
+            });
+        }
 
         return redirect()->route('employee.index')->with('success', 'Data Berhasil Dibuat');
     }
 
     public function edit(Employee $employee)
     {
-        $divisions = Division::all();
-        $roles = Role::all();
-        $user = User::all();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $divisions = Division::all();
+            $roles = Role::all();
+            $user = User::all();
+        }
 
         return view('employees.edit', compact('divisions', 'roles', 'employee', 'user'));
     }
@@ -84,39 +112,45 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $nama = $employee->fullname;
-        $request->validate([
-            'fullname' => 'required|string|max:255',
-            'nik' => 'required|digits_between:1,20',
-            'division_id' => 'required',
-            'address' => 'nullable|string',
-            'email' => 'required|string',
-            'phone' => 'required|digits_between:1,20|max:20',
-            'hire_date' => 'required|date',
-            'born_date' => 'required|date',
-            'bpjs_kesehatan' => 'required|digits_between:1,20|max:20',
-            'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20',
-            'npwp' => 'required|max:30',
-            'role_id' => 'required|exists:roles,id',
-        ]);
+        $roles = auth()->user()->role->name;
 
-        $employee->update([
-            'fullname' => $request->fullname,
-            'nik' => $request->nik,
-            'division_id' => $request->division_id,
-            'address' => $request->address,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'hire_date' => $request->hire_date,
-            'born_date' => $request->born_date,
-            'bpjs_kesehatan' => $request->bpjs_kesehatan,
-            'bpjs_ketenagakerjaan' => $request->bpjs_ketenagakerjaan,
-            'npwp' => $request->npwp,
-        ]);
-
-        if ($employee->user) {
-            $employee->user->update([
-                'role_id' => $request->role_id,
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $request->validate([
+                'fullname' => 'required|string|max:255',
+                'nik' => 'required|digits_between:1,20',
+                'division_id' => 'required',
+                'address' => 'nullable|string',
+                'email' => 'required|string',
+                'phone' => 'required|digits_between:1,20|max:20',
+                'hire_date' => 'required|date',
+                'born_date' => 'required|date',
+                'bpjs_kesehatan' => 'required|digits_between:1,20|max:20',
+                'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20',
+                'npwp' => 'required|max:30',
+                'role_id' => 'required|exists:roles,id',
             ]);
+
+            $employee->update([
+                'fullname' => $request->fullname,
+                'nik' => $request->nik,
+                'division_id' => $request->division_id,
+                'address' => $request->address,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'hire_date' => $request->hire_date,
+                'born_date' => $request->born_date,
+                'bpjs_kesehatan' => $request->bpjs_kesehatan,
+                'bpjs_ketenagakerjaan' => $request->bpjs_ketenagakerjaan,
+                'npwp' => $request->npwp,
+            ]);
+
+            if ($employee->user) {
+                $employee->user->update([
+                    'role_id' => $request->role_id,
+                ]);
+            }
         }
 
         return redirect()->route('employee.index')->with('success', "Data $nama Telah Diubah");
@@ -124,8 +158,13 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee)
     {
+        $roles = auth()->user()->role->name;
         $nama = $employee->fullname;
-        $employee->delete();
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $employee->delete();
+        }
 
         return redirect()
             ->route('employee.index')

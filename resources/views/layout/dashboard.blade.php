@@ -248,36 +248,51 @@
             </div>
         </div>
         <ul>
-            {{-- @if (auth()->check() && auth()->user()->role->name == 'owner') --}}
-            <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
-                        class="fa-solid fa-house"></i> Dashboard</a></li>
-            <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
-            <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
-                        class="fa-solid fa-tasks"></i> Tugas</a></li>
-            <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
-                        class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
-            <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
-                        class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
-            <li><a href="{{ route('leave-request.index') }}"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
-            <li><a href="{{ route('leave-type.index') }}"><i class="fa-solid fa-plane"></i> Jenis Cuti</a></li>
-            <li><a href="{{ route('presence.index') }}"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
-            <li><a href="{{ route('division.index') }}"><i class="fa-solid fa-user-check"></i> Divisi</a></li>
-            <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
-            <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-            {{-- @endif --}}
-            {{-- @if (auth()->check() && auth()->user()->role->name == 'hr')
+            @if ($userRole === 'owner')
+                <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
+                            class="fa-solid fa-house"></i> Dashboard</a></li>
+                <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
+                            class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
+                <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
+                            class="fa-solid fa-tasks"></i> Tugas</a></li>
+                <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                            class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
+                <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
+                            class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
+                        Slip Gaji</a></li>
+                <li><a href="{{ route('leave-request.index') }}"
+                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        Pengajuan Cuti</a>
+                </li>
+                <li><a href="{{ route('leave-type.index') }}"
+                        class="{{ request()->is('leave-type') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        Jenis Cuti</a></li>
+                <li><a href="{{ route('presence.index') }}" class="{{ request()->is('presence') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li><a href="{{ route('division.index') }}" class="{{ request()->is('division') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-check"></i> Divisi</a></li>
+                <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
+                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+            @endif
+            @if ($userRole === 'employee')
                 <li><a href="{{ route('dashboard.index') }}"
                         class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
                         Dashboard</a></li>
-                <li><a href="{{ route('employee.index') }}"><i class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
                 <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
                             class="fa-solid fa-tasks"></i> Tugas</a></li>
-                <li><a href="{{ route('payroll.index') }}" class="{{ request()->is('payroll') ? 'active' : '' }}"><i
-                            class="fa-solid fa-money-bill"></i> Slip Gaji</a></li>
-                <li><a href="cuti.php"><i class="fa-solid fa-plane"></i> Pengajuan Cuti</a></li>
-                <li><a href="kehadiran.php"><i class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
+                            class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
+                        Slip Gaji</a></li>
+                <li><a href="{{ route('leave-request.index') }}"
+                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        Pengajuan Cuti</a>
+                </li>
+                <li><a href="{{ route('presence.index') }}" class="{{ request()->is('presence') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                            class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
                 <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
-            @endif --}}
+            @endif
         </ul>
     </aside>
 

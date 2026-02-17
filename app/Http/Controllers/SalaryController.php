@@ -14,47 +14,73 @@ class SalaryController extends Controller
 {
     public function index()
     {
-        $salaries = Salary::all();
+        $user = auth()->user();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            $salaries = Salary::where('employee_id', $user->employee->id)->get();
+        } else {
+            $salaries = Salary::all();
+        }
 
         return view('Salary.index', compact('salaries'));
     }
 
     public function create()
     {
-        $employees = Employee::all();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $employees = Employee::all();
+        }
 
         return view('salary.create', compact('employees'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'employee_id' => 'required',
-            'net_salary' => 'required',
-            'cuts' => 'nullable',
-            'bonus' => 'nullable',
-            'date' => 'nullable',
-        ]);
 
-        $salary = (int) str_replace('.', '', $request->net_salary);
-        $bonus = (int) str_replace('.', '', $request->bonus);
-        $cuts = (int) str_replace('.', '', $request->cuts);
+        $roles = auth()->user()->role->name;
 
-        $request->merge([
-            'net_salary' => $salary,
-            'bonus' => $bonus,
-            'cuts' => $cuts,
-            'total' => $salary + $bonus - $cuts,
-        ]);
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $request->validate([
+                'employee_id' => 'required',
+                'net_salary' => 'required',
+                'cuts' => 'nullable',
+                'bonus' => 'nullable',
+                'date' => 'nullable',
+            ]);
 
-        Salary::create($request->all());
+            $salary = (int) str_replace('.', '', $request->net_salary);
+            $bonus = (int) str_replace('.', '', $request->bonus);
+            $cuts = (int) str_replace('.', '', $request->cuts);
+
+            $request->merge([
+                'net_salary' => $salary,
+                'bonus' => $bonus,
+                'cuts' => $cuts,
+                'total' => $salary + $bonus - $cuts,
+            ]);
+
+            Salary::create($request->all());
+        }
 
         return redirect()->route('salary.index')->with('success', 'Data Berhasil ditambahkan');
     }
 
     public function edit(Salary $salary)
     {
-        $employees = Employee::all();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $employees = Employee::all();
+        }
 
         return view('salary.edit', compact('salary', 'employees'));
     }
@@ -62,33 +88,45 @@ class SalaryController extends Controller
     public function update(Request $request, Salary $salary)
     {
 
-        $request->validate([
-            'employee_id' => 'required',
-            'net_salary' => 'required',
-            'cuts' => 'nullable',
-            'bonus' => 'nullable',
-            'date' => 'nullable',
-        ]);
+        $roles = auth()->user()->role->name;
 
-        $net = (int) str_replace('.', '', $request->net_salary);
-        $cuts = (int) str_replace('.', '', $request->cuts);
-        $bonus = (int) str_replace('.', '', $request->bonus);
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $request->validate([
+                'employee_id' => 'required',
+                'net_salary' => 'required',
+                'cuts' => 'nullable',
+                'bonus' => 'nullable',
+                'date' => 'nullable',
+            ]);
 
-        $request->merge([
-            'net_salary' => $net,
-            'bonus' => $bonus,
-            'cuts' => $cuts,
-            'total' => $net + $bonus - $cuts,
-        ]);
+            $net = (int) str_replace('.', '', $request->net_salary);
+            $cuts = (int) str_replace('.', '', $request->cuts);
+            $bonus = (int) str_replace('.', '', $request->bonus);
 
-        $salary->update($request->all());
+            $request->merge([
+                'net_salary' => $net,
+                'bonus' => $bonus,
+                'cuts' => $cuts,
+                'total' => $net + $bonus - $cuts,
+            ]);
+
+            $salary->update($request->all());
+        }
 
         return redirect()->route('salary.index')->with('success', 'Data Telah diubah');
     }
 
     public function destroy(Salary $salary)
     {
-        $salary->delete();
+        $roles = auth()->user()->role->name;
+
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            $salary->delete();
+        }
 
         return redirect()->route('salary.index')->with('success', 'Data Telah Dihapus');
     }
@@ -96,95 +134,101 @@ class SalaryController extends Controller
     // Generate Salary
     public function generate()
     {
-        Log::info('Salary generation started');
+        $roles = auth()->user()->role->name;
 
-        $today = today();
-        $start = $today->copy()->startOfMonth();
-        $end = $today->copy()->day(28);
+        if ($roles === 'employee') {
+            abort(403);
+        } else {
+            Log::info('Salary generation started');
 
-        // Duplication check
-        if (Salary::whereDate('date', $start)->exists()) {
-            Log::warning('Generate Salary Failed - already generated', [
-                'period' => $start->format('Y-m'),
-            ]);
+            $today = today();
+            $start = $today->copy()->startOfMonth();
+            $end = $today->copy()->day(28);
 
-            return back()->with('error', 'Gaji periode ini sudah digenerate');
-        }
+            // Duplication check
+            if (Salary::whereDate('date', $start)->exists()) {
+                Log::warning('Generate Salary Failed - already generated', [
+                    'period' => $start->format('Y-m'),
+                ]);
 
-        $employees = Employee::where('status', 'active')->get();
+                return back()->with('error', 'Gaji periode ini sudah digenerate');
+            }
 
-        foreach ($employees as $employee) {
-            try {
+            $employees = Employee::where('status', 'active')->get();
 
-                // PRESENCE CUTS
-                $presences = Presence::where('employee_id', $employee->id)
-                    ->whereBetween('date', [$start, $end])
-                    ->get();
+            foreach ($employees as $employee) {
+                try {
 
-                $lateMinutes = $presences->sum('late_minutes');
-                $lateCuts = $lateMinutes * 1000;
+                    // PRESENCE CUTS
+                    $presences = Presence::where('employee_id', $employee->id)
+                        ->whereBetween('date', [$start, $end])
+                        ->get();
 
-                //    LeaveCuts Default
-                $leaveCuts = 0;
+                    $lateMinutes = $presences->sum('late_minutes');
+                    $lateCuts = $lateMinutes * 1000;
 
-                $leaves = LeaveRequest::with('types')
-                    ->where('employee_id', $employee->id)
-                    ->where('status', 'confirmed')
-                    ->where(function ($q) use ($start, $end) {
-                        $q->whereBetween('start_date', [$start, $end])
-                            ->orWhereBetween('end_date', [$start, $end]);
-                    })
-                    ->get();
+                    //    LeaveCuts Default
+                    $leaveCuts = 0;
 
-                foreach ($leaves as $leave) {
+                    $leaves = LeaveRequest::with('types')
+                        ->where('employee_id', $employee->id)
+                        ->where('status', 'confirmed')
+                        ->where(function ($q) use ($start, $end) {
+                            $q->whereBetween('start_date', [$start, $end])
+                                ->orWhereBetween('end_date', [$start, $end]);
+                        })
+                        ->get();
 
-                    $type = $leave->types;
+                    foreach ($leaves as $leave) {
 
-                    // skip kalau paid atau data rusak
-                    if (! $type || $type->is_paid) {
-                        continue;
+                        $type = $leave->types;
+
+                        // skip kalau paid atau data rusak
+                        if (! $type || $type->is_paid) {
+                            continue;
+                        }
+
+                        $leaveStart = Carbon::parse($leave->start_date)->max($start);
+                        $leaveEnd = Carbon::parse($leave->end_date)->min($end);
+
+                        $days = $leaveStart->diffInDays($leaveEnd) + 1;
+
+                        $leaveCuts += $days * $type->deduction;
                     }
 
-                    $leaveStart = Carbon::parse($leave->start_date)->max($start);
-                    $leaveEnd = Carbon::parse($leave->end_date)->min($end);
+                    // Final Saalry
+                    $baseSalary = 5000000;
+                    $totalCuts = $lateCuts + $leaveCuts;
+                    $net = $baseSalary - $totalCuts;
 
-                    $days = $leaveStart->diffInDays($leaveEnd) + 1;
+                    Salary::create([
+                        'employee_id' => $employee->id,
+                        'net_salary' => $baseSalary,
+                        'cuts' => $totalCuts,
+                        'bonus' => 0,
+                        'date' => $start,
+                        'total' => $net,
+                    ]);
 
-                    $leaveCuts += $days * $type->deduction;
+                    Log::info('Salary Generated', [
+                        'employee_id' => $employee->id,
+                        'period' => $start->format('Y-m'),
+                        'late_cuts' => $lateCuts,
+                        'leave_cuts' => $leaveCuts,
+                        'total_cuts' => $totalCuts,
+                        'total' => $net,
+                    ]);
+
+                } catch (\Throwable $e) {
+                    Log::error('Generate Salary Error', [
+                        'employee_id' => $employee->id,
+                        'message' => $e->getMessage(),
+                    ]);
                 }
-
-                // Final Saalry
-                $baseSalary = 5000000;
-                $totalCuts = $lateCuts + $leaveCuts;
-                $net = $baseSalary - $totalCuts;
-
-                Salary::create([
-                    'employee_id' => $employee->id,
-                    'net_salary' => $baseSalary,
-                    'cuts' => $totalCuts,
-                    'bonus' => 0,
-                    'date' => $start,
-                    'total' => $net,
-                ]);
-
-                Log::info('Salary Generated', [
-                    'employee_id' => $employee->id,
-                    'period' => $start->format('Y-m'),
-                    'late_cuts' => $lateCuts,
-                    'leave_cuts' => $leaveCuts,
-                    'total_cuts' => $totalCuts,
-                    'total' => $net,
-                ]);
-
-            } catch (\Throwable $e) {
-                Log::error('Generate Salary Error', [
-                    'employee_id' => $employee->id,
-                    'message' => $e->getMessage(),
-                ]);
             }
-        }
 
-        Log::info('Salary generation ended');
+            Log::info('Salary generation ended');
+        }
 
         return back()->with('success', 'Gaji berhasil digenerate');
     }

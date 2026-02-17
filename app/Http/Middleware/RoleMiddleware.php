@@ -16,13 +16,16 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         $user = $request->user();
-        if (!$user) {
+        // dd($user->role);
+
+        if (! $user) {
             return redirect()->route('login')->with('error', 'Harap Login Terlebih Dahulu');
         }
 
-        if (!in_array($user->role->name, $roles)) {
+        if (! in_array($user->role->name, $roles)) {
             abort(403, 'Anda tidak dapat mengakses halaman ini');
         }
+
         return $next($request);
     }
 }
