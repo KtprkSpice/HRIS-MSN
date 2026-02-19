@@ -17,17 +17,19 @@
 
         @csrf
 
-        <div class="col-md-6">
-            <label class="form-label">Nama Karyawan</label>
-            <select name="employee_id" class="form-select" required>
-                <option value="">Choose...</option>
-                @foreach ($employees as $employee)
-                    <option value="{{ $employee->id }}">
-                        {{ ucwords($employee->fullname) }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
+        @if (in_array($userRole, ['hr', 'owner']))
+            <div class="col-md-6">
+                <label class="form-label">Nama Karyawan</label>
+                <select name="employee_id" class="form-select" required>
+                    <option value="">Choose...</option>
+                    @foreach ($employees as $employee)
+                        <option value="{{ $employee->id }}">
+                            {{ ucwords($employee->fullname) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
 
         <div class="col-md-6">
             <label class="form-label">Tanggal Mulai</label>

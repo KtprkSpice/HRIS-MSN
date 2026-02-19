@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\leaveApproval;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
+use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class LeaveRequestController extends Controller
 {
@@ -25,27 +28,77 @@ class LeaveRequestController extends Controller
 
     public function create()
     {
-
+        $user = auth()->user();
         $roles = auth()->user()->role->name;
 
+        $types = LeaveType::all();
+        $employees = null;
+
         if ($roles === 'employee') {
-            abort(403, 'Anda tidak dapat mengakses halaman ini.');
+            $employees = Employee::where('user_id', $user->id)->get();
+        } elseif ($roles === 'hr') {
+            // Bisa ajuin cuti untuk semua employe kecuali diri sendiri
+            $employees = Employee::where('user_id', '!=', $user->id)->get();
         } else {
-            $types = LeaveType::all();
-            $leaveRequests = LeaveRequest::all();
             $employees = Employee::all();
         }
 
-        return view('leave.create', compact('leaveRequests', 'employees', 'types'));
+        return view('leave.create', compact('employees', 'types'));
     }
 
     public function store(Request $request)
     {
 
+        $user = auth()->user();
         $roles = auth()->user()->role->name;
 
         if ($roles === 'employee') {
-            abort(403, 'Anda tidak dapat mengakses halaman ini.');
+
+            $validated = $request->validate([
+                'start_date' => 'required|date',
+                'end_date' => 'required|date',
+                'leave_id' => 'required',
+                'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            DB::transaction(function () use ($user, $request, $validated) {
+
+                if ($request->file('document_file')) {
+
+                    $file = $request->file('document_file');
+
+                    $filename = time().'_'.$file->getClientOriginalName();
+
+                    $file->move(storage_path('app/public/surat_dokter'), $filename);
+
+                    $validated['document_file'] = 'surat_dokter/'.$filename;
+                }
+
+                $leave = LeaveRequest::create([
+                    ...$validated,
+                    'employee_id' => $user->employee->id,
+                ]);
+
+                $hrRole = Role::where('name', 'hr')->first();
+                $ownerRole = Role::where('name', 'owner')->first();
+
+                // Hr Approval
+                leaveApproval::create([
+                    'leave_request_id' => $leave->id,
+                    'approval_order' => 1,
+                    'role_id' => $hrRole->id,
+                    'status' => 'pending',
+                ]);
+
+                // Owner approval
+                leaveApproval::create([
+                    'leave_request_id' => $leave->id,
+                    'approval_order' => 2,
+                    'role_id' => $ownerRole->id,
+                    'status' => 'pending',
+                ]);
+            });
+
         } else {
             $validated = $request->validate([
                 'employee_id' => 'required',
@@ -61,18 +114,44 @@ class LeaveRequestController extends Controller
             //     $request->file('document_file')?->getPathname()
             // );
 
-            if ($request->file('document_file')) {
+            DB::transaction(function () use ($request, $validated) {
+                if ($request->file('document_file')) {
 
-                $file = $request->file('document_file');
+                    $file = $request->file('document_file');
 
-                $filename = time().'_'.$file->getClientOriginalName();
+                    $filename = time().'_'.$file->getClientOriginalName();
 
-                $file->move(storage_path('app/public/surat_dokter'), $filename);
+                    $file->move(storage_path('app/public/surat_dokter'), $filename);
 
-                $validated['document_file'] = 'surat_dokter/'.$filename;
-            }
+                    $validated['document_file'] = 'surat_dokter/'.$filename;
+                }
+                $leave = LeaveRequest::create([
+                    ...$validated,
+                    'status' => 'pending',
+                    'current_step' => 1,
+                    'final_appoved_at' => null,
+                ]);
 
-            LeaveRequest::create($validated);
+                $hrRole = Role::where('name', 'hr')->first();
+                $ownerRole = Role::where('name', 'owner')->first();
+
+                // Hr Approval
+                leaveApproval::create([
+                    'leave_request_id' => $leave->id,
+                    'approval_order' => 1,
+                    'role_id' => $hrRole->id,
+                    'status' => 'pending',
+                ]);
+
+                // Owener Approval
+                leaveApproval::create([
+                    'leave_request_id' => $leave->id,
+                    'approval_order' => 2,
+                    'role_id' => $ownerRole->id,
+                    'status' => 'pending',
+                ]);
+
+            });
         }
 
         return redirect()->route('leave-request.index')
@@ -204,5 +283,70 @@ class LeaveRequestController extends Controller
         }
 
         return redirect()->route('leave-request.index')->with('success', "Cuti untuk $name telah diupdate menjadi rejected");
+    }
+
+    public function approve($id)
+    {
+        $user = auth()->user();
+        $role = $user->role->name;
+
+        if (! in_array($role, ['hr', 'owner'])) {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $leave = LeaveRequest::with('approvals')->findOrFail($id);
+
+        DB::transaction(function () use ($leave, $user, $role) {
+
+            // 🔹 Cari approval step sesuai current_step
+            $approval = leaveApproval::where('leave_request_id', $leave->id)
+                ->where('approval_order', $leave->current_step)
+                ->first();
+
+            // dd(
+            //     'Current Step: '.$leave->current_step,
+            //     'Approval Role ID: '.$approval?->role_id,
+            //     'Approval Role Name: '.$approval?->role?->name,
+            //     'Login Role ID: '.auth()->user()->role_id,
+            //     'Login Role Name: '.auth()->user()->role->name
+            // );
+
+            // 🔹 Pastikan role sesuai
+            if ($approval->role->name !== $role) {
+                abort(403, 'Bukan giliran Anda untuk approve.');
+            }
+
+            // 🔹 Update approval step
+            $approval->update([
+                'status' => 'approved',
+                'approved_by' => $user->id,
+                'approved_at' => now(),
+            ]);
+
+            // 🔹 Kalau masih ada step berikutnya
+            $nextStep = leaveApproval::where('leave_request_id', $leave->id)
+                ->where('approval_order', '>', $leave->current_step)
+                ->orderBy('approval_order')
+                ->first();
+
+            if ($nextStep) {
+
+                // Lanjut ke step berikutnya
+                $leave->update([
+                    'current_step' => $nextStep->approval_order,
+                ]);
+
+            } else {
+
+                // Tidak ada step lagi → FINAL APPROVED
+                $leave->update([
+                    'status' => 'confirmed',
+                    'final_approved_at' => now(),
+                ]);
+            }
+        });
+
+        return redirect()->route('leave-request.index')
+            ->with('success', 'Cuti berhasil diapprove.');
     }
 }

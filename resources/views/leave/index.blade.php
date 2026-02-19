@@ -1,165 +1,155 @@
 @extends('layout.dashboard')
 @section('header', 'Pengajuan Cuti')
+
 @section('content')
+
     <div class="card shadow mb-4">
         <div class="card-header bg-primary text-white">
             <i class="fa-solid fa-plus-circle me-2"></i> Tambah Cuti Manual
         </div>
+
         @if (session('success'))
-            <span class="alert alert-success">{{ session('success') }}</span>
+            <span class="alert alert-success d-block m-3">{{ session('success') }}</span>
         @endif
+
         <div class="card-body">
-            <div class="col-md-1 d-grid align-self-end">
-                <a href="{{ route('leave-request.create') }}" type="button" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Tambah
+            @if ($userRole === 'employee')
+                <a href="{{ route('leave-request.create') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Ajukan Cuti
                 </a>
-            </div>
+            @endif
+            @if ($userRole === 'hr')
+                <a href="{{ route('leave-request.create') }}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus"></i> Ajukan Cuti
+                </a>
+            @endif
         </div>
     </div>
 
-    <!-- Filter -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="me-2 fw-bold">Filter Status:</label>
-        <select id="filterStatus" class="form-select w-auto me-3">
-            <option value="">Semua</option>
-            <option value="Belum Selesai">Belum Selesai</option>
-            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-            <option value="Selesai">Selesai</option>
-            <option value="Menunggu ACC HRD">Menunggu ACC HRD</option>
-            <option value="Ditolak HRD">Ditolak HRD</option>
-        </select>
-
-        <label class="me-2 fw-bold">Filter Karyawan:</label>
-        <select id="filterKaryawan" class="form-select w-auto">
-            <option value="">Semua Karyawan</option>
-            <option value="Budi Santoso">Budi Santoso</option>
-            <option value="Siti Aminah">Siti Aminah</option>
-            <option value="Rudi Hartono">Rudi Hartono</option>
-        </select>
-    </div>
-
-    @php
-        $hasDocument = $leaveRequests->contains(function ($leave) {
-            return !empty($leave->document_file);
-        });
-    @endphp
-
-    <!-- Tabel Tugas -->
     <div class="card shadow">
         <div class="card-body">
-            <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Tugas</h5>
+            <h5 class="card-title">
+                <i class="fa-solid fa-list-check"></i> Daftar Pengajuan Cuti
+            </h5>
+
             <div class="table-responsive">
                 <table id="leaveTable" class="table table-bordered">
                     <thead>
-                        {{-- Th Owner and Hr --}}
-                        @if (in_array($userRole, ['hr', 'owner']))
-                            <tr>
-                                <th>Nama Karyawan</th>
-                                <th>Jenis Cuti</th>
-                                <th>Tanggal Mulai</th>
-                                <th>Tanggal Selesai</th>
-                                <th>Status</th>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Jenis Cuti</th>
+                            <th>Mulai</th>
+                            <th>Selesai</th>
+                            <th>Status HR</th>
+                            <th>Status Owner</th>
+                            <th>Status Final</th>
+                            @if (in_array($userRole, ['hr', 'owner']))
                                 <th>Aksi</th>
-                                <th>Opsi</th>
-                            </tr>
-                        @else
-                            {{-- TR for Employee --}}
-                            <tr>
-                                <th>Nama Karyawan</th>
-                                <th>Jenis Cuti</th>
-                                <th>Tanggal Mulai</th>
-                                <th>Tanggal Selesai</th>
-                                <th>Status</th>
-                                @if ($hasDocument)
-                                    <th>Dokumen</th>
-                                @endif
-                            </tr>
-                        @endif
+                            @endif
+                            <th>Dokumen</th>
+                        </tr>
                     </thead>
+
                     <tbody>
                         @foreach ($leaveRequests as $leave)
-                            {{-- TR for Owener and HR --}}
-                            @if (in_array($userRole, ['hr', 'owner']))
-                                <tr>
-                                    <td>{{ ucwords($leave->employee->fullname) }}</td>
-                                    <td>{{ ucwords($leave->types->name) }}</td>
-                                    <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
-                                    <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
-                                    <td><span @class([
-                                        'badge bg-danger text-white text-center p-2' =>
-                                            $leave->status == 'rejected',
-                                        'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
-                                        'badge bg-warning text-white text-center p-2' =>
-                                            $leave->status == 'pending',
-                                    ])>{{ ucwords($leave->status) }}</span>
-                                    </td>
+
+                            @php
+                                $hrApproval = $leave->approvals->where('approval_order', 1)->first();
+                                $ownerApproval = $leave->approvals->where('approval_order', 2)->first();
+                            @endphp
+
+                            <tr>
+                                <td>{{ ucwords($leave->employee->fullname) }}</td>
+                                <td>{{ ucwords($leave->types->name) }}</td>
+                                <td>{{ \Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
+
+                                {{-- STATUS HR --}}
+                                <td>
+                                    <span
+                                        class="badge 
+                                    {{ $hrApproval?->status === 'approved'
+                                        ? 'bg-success'
+                                        : ($hrApproval?->status === 'rejected'
+                                            ? 'bg-danger'
+                                            : 'bg-warning') }}">
+                                        {{ ucfirst($hrApproval?->status ?? 'pending') }}
+                                    </span>
+                                </td>
+
+                                {{-- STATUS OWNER --}}
+                                <td>
+                                    <span
+                                        class="badge 
+                                    {{ $ownerApproval?->status === 'approved'
+                                        ? 'bg-success'
+                                        : ($ownerApproval?->status === 'rejected'
+                                            ? 'bg-danger'
+                                            : 'bg-warning') }}">
+                                        {{ ucfirst($ownerApproval?->status ?? 'pending') }}
+                                    </span>
+                                </td>
+
+                                {{-- STATUS FINAL --}}
+                                <td>
+                                    <span
+                                        class="badge 
+                                    {{ $leave->status === 'confirmed' ? 'bg-info' : ($leave->status === 'rejected' ? 'bg-danger' : 'bg-warning') }}">
+                                        {{ ucfirst($leave->status) }}
+                                    </span>
+                                </td>
+
+                                {{-- AKSI --}}
+                                @if (in_array($userRole, ['hr', 'owner']))
                                     <td>
-                                        <select class="form-select" onchange="changeStatus(this)">
-                                            <option value="">Pilih...</option>
-                                            @if ($leave->status == 'pending')
-                                                <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
-                                                </option>
-                                                <option value="{{ route('leave-request.confirmed', $leave->id) }}">Confirmed
-                                                </option>
-                                            @elseif ($leave->status == 'confirmed')
-                                                <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
-                                                </option>
-                                                <option value="{{ route('leave-request.rejected', $leave->id) }}">Rejected
-                                                </option>
-                                            @else
-                                                <option value="{{ route('leave-request.confirmed', $leave->id) }}">
-                                                    Confirmed
-                                                <option value="{{ route('leave-request.pending', $leave->id) }}">Pending
-                                                </option>
+
+                                        @if ($leave->status === 'pending')
+                                            {{-- HR STEP --}}
+                                            @if ($userRole === 'hr' && $leave->current_step == 1)
+                                                <form action="{{ route('leave-request.approve', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+
+                                                {{-- <form action="{{ route('leave-request.reject', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-danger btn-sm">Reject</button>
+                                                </form> --}}
                                             @endif
-                                        </select>
-                                    </td>
-                                    <td>
-                                        @if ($leave->document_file)
-                                            <a class="btn btn-info btn-sm text-white"
-                                                href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
-                                                <i class="fa-solid fa-file"></i>
-                                            </a>
+
+                                            {{-- OWNER STEP --}}
+                                            @if ($userRole === 'owner' && $leave->current_step == 2)
+                                                <form action="{{ route('leave-request.approve', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-success btn-sm">Approve</button>
+                                                </form>
+
+                                                {{-- <form action="{{ route('leave-request.reject', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button class="btn btn-danger btn-sm">Reject</button>
+                                                </form> --}}
+                                            @endif
                                         @endif
-                                        <a href="{{ route('leave-request.edit', $leave->id) }}"
-                                            class="btn btn-warning btn-sm text-white"><i class="fa-solid fa-pen"></i></a>
-                                        <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
-                                            class="d-inline" id="deleteForm{{ $leave->id }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-danger btn-sm" type="button"
-                                                onclick="confirmDelete({{ $leave->id }})"><i
-                                                    class="fa-solid fa-trash"></i></button>
-                                        </form>
+
                                     </td>
-                                </tr>
-                            @else
-                                {{-- Tr for Employee --}}
-                                <tr>
-                                    <td>{{ ucwords($leave->employee->fullname) }}</td>
-                                    <td>{{ ucwords($leave->types->name) }}</td>
-                                    <td>{{ Carbon\Carbon::parse($leave->start_date)->format('d F Y') }}</td>
-                                    <td>{{ Carbon\Carbon::parse($leave->end_date)->format('d F Y') }}</td>
-                                    <td><span @class([
-                                        'badge bg-danger text-white text-center p-2' =>
-                                            $leave->status == 'rejected',
-                                        'badge bg-info text-white text-center p-2' => $leave->status == 'confirmed',
-                                        'badge bg-warning text-white text-center p-2' =>
-                                            $leave->status == 'pending',
-                                    ])>{{ ucwords($leave->status) }}</span>
-                                    </td>
-                                    @if ($hasDocument)
-                                        <td>
-                                            @if ($leave->document_file)
-                                                <a class="btn btn-info btn-sm text-white"
-                                                    href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
-                                                    <i class="fa-solid fa-file"></i>
-                                                </a>
-                                            @endif
-                                        </td>
+                                @endif
+
+                                {{-- DOKUMEN --}}
+                                <td>
+                                    @if ($leave->document_file)
+                                        <a class="btn btn-info btn-sm text-white"
+                                            href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
+                                            <i class="fa-solid fa-file"></i>
+                                        </a>
                                     @endif
-                                </tr>
-                            @endif
+                                </td>
+
+                            </tr>
+
                         @endforeach
                     </tbody>
                 </table>
@@ -169,9 +159,10 @@
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+
     <script>
         $(document).ready(function() {
-            let table = new DataTable('#leaveTable', {
+            new DataTable('#leaveTable', {
                 language: {
                     search: "Cari:",
                     lengthMenu: "Tampilkan _MENU_ data",
@@ -181,21 +172,14 @@
                         next: "Berikutnya",
                     },
                 },
-                @if (in_array($userRole, ['hr', 'owner']))
+                @if ($userRole === 'employee')
                     columnDefs: [{
-                        targets: 6,
-                        orderable: false,
-                        searchable: false
-                    }]
-                @elseif ($hasDocument)
-                    columnDefs: [{
-                        targets: 5,
+                        targets: 7,
                         orderable: false,
                         searchable: false
                     }]
                 @endif
             });
-
         });
     </script>
 

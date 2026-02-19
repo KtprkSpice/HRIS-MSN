@@ -51,6 +51,7 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
     Route::get('/leave-request/{id}/pending', [LeaveRequestController::class, 'pending'])->name('leave-request.pending');
     Route::get('/leave-request/{id}/confirmed', [LeaveRequestController::class, 'confirmed'])->name('leave-request.confirmed');
     Route::get('/leave-request/{id}/rejected', [LeaveRequestController::class, 'rejected'])->name('leave-request.rejected');
+    Route::post('/leave-request/{id}/approve', [LeaveRequestController::class, 'approve'])->name('leave-request.approve');
 
     // Leave Type
     Route::resource('/leave-type', LeaveTypeController::class);

@@ -17,6 +17,8 @@ class LeaveRequest extends Model
         'leave_id',
         'status',
         'document_file',
+        'current_step',
+        'final_approved',
     ];
 
     public function employee()
@@ -27,5 +29,10 @@ class LeaveRequest extends Model
     public function types()
     {
         return $this->belongsTo(LeaveType::class, 'leave_id');
+    }
+
+    public function approvals()
+    {
+        return $this->hasMany(leaveApproval::class);
     }
 }

@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('leave_requests', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'rejected'])->after('end_date')->default('pending');
+            $table->unsignedTinyInteger('current_step')->after('document_file')->default(1);
+            $table->timestamp('final_approved_at')->nullable()->after('current_step');
+            $table->index(['status', 'current_step']);
         });
     }
 
@@ -21,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('leave_request', function (Blueprint $table) {
+        Schema::table('leave_requests', function (Blueprint $table) {
             //
         });
     }
