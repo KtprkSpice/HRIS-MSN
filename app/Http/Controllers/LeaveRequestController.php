@@ -99,9 +99,8 @@ class LeaveRequestController extends Controller
                 ]);
             });
 
-        } else {
+        } elseif ($roles === 'hr') {
             $validated = $request->validate([
-                'employee_id' => 'required',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
                 'leave_id' => 'required',
@@ -114,7 +113,7 @@ class LeaveRequestController extends Controller
             //     $request->file('document_file')?->getPathname()
             // );
 
-            DB::transaction(function () use ($request, $validated) {
+            DB::transaction(function () use ($request, $validated, $user) {
                 if ($request->file('document_file')) {
 
                     $file = $request->file('document_file');
@@ -125,11 +124,51 @@ class LeaveRequestController extends Controller
 
                     $validated['document_file'] = 'surat_dokter/'.$filename;
                 }
+
                 $leave = LeaveRequest::create([
                     ...$validated,
+                    'employee_id' => $user->employee->id,
                     'status' => 'pending',
-                    'current_step' => 1,
+                    'current_step' => 2,
                     'final_appoved_at' => null,
+                ]);
+
+                $ownerRole = Role::where('name', 'owner')->first();
+
+                // Owener Approval
+                leaveApproval::create([
+                    'leave_request_id' => $leave->id,
+                    'approval_order' => 2,
+                    'role_id' => $ownerRole->id,
+                    'status' => 'pending',
+                ]);
+
+            });
+        } else {
+            $validated = $request->validate([
+                'employee_id' => 'required',
+                'start_date' => 'required|date',
+                'end_date' => 'required|date',
+                'leave_id' => 'required',
+                'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            DB::transaction(function () use ($user, $request, $validated) {
+
+                if ($request->file('document_file')) {
+
+                    $file = $request->file('document_file');
+
+                    $filename = time().'_'.$file->getClientOriginalName();
+
+                    $file->move(storage_path('app/public/surat_dokter'), $filename);
+
+                    $validated['document_file'] = 'surat_dokter/'.$filename;
+                }
+
+                $leave = LeaveRequest::create([
+                    ...$validated,
+                    'employee_id' => $user->employee->id,
                 ]);
 
                 $hrRole = Role::where('name', 'hr')->first();
@@ -143,15 +182,15 @@ class LeaveRequestController extends Controller
                     'status' => 'pending',
                 ]);
 
-                // Owener Approval
+                // Owner approval
                 leaveApproval::create([
                     'leave_request_id' => $leave->id,
                     'approval_order' => 2,
                     'role_id' => $ownerRole->id,
                     'status' => 'pending',
                 ]);
-
             });
+
         }
 
         return redirect()->route('leave-request.index')
@@ -306,9 +345,10 @@ class LeaveRequestController extends Controller
             // dd(
             //     'Current Step: '.$leave->current_step,
             //     'Approval Role ID: '.$approval?->role_id,
-            //     'Approval Role Name: '.$approval?->role?->name,
+            //     'Approval Role Name: '.$approval?->role->name,
             //     'Login Role ID: '.auth()->user()->role_id,
-            //     'Login Role Name: '.auth()->user()->role->name
+            //     'Login Role Name: '.auth()->user()->role->name,
+            //     'user Position name'.auth()->user()->employee->position->name,
             // );
 
             // 🔹 Pastikan role sesuai

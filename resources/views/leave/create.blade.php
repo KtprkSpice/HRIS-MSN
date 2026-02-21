@@ -17,7 +17,7 @@
 
         @csrf
 
-        @if (in_array($userRole, ['hr', 'owner']))
+        @if (in_array($userRole, ['owner']))
             <div class="col-md-6">
                 <label class="form-label">Nama Karyawan</label>
                 <select name="employee_id" class="form-select" required>

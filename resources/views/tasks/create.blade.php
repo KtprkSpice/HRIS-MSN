@@ -86,7 +86,7 @@
                                     </td>
                                     <td>{{ ucwords($employee->fullname) }}</td>
                                     <td>{{ ucwords($employee->division->name) }}</td>
-                                    <td> Posisi </td>
+                                    <td> {{ ucwords($employee->position->name) }} </td>
                                 </tr>
                             @endforeach
                         </tbody>

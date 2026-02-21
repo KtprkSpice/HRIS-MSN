@@ -248,7 +248,7 @@
             </div>
         </div>
         <ul>
-            @if ($userRole === 'owner')
+            @if (in_array($userRole, ['owner', 'hr']))
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i

@@ -13,12 +13,7 @@
         @endif
 
         <div class="card-body">
-            @if ($userRole === 'employee')
-                <a href="{{ route('leave-request.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Ajukan Cuti
-                </a>
-            @endif
-            @if ($userRole === 'hr')
+            @if (in_array($userRole, ['hr', 'employee']))
                 <a href="{{ route('leave-request.create') }}" class="btn btn-primary">
                     <i class="fa-solid fa-plus"></i> Ajukan Cuti
                 </a>
@@ -66,15 +61,19 @@
 
                                 {{-- STATUS HR --}}
                                 <td>
-                                    <span
-                                        class="badge 
-                                    {{ $hrApproval?->status === 'approved'
-                                        ? 'bg-success'
-                                        : ($hrApproval?->status === 'rejected'
-                                            ? 'bg-danger'
-                                            : 'bg-warning') }}">
-                                        {{ ucfirst($hrApproval?->status ?? 'pending') }}
-                                    </span>
+                                    @if ($userRole === 'hr' && $leave->employee->user_id === auth()->id())
+                                        -
+                                    @else
+                                        <span
+                                            class="badge 
+            {{ $hrApproval?->status === 'approved'
+                ? 'bg-success'
+                : ($hrApproval?->status === 'rejected'
+                    ? 'bg-danger'
+                    : 'bg-warning') }}">
+                                            {{ ucfirst($hrApproval?->status ?? 'pending') }}
+                                        </span>
+                                    @endif
                                 </td>
 
                                 {{-- STATUS OWNER --}}

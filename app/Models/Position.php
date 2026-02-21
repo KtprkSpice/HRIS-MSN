@@ -21,4 +21,9 @@ class Position extends Model
     {
         return $this->belongsTo(division::class);
     }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'employee_id');
+    }
 }

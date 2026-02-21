@@ -2,10 +2,12 @@
 
 namespace Database\Seeders;
 
+use App\Models\Employee;
+use App\Models\User;
 use faker\factory as faker;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class employee_seeder extends Seeder
 {
@@ -20,14 +22,22 @@ class employee_seeder extends Seeder
         $hire_date = $faker->dateTimeBetween('-5 years', 'now')->format('Y-m-d');
 
         foreach (range(1, 10) as $i) {
-            DB::table('employees')->insert([
-                'fullname' => $faker->name(),
+
+            $user = User::create([
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail(),
+                'password' => Hash::make('password'),
+                'role_id' => $faker->numberBetween(1, 3),
+            ]);
+
+            Employee::Create([
+                'fullname' => $faker->name,
                 'nik' => $faker->numerify('##########'),
                 'position_id' => $faker->numberBetween(1, 7),
                 'division_id' => $faker->numberBetween(1, 3),
                 'address' => $faker->address,
-                'email' => $faker->unique()->safeEmail(),
-                'user_id' => 1,
+                'email' => $user->email,
+                'user_id' => $user->id,
                 'phone' => $faker->unique()->numerify('+62###########'),
                 'hire_date' => $hire_date,
                 'born_date' => $born_date,

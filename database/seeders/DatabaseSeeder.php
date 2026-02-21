@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             shiftSeeder::class,
             LeaveTypeSeeder::class,
-            LeaveSeeder::class,
+            // LeaveSeeder::class,
             SalarySeeder::class,
             TaskSeeder::class,
             employeeTaskSeeder::class,
