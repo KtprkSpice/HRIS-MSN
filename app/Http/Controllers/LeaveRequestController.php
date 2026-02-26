@@ -265,26 +265,7 @@ class LeaveRequestController extends Controller
         return redirect()->route('leave-request.index')->with('success', "Cuti untuk $name menjadi confirmed");
     }
 
-    public function rejected($id)
-    {
-
-        $roles = auth()->user()->role->name;
-
-        if ($roles === 'employee') {
-            abort(403, 'Anda tidak dapat mengakses halaman ini.');
-        } else {
-            $leaveRequest = LeaveRequest::find($id);
-
-            $name = $leaveRequest->employee->fullname;
-
-            $leaveRequest->update([
-                'status' => 'rejected',
-            ]);
-        }
-
-        return redirect()->route('leave-request.index')->with('success', "Cuti untuk $name telah diupdate menjadi rejected");
-    }
-
+    // Approved
     public function approve($id)
     {
         $user = auth()->user();
@@ -340,10 +321,60 @@ class LeaveRequestController extends Controller
 
                 // Tidak ada step lagi → FINAL APPROVED
                 $leave->update([
-                    'status' => 'confirmed',
+                    'status' => 'approved',
                     'final_approved_at' => now(),
                 ]);
             }
+        });
+
+        return redirect()->route('leave-request.index')
+            ->with('success', 'Cuti berhasil diapprove.');
+    }
+
+    // Reject
+    public function rejected($id)
+    {
+        $user = auth()->user();
+        $role = $user->role->name;
+
+        if (! in_array($role, ['hr', 'owner'])) {
+            abort(403, 'Anda tidak memiliki akses.');
+        }
+
+        $leave = LeaveRequest::with('approvals')->findOrFail($id);
+
+        DB::transaction(function () use ($leave, $user, $role) {
+
+            // 🔹 Cari approval step sesuai current_step
+            $approval = leaveApproval::where('leave_request_id', $leave->id)
+                ->where('approval_order', $leave->current_step)
+                ->first();
+
+            // dd(
+            //     'Current Step: '.$leave->current_step,
+            //     'Approval Role ID: '.$approval?->role_id,
+            //     'Approval Role Name: '.$approval?->role?->name,
+            //     'Login Role ID: '.auth()->user()->role_id,
+            //     'Login Role Name: '.auth()->user()->role->name
+            // );
+
+            // 🔹 Pastikan role sesuai
+            if ($approval->role->name !== $role) {
+                abort(403, 'Bukan giliran Anda untuk approve.');
+            }
+
+            // 🔹 Update approval step
+            $approval->update([
+                'status' => 'rejected',
+                'approved_by' => $user->id,
+                'approved_at' => now(),
+            ]);
+
+            // Tidak ada step lagi → FINAL APPROVED
+            $leave->update([
+                'status' => 'rejected',
+                'final_approved_at' => now(),
+            ]);
         });
 
         return redirect()->route('leave-request.index')

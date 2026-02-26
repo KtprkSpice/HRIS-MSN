@@ -16,7 +16,48 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, .6), rgba(0, 0, 0, .6)),
-                url('{{ asset('build/assets/img/bg.jpg') }}') center/cover no-repeat;
+                url('{{ asset('build/assets/img/bg login.png') }}') center/cover no-repeat;
+        }
+
+        /* Password Toggle Icon */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .btn-toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px 8px;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .btn-toggle-password:hover {
+            color: #333;
+        }
+
+        .btn-toggle-password:focus {
+            outline: none;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 40px;
+        }
+
+        .password-wrapper .form-control.is-invalid {
+            padding-right: 40px;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.60); /* transparan */
+            backdrop-filter: blur(10px);           /* efek kaca (glassmorphism) */
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
@@ -32,7 +73,8 @@
                     style="width: 80px;">
             </div>
 
-            <h4 class="text-center fw-semibold mb-4">Login Dashboard</h4>
+           <h4 class="text-center fw-semibold mb-1">Login Dashboard</h4>
+            <p class="text-center text-muted small mb-4">PT. Megajaya Sarana Nusantara</p>
 
             {{-- GLOBAL ERROR --}}
             @if ($errors->any())
@@ -71,28 +113,35 @@
 
                 {{-- Password --}}
                 <div class="mb-3">
-                    <div class="d-flex justify-content-between">
-                        <label class="form-label">Password</label>
-                        <a href="{{ route('password.request') }}" class="small">
-                            Lupa Password?
-                        </a>
+                    <label class="form-label">Password</label>
+
+                    <div class="position-relative password-wrapper">
+                        <input type="password" id="passwordInput" name="password" class="form-control @error('password') is-invalid @enderror"
+                            required>
+                        <button type="button" class="btn-toggle-password" id="togglePasswordBtn">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
                     </div>
 
-                    <input type="password" name="password" class="form-control @error('password') is-invalid @enderror"
-                        required>
-
                     @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                     @enderror
                 </div>
 
-                {{-- Remember --}}
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
-                    <label class="form-check-label" for="remember">
-                        Ingat saya
-                    </label>
+                {{-- Lupa Password + Remember --}}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a href="{{ route('password.request') }}" class="small">
+                        Lupa Password?
+                    </a>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                        <label class="form-check-label" for="remember">
+                            Ingat saya
+                        </label>
+                    </div>
                 </div>
+
+
 
                 <button type="submit" class="btn btn-success w-100 py-2">
                     Login
@@ -105,5 +154,35 @@
 </body>
 
 <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
+
+{{-- Font Awesome --}}
+<link rel="stylesheet" href="{{ asset('fontawesome-free-7.1.0-web/css/all.min.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('togglePasswordBtn');
+        const passwordInput = document.getElementById('passwordInput');
+
+        if (toggleBtn && passwordInput) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Toggle input type antara password dan text
+                const isPassword = passwordInput.type === 'password';
+                passwordInput.type = isPassword ? 'text' : 'password';
+                
+                // Ubah icon
+                const icon = toggleBtn.querySelector('i');
+                if (isPassword) {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+        }
+    });
+</script>
 
 </html>

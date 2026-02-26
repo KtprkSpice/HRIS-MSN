@@ -2,8 +2,8 @@
 @section('header', 'Jadwal')
 @section('content')
     <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Data Karyawan
+        <div class="card-header bg-danger text-white">
+            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Jadwal
         </div>
         @if (session('success'))
             <span class="alert alert-success">{{ session('success') }}</span>

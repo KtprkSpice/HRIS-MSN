@@ -5,8 +5,8 @@
     {{-- Create Button --}}
     <div class="card shadow mb-4">
         @if (in_array($userRole, ['hr', 'owner']))
-            <div class="card-header bg-primary text-white">
-                <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru
+            <div class="card-header bg-danger text-white">
+                <i class="fa-solid fa-plus-circle me-2"></i> Tambah Kehadiran
             </div>
             @if (session('success'))
                 <span class="alert alert-success">{{ session('success') }}</span>
@@ -44,7 +44,7 @@
 
     {{-- Employees DattaTables --}}
     <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">Daftar Karyawan</div>
+        <div class="card-header bg-danger text-white">Daftar Kehadiran</div>
         <div class="card-body">
             <div class="table-responsive">
                 <table id="presencesTable" class="table table-bordered">

@@ -41,7 +41,7 @@
         .sidebar {
             width: 250px;
             min-height: 100vh;
-            background: linear-gradient(180deg, #204070ff 0%, #1565c0 60%, #1e88e5 100%);
+            background: linear-gradient(180deg, #7a1f2a 0%, #aa2c36 60%, #c73947 100%);
             color: #fff;
             position: fixed;
             top: 0;
@@ -52,13 +52,18 @@
         }
 
         body.bg-dark .sidebar {
-            background: linear-gradient(180deg, #0f1b3a 0%, #1a2a55 60%, #243b7c 100%);
+            background: linear-gradient(180deg, #5a1820 0%, #7a1f2a 60%, #8b2435 100%);
         }
 
         .sidebar .logo img {
             max-height: 45px;
             margin-right: 10px;
             transition: transform 0.3s ease;
+            background-color: #ffffff;
+            /* Warna background */
+            padding: 8px;
+            /* Jarak dalam */
+            border-radius: 12px;
         }
 
         .sidebar .logo:hover img {
@@ -111,23 +116,139 @@
         }
 
         /* ===== HEADER ===== */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            padding: 12px 0;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            transition: border-color 0.5s;
+        }
+
+        body.bg-dark header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 0 0 auto;
+        }
+
+        header .header-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 0;
+        }
+
+        header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 0 0 auto;
+        }
+
         header h1 {
-            color: #1a237e;
+            color: #aa2c36;
             font-weight: 700;
             transition: color 0.5s;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         body.bg-dark header h1 {
-            color: #ffffffff;
+            color: #ff6b7a;
+        }
+
+        header .btn,
+        #toggleSidebar,
+        #toggleModeBtn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        header .btn:hover,
+        #toggleSidebar:hover,
+        #toggleModeBtn:hover {
+            transform: translateY(-1px);
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
         }
 
         .profile img {
             border-radius: 50%;
             transition: transform 0.3s ease;
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
         }
 
         .profile img:hover {
             transform: scale(1.1);
+        }
+
+        .profile a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile div {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .profile strong {
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .profile small {
+            font-size: 12px;
+        }
+
+        /* ===== DROPDOWN MENU ===== */
+        .dropdown-menu {
+            border-radius: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        body.bg-dark .dropdown-menu {
+            background-color: #2a2a3d;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #f1f1f1;
+        }
+
+        body.bg-dark .dropdown-item {
+            color: #f1f1f1;
+        }
+
+        body.bg-dark .dropdown-item:hover,
+        body.bg-dark .dropdown-item:focus {
+            background-color: #3a3a4d;
+            color: #fff;
+        }
+
+        body.bg-dark .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         /* ===== NOTICE BOARD ===== */
@@ -175,13 +296,13 @@
 
         /* ===== TABLE ===== */
         .table thead {
-            background: linear-gradient(to right, #0d47a1, #1976d2);
+            background: linear-gradient(to right, #7a1f2a, #aa2c36);
             color: #fff;
             transition: background 0.5s;
         }
 
         body.bg-dark .table thead {
-            background: linear-gradient(to right, #1a2b5f, #243b7c);
+            background: linear-gradient(to right, #5a1820, #7a1f2a);
         }
 
         /* .table tbody tr:hover {
@@ -235,6 +356,286 @@
                 height: 300px;
             }
         }
+
+        /* Sidebar collapse */
+        .sidebar.collapsed {
+            margin-left: -250px;
+        }
+
+        .main-container.full {
+            margin-left: 0;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile devices: 576px and below */
+        @media (max-width: 576px) {
+
+            /* Sidebar: convert to full overlay on very small screens */
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 1050;
+                margin-left: 0;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            /* Add dark overlay when sidebar is shown */
+            .sidebar.show::before {
+                content: '';
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: -1;
+            }
+
+            .main-container {
+                margin-left: 0;
+                padding: 15px;
+            }
+
+            .main-container.full {
+                margin-left: 0;
+            }
+
+            /* Header: optimize layout on small screens */
+            header {
+                flex-wrap: nowrap;
+                gap: 8px;
+                padding: 10px 0;
+                margin-bottom: 16px;
+            }
+
+            header .header-left,
+            header .header-center,
+            header .header-right {
+                flex-basis: auto;
+                justify-content: center;
+            }
+
+            header .header-left {
+                flex: 0 0 auto;
+                justify-content: flex-start !important;
+            }
+
+            header .header-center {
+                flex: 1;
+                justify-content: center !important;
+                min-width: 0;
+            }
+
+            header .header-right {
+                flex: 0 0 auto;
+                justify-content: flex-end !important;
+            }
+
+            header h1 {
+                font-size: 1rem;
+                word-break: break-word;
+            }
+
+            header .btn,
+            #toggleSidebar,
+            #toggleModeBtn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+
+            .profile img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .profile a {
+                flex-direction: column;
+                gap: 2px;
+            }
+
+            .profile strong {
+                font-size: 11px;
+            }
+
+            .profile small {
+                font-size: 9px;
+            }
+
+            /* Cards: full width on mobile */
+            .cards .card {
+                margin-bottom: 12px;
+            }
+
+            .card {
+                font-size: 0.95rem;
+            }
+
+            .card-body {
+                padding: 12px;
+            }
+
+            .card-header {
+                padding: 10px 12px;
+                font-size: 0.95rem;
+            }
+
+            /* Tables: add horizontal scroll on mobile */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            table th,
+            table td {
+                padding: 8px 6px !important;
+            }
+
+            /* Sidebar logo and text: make compact */
+            .sidebar .logo img {
+                max-height: 35px;
+            }
+
+            .sidebar .logo span {
+                font-size: 0.9rem;
+            }
+
+            .sidebar ul li a {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+
+            .sidebar ul li a i {
+                margin-right: 8px;
+                font-size: 14px;
+            }
+
+            /* Notice board: reduce padding */
+            .notice-board {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+
+            .notice-board h3 {
+                font-size: 1rem;
+            }
+
+            .notice-board p {
+                font-size: 0.85rem;
+            }
+
+            /* Carousel: smaller height on mobile */
+            .carousel-img-full {
+                height: 200px;
+            }
+
+            /* Buttons: full width on mobile where needed */
+            .btn {
+                font-size: 0.9rem;
+                padding: 6px 12px;
+            }
+
+            /* Row gaps: reduce on mobile */
+            .row.g-3 {
+                --bs-gutter-x: 0.75rem;
+                --bs-gutter-y: 0.75rem;
+            }
+
+            .row.g-4 {
+                --bs-gutter-x: 0.75rem;
+                --bs-gutter-y: 0.75rem;
+            }
+        }
+
+        /* Tablets: 577px to 992px */
+        @media (max-width: 992px) and (min-width: 577px) {
+            .sidebar {
+                width: 220px;
+                padding-top: 20px;
+            }
+
+            .main-container {
+                margin-left: 230px;
+                padding: 20px;
+            }
+
+            .sidebar .logo span {
+                font-size: 0.95rem;
+            }
+
+            .sidebar ul li a {
+                padding: 10px 18px;
+                font-size: 14px;
+            }
+
+            .carousel-img-full {
+                height: 350px;
+            }
+
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            /* Col adjustments for tablets */
+            .col-md-4 {
+                flex: 0 0 calc(100% - 8px);
+                max-width: calc(100% - 8px);
+            }
+
+            .col-md-3 {
+                flex: 0 0 calc(50% - 8px);
+                max-width: calc(50% - 8px);
+            }
+        }
+
+        /* Large screens: 993px and up */
+        @media (min-width: 993px) {
+            .sidebar {
+                width: 250px;
+                padding-top: 25px;
+            }
+
+            .main-container {
+                margin-left: 260px;
+                padding: 25px;
+            }
+        }
+
+        /* Extra small fixes for ultra-small devices (320px - 375px) */
+        @media (max-width: 375px) {
+            header h1 {
+                font-size: 1rem;
+            }
+
+            .card-title {
+                font-size: 0.9rem;
+            }
+
+            .card-text {
+                font-size: 0.85rem;
+            }
+
+            #toggleSidebar {
+                padding: 4px 8px;
+                font-size: 0.9rem;
+            }
+
+            .btn-outline-secondary {
+                padding: 4px 8px;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 
@@ -244,11 +645,11 @@
         <div class="d-flex align-items-center justify-content-center mb-4">
             <div class="logo d-flex align-items-center">
                 <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo">
-                <span class="fw-bold">PT. Swat Service Indonesia</span>
+                <span class="fw-bold">PT. Megajaya Sarana Nusantara</span>
             </div>
         </div>
         <ul>
-            @if ($userRole === 'owner')
+            @if (in_array($userRole, ['hr', 'owner']))
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
@@ -298,19 +699,33 @@
 
     <div class="main-container">
 
-        <header class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">@yield('header')</h1>
-            <div class="d-flex align-items-center gap-3">
-                <button class="btn btn-outline-secondary btn-sm" id="toggleModeBtn">
+        <header>
+            <!-- Header Left: Hamburger Button -->
+            <div class="header-left">
+                <button class="btn btn-outline-secondary" id="toggleSidebar" title="Toggle Menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Header Center: Title -->
+            <div class="header-center">
+                <h1 class="h3">@yield('header')</h1>
+            </div>
+
+            <!-- Header Right: Dark Mode + Profile -->
+            <div class="header-right">
+                <button class="btn btn-outline-secondary btn-sm" id="toggleModeBtn" title="Toggle Dark Mode">
                     <i id="moon-icon" class="fa-solid fa-moon"></i>
                     <i id="sun-icon" class="fa-solid fa-sun d-none"></i>
                 </button>
                 <div class="dropdown profile">
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://i.pravatar.cc/40" alt="User" class="me-2 rounded-circle">
-                        <div><strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong><br><small
-                                class="text-muted">{{ ucwords(auth()->user()->role->name) }}</small></div>
+                        <img src="https://i.pravatar.cc/40" alt="User" class="rounded-circle">
+                        <div>
+                            <strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong>
+                            <small class="text-muted">{{ ucwords(auth()->user()->role->name) }}</small>
+                        </div>
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="profileDropdown">
                         <li>
@@ -357,6 +772,85 @@
     <script src="{{ asset('js/apexcharts.js') }}"></script>
 
     {{-- Data Table Logic --}}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleBtn = document.getElementById("toggleSidebar");
+            const sidebar = document.querySelector(".sidebar");
+            const mainContainer = document.querySelector(".main-container");
+            const body = document.body;
+
+            // Create backdrop overlay for mobile
+            const backdrop = document.createElement("div");
+            backdrop.className = "sidebar-backdrop";
+            backdrop.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1049;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        `;
+            body.appendChild(backdrop);
+
+            // For mobile (< 576px): use overlay mode
+            // For tablet/desktop (>= 576px): use collapse mode
+            toggleBtn.addEventListener("click", function() {
+                const screenWidth = window.innerWidth; // Check screen width on every click
+                if (screenWidth < 576) {
+                    sidebar.classList.toggle("show");
+                    if (sidebar.classList.contains("show")) {
+                        backdrop.style.display = "block";
+                        setTimeout(() => backdrop.style.opacity = "1", 10);
+                    } else {
+                        backdrop.style.opacity = "0";
+                        setTimeout(() => backdrop.style.display = "none", 300);
+                    }
+                } else {
+                    sidebar.classList.toggle("collapsed");
+                    mainContainer.classList.toggle("full");
+                }
+            });
+
+            // Close sidebar when clicking on backdrop or outside on mobile
+            backdrop.addEventListener("click", function() {
+                sidebar.classList.remove("show");
+                backdrop.style.opacity = "0";
+                setTimeout(() => backdrop.style.display = "none", 300);
+            });
+
+            document.addEventListener("click", function(e) {
+                const screenWidth = window.innerWidth; // Check screen width dynamically
+                if (screenWidth < 576 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !
+                    backdrop.contains(e.target)) {
+                    if (sidebar.classList.contains("show")) {
+                        sidebar.classList.remove("show");
+                        backdrop.style.opacity = "0";
+                        setTimeout(() => backdrop.style.display = "none", 300);
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener("resize", function() {
+                const newScreenWidth = window.innerWidth;
+                if (newScreenWidth < 576) {
+                    sidebar.classList.remove("collapsed");
+                    mainContainer.classList.remove("full");
+                    sidebar.classList.remove("show");
+                    backdrop.style.display = "none";
+                    backdrop.style.opacity = "0";
+                } else {
+                    sidebar.classList.remove("show");
+                    backdrop.style.display = "none";
+                    backdrop.style.opacity = "0";
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

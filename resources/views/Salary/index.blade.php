@@ -3,8 +3,8 @@
 @section('content')
     <div class="card shadow mb-4">
         @if (in_array($userRole, ['hr', 'owner']))
-            <div class="card-header bg-primary text-white">
-                <i class="fa-solid fa-plus-circle me-2"></i> Tambah Tugas Baru
+            <div class="card-header bg-danger text-white">
+                <i class="fa-solid fa-plus-circle me-2"></i> Tambah Slip Gaji
             </div>
             @if (session('success'))
                 <span class="alert alert-success">{{ session('success') }}</span>
