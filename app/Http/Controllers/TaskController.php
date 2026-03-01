@@ -18,7 +18,7 @@ class TaskController extends Controller
     {
         $user = auth()->user();
         $roles = auth()->user()->role->name;
-        if ($roles === 'owner') {
+        if (in_array ($roles, ['hr', 'owner'])) {
 
             $tasks = Task::all();
         } elseif ($roles === 'employee') {

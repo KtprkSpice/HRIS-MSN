@@ -1,139 +1,232 @@
 @extends('layout.dashboard')
-@section('header', 'Divisions')
+@section('header', 'Manajemen Divisi')
 @section('content')
-    <div class="card shadow mb-4">
-        <div class="card-header bg-primary text-white">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Divisi
-        </div>
-        @if (session('success'))
-            <span class="alert alert-success">{{ session('success') }}</span>
-        @endif
-        <div class="card-body">
-            <div class="col-md-1 d-grid align-self-end">
-                <a href="{{ route('division.create') }}" type="button" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Tambah
-                </a>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+    /* Table Styling Modern */
+    .table { font-size: 0.85rem; vertical-align: middle; }
+    #leaveTable thead th {
+        background: linear-gradient(180deg, #bc5e6b 0%, #a34a57 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Card Customization */
+    .card-custom-header {
+        background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%);
+        color: white;
+        font-weight: bold;
+        padding: 12px 20px;
+        border-radius: 12px 12px 0 0 !important;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+    }
+
+    /* Select2 Adjustment */
+    .select2-container--default .select2-selection--single {
+        height: 40px !important;
+        padding: 5px !important;
+        border: 1px solid #dee2e6 !important;
+        border-radius: 8px !important;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 38px !important;
+    }
+
+    /* Modern Buttons */
+    .btn-action {
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        transition: all 0.3s;
+        border: none;
+        color: white !important;
+        text-decoration: none;
+    }
+    .btn-action:hover { transform: translateY(-3px); box-shadow: 0 5px 10px rgba(0,0,0,0.15); }
+    .btn-edit { background: linear-gradient(45deg, #ffc107, #ff9800); }
+    .btn-delete { background: linear-gradient(45deg, #dc3545, #b02a37); }
+    
+    /* Badge Status */
+    .badge-status {
+        font-weight: 600;
+        padding: 7px 12px;
+        border-radius: 8px;
+        width: 90px;
+        display: inline-block;
+        text-align: center;
+        font-size: 0.75rem;
+    }
+    .status-active { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+    .status-inactive { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+</style>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light p-2 rounded-3 me-3">
+                        <i class="fa-solid fa-sitemap fs-4" style="color: #bc5e6b;"></i>
+                    </div>
+                    <div>
+                        <h5 class="mb-0 fw-bold">Data Divisi</h5>
+                        <p class="text-muted small mb-0">Kelola departemen organisasi</p>
+                    </div>
+                </div>
+                <a href="{{ route('division.create') }}" class="btn text-white px-4 shadow-sm fw-bold" 
+   style="background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%); border: none; border-radius: 8px;">
+    <i class="fa-solid fa-plus-circle me-2" style="color: #ffffff;"></i> Tambah Divisi
+</a>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Filter -->
-    <div class="mb-3 d-flex align-items-center">
-        <label class="me-2 fw-bold">Filter Status:</label>
-        <select id="filterStatus" class="form-select w-auto me-3">
-            <option value="">Semua</option>
-            <option value="Belum Selesai">Belum Selesai</option>
-            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-            <option value="Selesai">Selesai</option>
-            <option value="Menunggu ACC HRD">Menunggu ACC HRD</option>
-            <option value="Ditolak HRD">Ditolak HRD</option>
-        </select>
-
-        <label class="me-2 fw-bold">Filter Karyawan:</label>
-        <select id="filterKaryawan" class="form-select w-auto">
-            <option value="">Semua Karyawan</option>
-            <option value="Budi Santoso">Budi Santoso</option>
-            <option value="Siti Aminah">Siti Aminah</option>
-            <option value="Rudi Hartono">Rudi Hartono</option>
-        </select>
+<div class="filter-section mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-bold text-secondary small">
+                <i class="fa-solid fa-filter me-2" style="color: #bc5e6b;"></i> Filter Status
+            </label>
+            <select id="filterStatus" class="form-control select2-js">
+                <option value="">-- Semua Status --</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label fw-bold text-secondary small">
+                <i class="fa-solid fa-search me-2" style="color: #bc5e6b;"></i> Cari Nama Divisi
+            </label>
+            <select id="filterKaryawan" class="form-control select2-js">
+                <option value="">-- Ketik Nama --</option>
+                @foreach ($divisions as $d)
+                    <option value="{{ $d->name }}">{{ ucwords($d->name) }}</option>
+                @endforeach
+            </select>
+        </div>
     </div>
+</div>
 
-    <!-- Tabel Tugas -->
-    <div class="card shadow">
-        <div class="card-body">
-            <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Divisi</h5>
-            <div class="table-responsive">
-                <table id="leaveTable" class="table table-bordered">
-                    <thead>
+<div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
+    <div class="card-header card-custom-header">
+        <i class="fa-solid fa-list me-2"></i> List Departemen / Divisi
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table id="leaveTable" class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-4">Nama Divisi</th>
+                        <th>Deskripsi</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Opsi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($divisions as $division)
                         <tr>
-                            <th>Nama Divisi</th>
-                            <th>description</th>
-                            <th>Status</th>
-                            <th>Opsi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($divisions as $division)
-                            <tr>
-                                <td>{{ ucwords($division->name) }}</td>
-                                <td>
-                                    @if ($division->description)
-                                        {{ ucwords($division->description) }}
-                                    @else
-                                        -
-                                    @endif
-                                </td>
-                                <td>{{ ucwords($division->status) }}</td>
-                                <td>
-                                    <a href="{{ route('leave-request.edit', $division->id) }}"
-                                        class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
-                                    <form action="{{ route('leave-request.destroy', $division->id) }}" method="POST"
-                                        class="d-inline" id="deleteForm{{ $division->id }}">
+                            <td class="ps-4 fw-bold text-dark">{{ ucwords($division->name) }}</td>
+                            <td class="text-muted small">{{ $division->description ?: '-' }}</td>
+                            <td class="text-center">
+                                <span class="badge-status {{ strtolower($division->status) == 'active' ? 'status-active' : 'status-inactive' }}">
+                                    {{ ucwords($division->status) }}
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="{{ route('leave-request.edit', $division->id) }}" class="btn-action btn-edit" title="Edit">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>
+                                    <button type="button" class="btn-action btn-delete" onclick="confirmDelete({{ $division->id }})" title="Hapus">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                    <form id="delete-form-{{ $division->id }}" action="{{ route('leave-request.destroy', $division->id) }}" method="POST" style="display: none;">
                                         @csrf
                                         @method('DELETE')
-                                        <button class="btn btn-danger btn-sm" type="button"
-                                            onclick="confirmDelete({{ $division->id }})"><i
-                                                class="fa-solid fa-trash"></i></button>
                                     </form>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
-    <script>
-        $(document).ready(function() {
-            let table = new DataTable('#leaveTable', {
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                    paginate: {
-                        previous: "Sebelumnya",
-                        next: "Berikutnya",
-                    },
-                },
-                columnDefs: [{
-                    targets: 3,
-                    orderable: false,
-                    searchable: false
-                }]
-            });
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-            // Custom filtering
-            DataTable.ext.search.push(function(settings, data, dataIndex) {
+<script>
+    $(document).ready(function() {
+        $('.select2-js').select2({ theme: "default", width: '100%' });
 
-                let filterKaryawan = $("#filterKaryawan").val();
-                let filterStatus = $("#filterStatus").val();
-
-                let namaKaryawan = data[0]; // kolom nama karyawan
-                let status = data[4]; // kolom status (cek index tabel kamu)
-
-                if (
-                    (filterKaryawan === "" || namaKaryawan.includes(filterKaryawan)) &&
-                    (filterStatus === "" || status.includes(filterStatus))
-                ) {
-                    return true;
-                }
-                return false;
-            });
-
-            // Re-draw table on dropdown change
-            $("#filterKaryawan, #filterStatus").on("change", function() {
-                table.draw();
-            });
+        let table = $('#leaveTable').DataTable({
+            language: { search: "Cari:", lengthMenu: "_MENU_", info: "Total: _TOTAL_ data" },
+            columnDefs: [{ targets: 3, orderable: false }]
         });
 
-        function changeStatus(select) {
-            if (select.value) {
-                window.location.href = select.value
+        $('#filterStatus, #filterKaryawan').on('change', function() { table.draw(); });
+
+        DataTable.ext.search.push(function(settings, data, dataIndex) {
+            let fName = $("#filterKaryawan").val().toLowerCase();
+            let fStat = $("#filterStatus").val().toLowerCase();
+            let name = data[0].toLowerCase();
+            let stat = data[2].toLowerCase();
+            return (fName === "" || name.includes(fName)) && (fStat === "" || stat.includes(fStat));
+        });
+
+        // Tampilkan SweetAlert sukses jika ada session
+        @if(session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: "{{ session('success') }}",
+                timer: 3000,
+                showConfirmButton: false
+            });
+        @endif
+    });
+
+    // Fungsi SweetAlert untuk Konfirmasi Hapus
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: "Data divisi yang dihapus tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#bc5e6b',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
             }
-        }
-    </script>
+        });
+    }
+</script>
 
 @endsection
