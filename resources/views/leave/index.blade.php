@@ -82,6 +82,7 @@
                                 <th>Aksi</th>
                             @endif
                             <th>Dokumen</th>
+                            <th>Opsi</th>
                         </tr>
                     </thead>
 
@@ -185,6 +186,18 @@
                                                 <i class="fa-solid fa-file"></i>
                                             </a>
                                         @endif
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('leave-request.edit', $leave->id) }}"
+                                            class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
+                                        <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
+                                            class="d-inline" id="deleteForm{{ $leave->id }}">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-danger btn-sm" type="button"
+                                                onclick="confirmDelete({{ $leave->id }})"><i
+                                                    class="fa-solid fa-trash"></i></button>
+                                        </form>
                                     </td>
 
                             </tr>

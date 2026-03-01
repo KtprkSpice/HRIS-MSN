@@ -66,6 +66,27 @@
             @enderror
         </div>
 
+        {{-- Limit type radio --}}
+        <div class="col-md-6">
+            <label class="form-label d-block">Jenis Limit</label>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="limit_type" id="limit_type_yes" value="yearly"
+                    {{ old('limit_type', 'yearly') == 'yearly' ? 'checked' : '' }}>
+                <label class="form-check-label" for="limit_type_yes">Tahunan</label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="limit_type" id="limit_type_no" value="monthly"
+                    {{ (old('limit_type') == 'monthly') == 'monthly' ? 'checked' : '' }}>
+                <label class="form-check-label" for="limit_type_no">Bulanan</label>
+            </div>
+
+            @error('limit_type')
+                <div class="text-danger">{{ $message }}</div>
+            @enderror
+        </div>
+
         <div class="col-md-6" id="deduction-wrapper">
             <label for="deduction" class="form-label">Potongan per Hari</label>
             <input type="number" class="form-control @error('deduction') is-invalid @enderror" name="deduction"
@@ -82,6 +103,16 @@
                 id="max_days" value="{{ old('max_days') }}" min="1">
 
             @error('max_days')
+                <span class="invalid-feedback">{{ $message }}</span>
+            @enderror
+        </div>
+        {{-- Limit Days --}}
+        <div class="col-md-6">
+            <label for="limit_days" class="form-label">Kouta Cuti</label>
+            <input type="number" class="form-control @error('limit_days') is-invalid @enderror" name="limit_days"
+                id="limit_days" value="{{ old('limit_days') }}" min="1">
+
+            @error('limit_days')
                 <span class="invalid-feedback">{{ $message }}</span>
             @enderror
         </div>

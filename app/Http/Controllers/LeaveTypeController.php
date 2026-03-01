@@ -46,6 +46,8 @@ class LeaveTypeController extends Controller
                 'max_days' => 'nullable|numeric|min:1',
                 'deduction' => 'nullable|numeric|min:0',
                 'document' => 'boolean|required',
+                'limit_type' => 'string|required',
+                'limit_days' => 'numeric|required',
             ]);
 
             if ($validated['is_paid']) {
@@ -88,8 +90,10 @@ class LeaveTypeController extends Controller
                 'name' => 'string|required|max:255',
                 'is_paid' => 'boolean|required',
                 'max_days' => 'nullable|numeric|min:1',
-                'deduction' => 'nullable|numeric',
+                'deduction' => 'nullable|numeric|min:0',
                 'document' => 'boolean|required',
+                'limit_type' => 'string|required',
+                'limit_days' => 'numeric|required',
             ]);
 
             if ($validated['is_paid']) {

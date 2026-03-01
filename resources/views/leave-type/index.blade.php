@@ -29,6 +29,8 @@
                             <th>Nama Cuti</th>
                             <th>Potongan</th>
                             <th>Maks Hari</th>
+                            <th>Periode Kuota</th>
+                            <th>Kouta Cuti</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -44,7 +46,16 @@
                                         -
                                     @endif
                                 </td>
-
+                                <td>
+                                    {{ ucwords($leaveType->limit_type) }}
+                                </td>
+                                <td>
+                                    @if ($leaveType->limit_days)
+                                        {{ $leaveType->limit_days }} Hari
+                                    @else
+                                        -
+                                    @endif
+                                </td>
                                 <td>
                                     <a href="{{ route('leave-type.edit', $leaveType->id) }}"
                                         class="btn btn-warning btn-sm"><i class="fa-solid fa-pen"></i></a>
