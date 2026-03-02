@@ -11,147 +11,305 @@
             </ul>
         </div>
     @endif
+    <style>
+<style>
 
-    <div class="row g-3">
-        {{-- Detail Tugas --}}
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Nama Tugas</label>
+/* ========================= */
+/* CARD CONSISTENT STYLE     */
+/* ========================= */
+.card {
+    border-radius: 16px !important;
+    border: none !important;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04) !important;
+    margin-bottom: 24px;
+}
+.detail-card {
+    min-height: 100%;
+}
+.card-body {
+    padding: 2rem !important;
+}
+
+/* ========================= */
+/* BUTTON SHIFT STYLE        */
+/* ========================= */
+.btn-group .btn-outline-primary {
+    border: 1.5px solid #b83e48;
+    color: #b83e48;
+    font-weight: 500;
+}
+
+.btn-group .btn-check:checked + .btn-outline-primary {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%);
+    border-color: transparent;
+    color: #ffffff;
+}
+
+/* ========================= */
+/* TABLE HEADER (SAMA)       */
+/* ========================= */
+#jadwalTable thead {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
+}
+
+#jadwalTable thead th {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border: none !important;
+    letter-spacing: 0.4px;
+    padding: 14px;
+}
+
+/* ========================= */
+/* TABLE BODY (SAMA)         */
+/* ========================= */
+#jadwalTable tbody tr {
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+#jadwalTable tbody tr:nth-child(even) {
+    background: #fdf2f4;
+}
+
+#jadwalTable tbody tr:hover {
+    background: #f8f9fa;
+}
+
+#jadwalTable td {
+    padding: 14px;
+    vertical-align: middle;
+}
+
+.table>:not(caption)>*>* {
+    border-bottom-width: 0px !important;
+}
+/* ========================= */
+/* TABLE GRADIENT MERAH      */
+/* ========================= */
+
+#EmployeeTable thead {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
+}
+
+#EmployeeTable thead th {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    border: none !important;
+    padding: 14px;
+    letter-spacing: 0.4px;
+}
+
+/* Body */
+#EmployeeTable tbody tr {
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+#EmployeeTable tbody tr:nth-child(even) {
+    background: #fdf2f4; /* soft pink */
+}
+
+#EmployeeTable tbody tr:hover {
+    background: #fce7eb;
+}
+
+/* Cell spacing */
+#EmployeeTable td {
+    padding: 14px;
+    vertical-align: middle;
+}
+
+/* Hilangkan border default bootstrap */
+.table>:not(caption)>*>* {
+    border-bottom-width: 0px !important;
+}
+
+/* ========================= */
+/* RESPONSIVE FIX            */
+/* ========================= */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1.25rem !important;
+    }
+}
+</style>
+
+
+<div class="container-fluid px-3 px-md-4">
+    <div class="row">
+        <div class="col-12">
+
+    <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body p-5 p-md-4">
+
+            {{-- Header Section --}}
+            <div class="d-flex align-items-center gap-3 mb-5 pb-3 border-bottom">
+                <div class="rounded-3 d-flex align-items-center justify-content-center"
+    style="width:48px;height:48px;
+    background:linear-gradient(100deg,#b83e48 0%, #eb8697 100%);
+    color:white;">
+    <i class="fa-solid fa-clipboard-list"></i>
+</div>
+                <div>
+                    <h5 class="fw-bold mb-0">Detail Tugas</h5>
+                    <small class="text-muted">Informasi lengkap tugas yang telah dibuat</small>
+                </div>
+            </div>
+
+            {{-- Form Content --}}
+            <div class="row g-4">
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label fw-semibold">Nama Tugas</label>
                     <input type="text" readonly
-                        class="form-control @error('name')
-                is-invalid
-                @enderror"
-                        id="name" name="name" required value="{{ old('name', $task->name) }}">
+                        class="form-control modern-input @error('name') is-invalid @enderror"
+                        value="{{ old('name', $task->name) }}">
                     @error('name')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-6">
-                    <label for="start_time" class="form-label">Tanggal Mulai</label>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label fw-semibold">Tanggal Mulai</label>
                     <input type="date" readonly
-                        class="form-control @error('start_time')
-                is-invalid
-                 @enderror"
-                        id="start_time" name="start_time" required value="{{ old('start_time', $task->start_time) }}">
+                        class="form-control modern-input @error('start_time') is-invalid @enderror"
+                        value="{{ old('start_time', $task->start_time) }}">
                     @error('start_time')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-6">
-                    <label for="end_time" class="form-label">Tanggal Selesai</label>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label class="form-label fw-semibold">Tanggal Selesai</label>
                     <input type="date" readonly
-                        class="form-control @error('end_time')
-                is-invalid
-            @enderror"
-                        id="end_time" name="end_time" required value="{{ old('end_time', $task->end_time) }}">
+                        class="form-control modern-input @error('end_time') is-invalid @enderror"
+                        value="{{ old('end_time', $task->end_time) }}">
                     @error('end_time')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
+
                 <div class="col-12">
-                    <label for="description" class="form-label">Deskripsi</label>
-                    <input type="text" readonly
-                        class="form-control @error('description')
-                is-invalid
-            @enderror"
-                        id="description" placeholder="" name="description" required
-                        value="{{ old('description', $task->description) }}">
+                    <label class="form-label fw-semibold">Deskripsi</label>
+                    <textarea readonly rows="4"
+                        class="form-control modern-input @error('description') is-invalid @enderror">{{ old('description', $task->description) }}</textarea>
                     @error('description')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-            </div>
-        </div>
 
+            </div>
+
+        </div>
+    </div>
+
+</div>
         {{-- Table tugas --}}
-        <div class="card shadow">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Karyawan</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered" id="EmployeeTable">
-                        <thead>
-                            <tr>
-                                <th>Nama Karyawan</th>
-                                <th>Divisi</th>
-                                <th>Posisi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($employees as $employee)
-                                <tr> {{-- PERBAIKAN: Tambahkan tag <tr> yang hilang --}}
-                                    <td>{{ ucwords($employee->fullname) }}</td>
-                                    <td>{{ ucwords($employee->division->name) }}</td>
-                                    <td>{{ ucwords($employee->position->name) }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body p-4">
+
+        <h5 class="card-title">
+            <i class="fa-solid fa-list-check me-2 text-danger"></i>
+            Daftar Karyawan
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" id="EmployeeTable">
+                <thead>
+                    <tr>
+                        <th>Nama Karyawan</th>
+                        <th>Divisi</th>
+                        <th>Posisi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($employees as $employee)
+                        <tr>
+                            <td class="fw-semibold text-dark">
+                                {{ ucwords($employee->fullname) }}
+                            </td>
+                            <td>
+                                {{ ucwords($employee->division->name) }}
+                            </td>
+                            <td>
+                                Posisi
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
 
-        {{-- Table Jadwal --}}
-        <div class="card shadow">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Jadwal Tugas</h5>
-                <div class="table-responsive">
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                        {{-- PERBAIKAN: Ubah ID dan value radio button --}}
-                        <input type="radio" class="btn-check" name="shift" id="btn-pagi" value="pagi"
-                            autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btn-pagi">Pagi</label>
+    </div>
+</div>
 
-                        <input type="radio" class="btn-check" name="shift" id="btn-sore" value="sore"
-                            autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btn-sore">Sore</label>
+       {{-- Table Jadwal --}}
+<div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
 
-                        <input type="radio" class="btn-check" name="shift" id="btn-malam" value="malam"
-                            autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btn-malam">Malam</label>
-                    </div>
-                    <table class="table table-bordered mt-3">
-                        <thead>
-                            <tr>
-                                <th>Nama Karyawan</th>
-                                <th>Shift</th>
-                                <th>Tanggal</th>
-                            </tr>
-                        </thead>
-                        {{-- PERBAIKAN: Gunakan tbody dengan ID yang sesuai dengan radio button --}}
-                        <tbody id="pagi">
-                            @foreach ($schedules['1'] ?? [] as $schedule)
-                                <tr>
-                                    <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
-                                    <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
+        <h5 class="card-title mb-3">
+            <i class="fa-solid fa-list-check me-2 text-danger"></i>
+            Jadwal Tugas
+        </h5>
 
-                        <tbody id="sore" style="display:none">
-                            @foreach ($schedules['2'] ?? [] as $schedule)
-                                <tr>
-                                    <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
-                                    <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
+        <div class="btn-group mb-3" role="group">
+            <input type="radio" class="btn-check" name="shift" id="btn-pagi" value="pagi" autocomplete="off" checked>
+            <label class="btn btn-outline-primary" for="btn-pagi">Pagi</label>
 
-                        <tbody id="malam" style="display:none">
-                            @foreach ($schedules['3'] ?? [] as $schedule)
-                                <tr>
-                                    <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
-                                    <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <input type="radio" class="btn-check" name="shift" id="btn-sore" value="sore" autocomplete="off">
+            <label class="btn btn-outline-primary" for="btn-sore">Sore</label>
+
+            <input type="radio" class="btn-check" name="shift" id="btn-malam" value="malam" autocomplete="off">
+            <label class="btn btn-outline-primary" for="btn-malam">Malam</label>
         </div>
+
+        <div class="table-responsive">
+            <table class="table align-middle mb-0" id="jadwalTable">
+                <thead>
+                    <tr>
+                        <th>Nama Karyawan</th>
+                        <th>Shift</th>
+                        <th>Tanggal</th>
+                    </tr>
+                </thead>
+
+                <tbody id="pagi">
+                    @foreach ($schedules['1'] ?? [] as $schedule)
+                        <tr>
+                            <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
+                            <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+
+                <tbody id="sore" style="display:none">
+                    @foreach ($schedules['2'] ?? [] as $schedule)
+                        <tr>
+                            <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
+                            <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+
+                <tbody id="malam" style="display:none">
+                    @foreach ($schedules['3'] ?? [] as $schedule)
+                        <tr>
+                            <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
+                            <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                            <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+</div>
 
         @if (in_array($userRole, ['hr', 'owner']))
             <div class="card shadow mt-3">
@@ -261,5 +419,6 @@
             radius
         }).addTo(map);
     </script>
+    
 
 @endsection

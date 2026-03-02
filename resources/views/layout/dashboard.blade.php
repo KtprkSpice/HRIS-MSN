@@ -32,10 +32,10 @@
             transition: background 0.5s, color 0.5s;
         }
 
-        body.bg-dark {
-            background-color: #1b1b2f;
-            color: #e0e0e0;
-        }
+        /* body.bg-dark { */
+            /* background-color: #1b1b2f; */
+            /* color: #e0e0e0; */
+        
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -51,18 +51,16 @@
             transition: all 0.3s ease, background 0.5s;
         }
 
-        body.bg-dark .sidebar {
+        /* body.bg-dark .sidebar {
             background: linear-gradient(180deg, #5a1820 0%, #7a1f2a 60%, #8b2435 100%);
-        }
+        } */
 
         .sidebar .logo img {
             max-height: 45px;
             margin-right: 10px;
             transition: transform 0.3s ease;
-            background-color: #ffffff;
-            /* Warna background */
-            padding: 8px;
-            /* Jarak dalam */
+            background-color: #ffffff;   /* Warna background */
+            padding: 8px;                /* Jarak dalam */
             border-radius: 12px;
         }
 
@@ -123,13 +121,13 @@
             gap: 20px;
             padding: 12px 0;
             margin-bottom: 24px;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(0,0,0, 0.08);
             transition: border-color 0.5s;
         }
 
-        body.bg-dark header {
-            border-bottom-color: rgba(255, 255, 255, 0.1);
-        }
+        /* body.bg-dark header {
+            border-bottom-color: rgba(255,255,255, 0.1);
+        } */
 
         header .header-left {
             display: flex;
@@ -163,9 +161,9 @@
             text-overflow: ellipsis;
         }
 
-        body.bg-dark header h1 {
+        /* body.bg-dark header h1 {
             color: #ff6b7a;
-        }
+        } */
 
         header .btn,
         #toggleSidebar,
@@ -227,17 +225,17 @@
         /* ===== DROPDOWN MENU ===== */
         .dropdown-menu {
             border-radius: 8px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0,0,0, 0.1);
+            box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
         }
 
-        body.bg-dark .dropdown-menu {
+        /* body.bg-dark .dropdown-menu {
             background-color: #2a2a3d;
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255,255,255, 0.1);
             color: #f1f1f1;
-        }
+        } */
 
-        body.bg-dark .dropdown-item {
+        /* body.bg-dark .dropdown-item {
             color: #f1f1f1;
         }
 
@@ -248,8 +246,8 @@
         }
 
         body.bg-dark .dropdown-divider {
-            border-color: rgba(255, 255, 255, 0.1);
-        }
+            border-color: rgba(255,255,255, 0.1);
+        } */
 
         /* ===== NOTICE BOARD ===== */
         .notice-board {
@@ -262,11 +260,11 @@
             transition: all 0.3s ease, background 0.5s, color 0.5s;
         }
 
-        body.bg-dark .notice-board {
-            background: #2f2f3d;
-            color: #f1f1f1;
-            border-color: #444464;
-        }
+        /* body.bg-dark .notice-board { */
+            /* background: #2f2f3d; */
+            /* color: #f1f1f1; */
+            /* border-color: #444464; */
+        
 
         /* ===== CARDS ===== */
         .cards .card {
@@ -276,10 +274,10 @@
             cursor: pointer;
         }
 
-        body.bg-dark .cards .card {
-            background: #2a2a3d;
-            color: #f1f1f1;
-        }
+        /* body.bg-dark .cards .card { */
+            /* background: #2a2a3d; */
+            /* color: #f1f1f1; */
+        
 
         .cards .card:hover {
             transform: translateY(-5px);
@@ -301,9 +299,9 @@
             transition: background 0.5s;
         }
 
-        body.bg-dark .table thead {
-            background: linear-gradient(to right, #5a1820, #7a1f2a);
-        }
+        /* body.bg-dark .table thead { */
+            /* background: linear-gradient(to right, #5a1820, #7a1f2a); */
+        
 
         /* .table tbody tr:hover {
             background: #f1f3f5;
@@ -327,9 +325,9 @@
             transform: scale(1.05);
         }
 
-        body.bg-dark .carousel-caption {
-            background: rgba(0, 0, 0, 0.5);
-        }
+        /* body.bg-dark .carousel-caption { */
+            /* background: rgba(0, 0, 0, 0.5); */
+        
 
         /* ===== Dark Mode Icons ===== */
         #moon-icon,
@@ -337,13 +335,13 @@
             transition: all 0.3s ease;
         }
 
-        body.bg-dark #moon-icon {
-            color: #f1c40f;
-        }
+        /* body.bg-dark #moon-icon { */
+            /* color: #f1c40f; */
+        
 
-        body.bg-dark #sun-icon {
-            color: #f39c12;
-        }
+        /* body.bg-dark #sun-icon { */
+            /* color: #f39c12; */
+        
 
         /* Tabe leftg */
         table thead th,
@@ -356,7 +354,7 @@
                 height: 300px;
             }
         }
-
+        
         /* Sidebar collapse */
         .sidebar.collapsed {
             margin-left: -250px;
@@ -369,7 +367,6 @@
         /* ===== RESPONSIVE DESIGN ===== */
         /* Mobile devices: 576px and below */
         @media (max-width: 576px) {
-
             /* Sidebar: convert to full overlay on very small screens */
             .sidebar {
                 width: 100%;
@@ -497,8 +494,7 @@
                 font-size: 0.85rem;
             }
 
-            table th,
-            table td {
+            table th, table td {
                 padding: 8px 6px !important;
             }
 
@@ -649,7 +645,7 @@
             </div>
         </div>
         <ul>
-            @if (in_array($userRole, ['hr', 'owner']))
+            @if (in_array($userRole,['hr','owner']))
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
@@ -714,10 +710,10 @@
 
             <!-- Header Right: Dark Mode + Profile -->
             <div class="header-right">
-                <button class="btn btn-outline-secondary btn-sm" id="toggleModeBtn" title="Toggle Dark Mode">
+                <!-- <button class="btn btn-outline-secondary btn-sm" id="toggleModeBtn" title="Toggle Dark Mode">
                     <i id="moon-icon" class="fa-solid fa-moon"></i>
                     <i id="sun-icon" class="fa-solid fa-sun d-none"></i>
-                </button>
+                </button> -->
                 <div class="dropdown profile">
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -773,16 +769,16 @@
 
     {{-- Data Table Logic --}}
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const toggleBtn = document.getElementById("toggleSidebar");
-            const sidebar = document.querySelector(".sidebar");
-            const mainContainer = document.querySelector(".main-container");
-            const body = document.body;
+    document.addEventListener("DOMContentLoaded", function () {
+        const toggleBtn = document.getElementById("toggleSidebar");
+        const sidebar = document.querySelector(".sidebar");
+        const mainContainer = document.querySelector(".main-container");
+        const body = document.body;
 
-            // Create backdrop overlay for mobile
-            const backdrop = document.createElement("div");
-            backdrop.className = "sidebar-backdrop";
-            backdrop.style.cssText = `
+        // Create backdrop overlay for mobile
+        const backdrop = document.createElement("div");
+        backdrop.className = "sidebar-backdrop";
+        backdrop.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -794,63 +790,62 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         `;
-            body.appendChild(backdrop);
+        body.appendChild(backdrop);
 
-            // For mobile (< 576px): use overlay mode
-            // For tablet/desktop (>= 576px): use collapse mode
-            toggleBtn.addEventListener("click", function() {
-                const screenWidth = window.innerWidth; // Check screen width on every click
-                if (screenWidth < 576) {
-                    sidebar.classList.toggle("show");
-                    if (sidebar.classList.contains("show")) {
-                        backdrop.style.display = "block";
-                        setTimeout(() => backdrop.style.opacity = "1", 10);
-                    } else {
-                        backdrop.style.opacity = "0";
-                        setTimeout(() => backdrop.style.display = "none", 300);
-                    }
+        // For mobile (< 576px): use overlay mode
+        // For tablet/desktop (>= 576px): use collapse mode
+        toggleBtn.addEventListener("click", function () {
+            const screenWidth = window.innerWidth;  // Check screen width on every click
+            if (screenWidth < 576) {
+                sidebar.classList.toggle("show");
+                if (sidebar.classList.contains("show")) {
+                    backdrop.style.display = "block";
+                    setTimeout(() => backdrop.style.opacity = "1", 10);
                 } else {
-                    sidebar.classList.toggle("collapsed");
-                    mainContainer.classList.toggle("full");
-                }
-            });
-
-            // Close sidebar when clicking on backdrop or outside on mobile
-            backdrop.addEventListener("click", function() {
-                sidebar.classList.remove("show");
-                backdrop.style.opacity = "0";
-                setTimeout(() => backdrop.style.display = "none", 300);
-            });
-
-            document.addEventListener("click", function(e) {
-                const screenWidth = window.innerWidth; // Check screen width dynamically
-                if (screenWidth < 576 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !
-                    backdrop.contains(e.target)) {
-                    if (sidebar.classList.contains("show")) {
-                        sidebar.classList.remove("show");
-                        backdrop.style.opacity = "0";
-                        setTimeout(() => backdrop.style.display = "none", 300);
-                    }
-                }
-            });
-
-            // Handle window resize
-            window.addEventListener("resize", function() {
-                const newScreenWidth = window.innerWidth;
-                if (newScreenWidth < 576) {
-                    sidebar.classList.remove("collapsed");
-                    mainContainer.classList.remove("full");
-                    sidebar.classList.remove("show");
-                    backdrop.style.display = "none";
                     backdrop.style.opacity = "0";
-                } else {
-                    sidebar.classList.remove("show");
-                    backdrop.style.display = "none";
-                    backdrop.style.opacity = "0";
+                    setTimeout(() => backdrop.style.display = "none", 300);
                 }
-            });
+            } else {
+                sidebar.classList.toggle("collapsed");
+                mainContainer.classList.toggle("full");
+            }
         });
-    </script>
+
+        // Close sidebar when clicking on backdrop or outside on mobile
+        backdrop.addEventListener("click", function () {
+            sidebar.classList.remove("show");
+            backdrop.style.opacity = "0";
+            setTimeout(() => backdrop.style.display = "none", 300);
+        });
+
+        document.addEventListener("click", function (e) {
+            const screenWidth = window.innerWidth;  // Check screen width dynamically
+            if (screenWidth < 576 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !backdrop.contains(e.target)) {
+                if (sidebar.classList.contains("show")) {
+                    sidebar.classList.remove("show");
+                    backdrop.style.opacity = "0";
+                    setTimeout(() => backdrop.style.display = "none", 300);
+                }
+            }
+        });
+
+        // Handle window resize
+        window.addEventListener("resize", function () {
+            const newScreenWidth = window.innerWidth;
+            if (newScreenWidth < 576) {
+                sidebar.classList.remove("collapsed");
+                mainContainer.classList.remove("full");
+                sidebar.classList.remove("show");
+                backdrop.style.display = "none";
+                backdrop.style.opacity = "0";
+            } else {
+                sidebar.classList.remove("show");
+                backdrop.style.display = "none";
+                backdrop.style.opacity = "0";
+            }
+        });
+    });
+</script>
 </body>
 
 </html>

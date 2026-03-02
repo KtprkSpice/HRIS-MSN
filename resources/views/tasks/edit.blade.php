@@ -12,92 +12,120 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('task.update', $task->id) }}" method="post">
-        @method('PUT')
-        @csrf
-        <div class="card shadow">
-            <div class="card-body">
-                <div class="col-md-6">
-                    <label for="name" class="form-label">Nama Tugas</label>
+    <form class="row g-4" action="{{ route('task.update', $task->id) }}" method="post">
+    @method('PUT')
+    @csrf
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+
+            <div class="row g-4">
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="name" class="form-label fw-semibold">Nama Tugas</label>
                     <input type="text"
-                        class="form-control @error('name')
-                is-invalid
-            @enderror" id="name"
-                        name="name" required value="{{ old('name', $task->name) }}">
+                        id="name"
+                        name="name"
+                        required
+                        class="form-control modern-input @error('name') is-invalid @enderror"
+                        value="{{ old('name', $task->name) }}">
                     @error('name')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-6">
-                    <label for="start_time" class="form-label">Tanggal Mulai</label>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="start_time" class="form-label fw-semibold">Tanggal Mulai</label>
                     <input type="date"
-                        class="form-control @error('start_time')
-                is-invalid
-            @enderror"
-                        id="start_time" name="start_time" required value="{{ old('start_time', $task->start_time) }}">
+                        id="start_time"
+                        name="start_time"
+                        required
+                        class="form-control modern-input @error('start_time') is-invalid @enderror"
+                        value="{{ old('start_time', $task->start_time) }}">
                     @error('start_time')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-                <div class="col-md-6">
-                    <label for="end_time" class="form-label">Tanggal Selesai</label>
+
+                <div class="col-12 col-md-6 col-lg-4">
+                    <label for="end_time" class="form-label fw-semibold">Tanggal Selesai</label>
                     <input type="date"
-                        class="form-control @error('end_time')
-                is-invalid
-            @enderror"
-                        id="end_time" name="end_time" required value="{{ old('end_time', $task->end_time) }}">
+                        id="end_time"
+                        name="end_time"
+                        required
+                        class="form-control modern-input @error('end_time') is-invalid @enderror"
+                        value="{{ old('end_time', $task->end_time) }}">
                     @error('end_time')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
+
                 <div class="col-12">
-                    <label for="description" class="form-label">Deskripsi</label>
-                    <input type="text"
-                        class="form-control @error('description')
-                is-invalid
-            @enderror"
-                        id="description" placeholder="" name="description" required
-                        value="{{ old('description', $task->description) }}">
+                    <label for="description" class="form-label fw-semibold">Deskripsi</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="4"
+                        required
+                        class="form-control modern-input @error('description') is-invalid @enderror">{{ old('description', $task->description) }}</textarea>
                     @error('description')
                         <span class="invalid-feedback">{{ $message }}</span>
                     @enderror
                 </div>
-            </div>
-        </div>
-        <div class="card shadow">
-            <div class="card-body">
-                <h5 class="card-title"><i class="fa-solid fa-list-check"></i> Daftar Karyawan</h5>
-                <div class="table-responsive">
-                    <table id="employeeTable" class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>
-                                    <input type="checkbox" id="selectAll">
-                                    Pilih Semua
-                                </th>
-                                <th>Nama Karyawan</th>
-                                <th>Divisi</th>
-                                <th>Posisi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($employees as $employee)
-                                <tr>
-                                    <td>
-                                        <input type="checkbox" name="selected_employee[]" value="{{ $employee->id }}"
-                                            {{ in_array($employee->id, $task->employees->pluck('id')->toArray()) ? 'checked' : '' }}>
 
-                                    </td>
-                                    <td>{{ ucwords($employee->fullname) }}</td>
-                                    <td>{{ ucwords($employee->division->name) }}</td>
-                                    <td> Posisi </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
             </div>
+
         </div>
+    </div>
+</form>
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-4">
+
+        <h5 class="card-title fw-semibold mb-3">
+            <i class="fa-solid fa-list-check me-2 text-danger"></i>
+            Daftar Karyawan
+        </h5>
+
+        <div class="table-responsive">
+            <table id="employeeTable" class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th style="width: 120px;">
+                            <input type="checkbox" id="selectAll" class="form-check-input me-2">
+                            Pilih Semua
+                        </th>
+                        <th>Nama Karyawan</th>
+                        <th>Divisi</th>
+                        <th>Posisi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($employees as $employee)
+                        <tr>
+                            <td>
+                                <input type="checkbox"
+                                    class="form-check-input"
+                                    name="selected_employee[]"
+                                    value="{{ $employee->id }}"
+                                    {{ in_array($employee->id, $task->employees->pluck('id')->toArray()) ? 'checked' : '' }}>
+                            </td>
+                            <td class="fw-semibold text-dark">
+                                {{ ucwords($employee->fullname) }}
+                            </td>
+                            <td>
+                                {{ ucwords($employee->division->name) }}
+                            </td>
+                            <td>
+                                Posisi
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
 
         <div class="card shadow mt-3">
             <div class="card-body">
@@ -128,8 +156,8 @@
         </div>
 
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Submit</button>
+        <div class="col-15">
+            <button type="submit" class="btn btn-primary px-3">Submit</button>
         </div>
     </form>
 
@@ -195,4 +223,101 @@
         });
     </script>
 
+<style>
+/* ========================= */
+/* CARD STYLE CONSISTEN      */
+/* ========================= */
+.card {
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.card-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-title i {
+    background: linear-gradient(135deg, #b83e48, #eb8697);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ========================= */
+/* FORM STYLE                */
+/* ========================= */
+.form-label {
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    padding: 10px 14px;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 3px rgba(220,53,69,0.15);
+}
+
+/* ========================= */
+/* TABLE STYLE GRADIENT      */
+/* ========================= */
+#employeeTable thead {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%);
+}
+
+#employeeTable thead th {
+    background: transparent !important;
+    color: #fff !important;
+    font-weight: 600;
+    border: none !important;
+    padding: 14px;
+}
+
+#employeeTable tbody tr {
+    background: #fff;
+    transition: 0.2s;
+}
+
+#employeeTable tbody tr:nth-child(even) {
+    background: #fdf2f4;
+}
+
+#employeeTable tbody tr:hover {
+    background: #fce7eb;
+}
+
+#employeeTable td {
+    padding: 14px;
+    vertical-align: middle;
+}
+
+.table>:not(caption)>*>* {
+    border-bottom-width: 0px !important;
+}
+
+/* ========================= */
+/* BUTTON STYLE              */
+/* ========================= */
+.btn-primary {
+    background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(184,62,72,0.25);
+}
+</style>
 @endsection
