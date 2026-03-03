@@ -66,7 +66,9 @@ class TaskController extends Controller
             abort('403');
         } else {
 
-            $employees = Employee::all();
+            $employees = Employee::where('status', 'active')->whereHas('user.role', function ($q) {
+                $q->where('name', 'employee');
+            })->get();
         }
 
         return view('tasks.create', compact('employees'));
@@ -128,7 +130,9 @@ class TaskController extends Controller
             abort(403);
         } else {
 
-            $employees = Employee::all();
+            $employees = Employee::whereHas('user.role', function ($q) {
+                $q->where('name', 'employee');
+            })->get();
             $locations = Tasklocation::where('task_id', $task->id)->first();
         }
 

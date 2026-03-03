@@ -19,12 +19,39 @@ class EmployeeController extends Controller
 
         if ($roles === 'employee') {
             abort(403);
+        } elseif ($roles === 'owner') {
+            // Owner
+            $employees = Employee::whereHas('user.role', function ($q) {
+                $q->where('name', '!=', 'owner');
+            })->get();
+            // $employeeStats = Employee::whereHas('user.role', function ($q) {
+            //     $q->where('name', 'employee');
+            // })->selectRaw('status, COUNT(*) as total')
+            //     ->groupBy('status')
+            //     ->pluck('total', 'status');
+
+            $countActiveEmployee = $employees->where('status', 'active')->count();
+            $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
+            $countTotalEmployee = $employees->count();
+
         } else {
-            $employees = Employee::all();
+            // Hr
+            $employees = Employee::whereHas('user.role', function ($q) {
+                $q->whereNotIn('name', ['owner', 'hr']);
+            })->get();
+            // $employeeStats = Employee::whereHas('user.role', function ($q) {
+            //     $q->where('name', 'employee');
+            // })->selectRaw('status, COUNT(*) as total')
+            //     ->groupBy('status')
+            //     ->pluck('total', 'status');
+
+            $countActiveEmployee = $employees->where('status', 'active')->count();
+            $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
+            $countTotalEmployee = $employees->count();
 
         }
 
-        return view('Employees.index', compact('employees'));
+        return view('Employees.index', compact('employees', 'countActiveEmployee', 'countNonActiveEmployee', 'countTotalEmployee'));
 
     }
 
@@ -106,7 +133,7 @@ class EmployeeController extends Controller
             $user = User::all();
         }
 
-        return view('employees.edit', compact('divisions', 'roles', 'employee', 'user'));
+        return view('Employees.edit', compact('divisions', 'roles', 'employee', 'user'));
     }
 
     public function update(Request $request, Employee $employee)
@@ -130,6 +157,8 @@ class EmployeeController extends Controller
                 'bpjs_ketenagakerjaan' => 'required|digits_between:1,20|max:20',
                 'npwp' => 'required|max:30',
                 'role_id' => 'required|exists:roles,id',
+                'status' => 'required|string|max:255',
+
             ]);
 
             $employee->update([
@@ -144,6 +173,7 @@ class EmployeeController extends Controller
                 'bpjs_kesehatan' => $request->bpjs_kesehatan,
                 'bpjs_ketenagakerjaan' => $request->bpjs_ketenagakerjaan,
                 'npwp' => $request->npwp,
+                'status' => $request->status,
             ]);
 
             if ($employee->user) {

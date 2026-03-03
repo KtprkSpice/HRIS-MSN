@@ -432,6 +432,6 @@ class LeaveRequestController extends Controller
         });
 
         return redirect()->route('leave-request.index')
-            ->with('success', 'Cuti berhasil diapprove.');
+            ->with('success', 'Cuti telah direject.');
     }
 }

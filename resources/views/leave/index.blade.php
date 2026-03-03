@@ -123,7 +123,7 @@
                             <th>Status Owner</th>
                             <th>Status Final</th>
                             <th>Dokumen</th>
-                            @if ($userRole === 'owner')
+                            @if (in_array($userRole, ['hr', 'owner']))
                                 <th>Aksi</th>
                             @endif
                         </tr>
@@ -197,7 +197,7 @@
                                     @endif
                                 </td>
 
-                                @if ($userRole === 'owner')
+                                @if (in_array($userRole, ['hr', 'owner']))
                                     <td>
                                         @if ($leave->status === 'pending')
                                             @if (
@@ -214,10 +214,14 @@
                                                 </form>
 
                                                 {{-- Tombol Reject (Hanya Tampilan/Visual) --}}
-                                                <button type="button" class="btn btn-danger btn-action shadow-sm ms-1"
-                                                    title="Tolak (Fungsi Belum Aktif)">
-                                                    <i class="fa-solid fa-xmark"></i>
-                                                </button>
+                                                <form action="{{ route('leave-request.rejected', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-action shadow-sm"
+                                                        title="Tolak">
+                                                        <i class="fa-solid fa-x"></i>
+                                                    </button>
+                                                </form>
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif

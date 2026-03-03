@@ -1,7 +1,8 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Jenis Cuti')
+@section('header', 'Tambah Cuti')
 
 @section('content')
+
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -12,146 +13,188 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('leave-type.store') }}" method="post">
+    <form class="row g-3" action="{{ route('leave-request.store') }}" method="POST" enctype="multipart/form-data"
+        id="leaveForm">
+
         @csrf
 
+        @if (in_array($userRole, ['hr', 'owner']))
+            <div class="col-md-6">
+                <label class="form-label">Nama Karyawan</label>
+                <select name="employee_id" class="form-select" required>
+                    <option value="">Choose...</option>
+                    @foreach ($employees as $employee)
+                        <option value="{{ $employee->id }}">
+                            {{ ucwords($employee->fullname) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        @endif
+
         <div class="col-md-6">
-            <label for="name" class="form-label">Nama Cuti</label>
-            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name"
-                value="{{ old('name') }}" required>
-
-            @error('name')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
-        </div>
-
-        <div class="col-md-3">
-            <label class="form-label d-block">Dibayar</label>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="is_paid" id="paid_yes" value="1"
-                    {{ old('is_paid', '1') == '1' ? 'checked' : '' }}>
-                <label class="form-check-label" for="paid_yes">Ya</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="is_paid" id="paid_no" value="0"
-                    {{ old('is_paid') == '0' ? 'checked' : '' }}>
-                <label class="form-check-label" for="paid_no">Tidak</label>
-            </div>
-
-            @error('is_paid')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        {{-- Document radio --}}
-        <div class="col-md-3">
-            <label class="form-label d-block">Wajib Dokumen</label>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="document" id="document_yes" value="1"
-                    {{ old('document', '1') == '1' ? 'checked' : '' }}>
-                <label class="form-check-label" for="document_yes">Ya</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="document" id="document_no" value="0"
-                    {{ old('document') == '0' ? 'checked' : '' }}>
-                <label class="form-check-label" for="document_no">Tidak</label>
-            </div>
-
-            @error('document')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        {{-- Limit type radio --}}
-        <div class="col-md-6">
-            <label class="form-label d-block">Jenis Limit</label>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="limit_type" id="limit_type_yes" value="yearly"
-                    {{ old('limit_type', 'yearly') == 'yearly' ? 'checked' : '' }}>
-                <label class="form-check-label" for="limit_type_yes">Tahunan</label>
-            </div>
-
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="radio" name="limit_type" id="limit_type_no" value="monthly"
-                    {{ (old('limit_type') == 'monthly') == 'monthly' ? 'checked' : '' }}>
-                <label class="form-check-label" for="limit_type_no">Bulanan</label>
-            </div>
-
-            @error('limit_type')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="col-md-6" id="deduction-wrapper">
-            <label for="deduction" class="form-label">Potongan per Hari</label>
-            <input type="number" class="form-control @error('deduction') is-invalid @enderror" name="deduction"
-                id="deduction" value="{{ old('deduction', 0) }}" min="0">
-
-            @error('deduction')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
+            <label class="form-label">Tanggal Mulai</label>
+            <input type="date" name="start_date" class="form-control" min="{{ date('Y-m-d') }}" required>
         </div>
 
         <div class="col-md-6">
-            <label for="max_days" class="form-label">Maksimal Hari</label>
-            <input type="number" class="form-control @error('max_days') is-invalid @enderror" name="max_days"
-                id="max_days" value="{{ old('max_days') }}" min="1">
-
-            @error('max_days')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
-        </div>
-        {{-- Limit Days --}}
-        <div class="col-md-6">
-            <label for="limit_days" class="form-label">Kouta Cuti</label>
-            <input type="number" class="form-control @error('limit_days') is-invalid @enderror" name="limit_days"
-                id="limit_days" value="{{ old('limit_days') }}" min="1">
-
-            @error('limit_days')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
+            <label class="form-label">Tanggal Selesai</label>
+            <input type="date" name="end_date" class="form-control" min="{{ date('Y-m-d') }}" required>
         </div>
 
         <div class="col-md-6">
-            <label for="description" class="form-label">Deskripsi</label>
-            <input type="text" class="form-control @error('description') is-invalid @enderror" name="description"
-                id="description" value="{{ old('description') }}" min="1">
+            <label class="form-label">Jenis Cuti</label>
+            <select name="leave_id" class="form-select" required>
+                <option value="">Choose...</option>
+                @foreach ($types as $type)
+                    <option value="{{ $type->id }}" data-requires="{{ $type->document }}"
+                        data-max="{{ $type->max_days }}" data-limit="{{ $type->limit_days }}"
+                        data-period="{{ $type->limit_type }}">
+                        {{ $type->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
-            @error('description')
-                <span class="invalid-feedback">{{ $message }}</span>
-            @enderror
+        <div class="col-md-6">
+            <label class="form-label">Upload Surat Bukti</label>
+            <input type="file" name="document_file" class="form-control" accept="image/*, application/pdf">
+        </div>
+
+        {{-- INFO CUTI --}}
+        <div class="col-md-12">
+            <div id="leaveInfo" class="alert alert-info d-none"></div>
+        </div>
+
+        {{-- INFO JUMLAH HARI --}}
+        <div class="col-md-12">
+            <div id="dayInfo" class="alert alert-warning d-none"></div>
         </div>
 
         <div class="col-12">
             <button type="submit" class="btn btn-primary">
-                Simpan
+                Submit
             </button>
         </div>
     </form>
 
     <script>
-        function toggleDeduction() {
-            const isPaid = document.querySelector('input[name="is_paid"]:checked').value;
-            const wrapper = document.getElementById('deduction-wrapper');
-            const input = document.getElementById('deduction');
+        document.addEventListener("DOMContentLoaded", function() {
 
-            if (isPaid == 1) {
-                wrapper.style.display = 'none';
-                input.value = 0;
-            } else {
-                wrapper.style.display = 'block';
+            const leaveSelect = document.querySelector("select[name='leave_id']");
+            const leaveInfo = document.getElementById("leaveInfo");
+            const dayInfo = document.getElementById("dayInfo");
+
+            const startInput = document.querySelector("input[name='start_date']");
+            const endInput = document.querySelector("input[name='end_date']");
+            const form = document.getElementById("leaveForm");
+
+            // =========================
+            // Update End Date Minimum
+            // =========================
+            startInput.addEventListener("change", function() {
+                endInput.min = this.value;
+                calculateDays();
+            });
+
+            endInput.addEventListener("change", calculateDays);
+
+            // =========================
+            // Hitung Jumlah Hari
+            // =========================
+            function calculateDays() {
+
+                if (!startInput.value || !endInput.value) {
+                    dayInfo.classList.add("d-none");
+                    return;
+                }
+
+                const start = new Date(startInput.value);
+                const end = new Date(endInput.value);
+
+                const diffTime = end - start;
+                const diffDays = (diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                if (diffDays <= 0) {
+                    dayInfo.classList.add("d-none");
+                    return;
+                }
+
+                const selected = leaveSelect.options[leaveSelect.selectedIndex];
+                const max = selected.dataset.max;
+
+                let message = `Anda mengajukan ${diffDays} hari cuti.`;
+
+                if (max && diffDays > max) {
+                    message += ` (Melebihi maksimal ${max} hari per pengajuan!)`;
+                    dayInfo.classList.remove("alert-warning");
+                    dayInfo.classList.add("alert-danger");
+                } else {
+                    dayInfo.classList.remove("alert-danger");
+                    dayInfo.classList.add("alert-warning");
+                }
+
+                dayInfo.innerHTML = message;
+                dayInfo.classList.remove("d-none");
             }
-        }
 
-        document.querySelectorAll('input[name="is_paid"]').forEach(el => {
-            el.addEventListener('change', toggleDeduction);
+            // =========================
+            // Info Kuota Saat Pilih Jenis
+            // =========================
+            leaveSelect.addEventListener("change", function() {
+
+                const selected = this.options[this.selectedIndex];
+
+                if (!selected.value) {
+                    leaveInfo.classList.add("d-none");
+                    return;
+                }
+
+                const max = selected.dataset.max;
+                const limit = selected.dataset.limit;
+                const period = selected.dataset.period;
+
+                let periodText = '';
+
+                if (period === 'yearly') periodText = 'per tahun';
+                if (period === 'monthly') periodText = 'per bulan';
+
+                leaveInfo.innerHTML = `
+            <strong>Informasi Cuti:</strong><br>
+            Kuota: ${limit ? limit + ' hari ' + periodText : 'Tidak dibatasi'}<br>
+            Maksimal sekali pengajuan: ${max ? max + ' hari' : 'Tidak dibatasi'}
+        `;
+
+                leaveInfo.classList.remove("d-none");
+
+                calculateDays();
+            });
+
+            // =========================
+            // Validasi Dokumen
+            // =========================
+            form.addEventListener("submit", function(e) {
+
+                const selected = leaveSelect.options[leaveSelect.selectedIndex];
+
+                if (!selected.value) return;
+
+                const requiresDocument = selected.dataset.requires === "1";
+                const documentFile = document.querySelector("input[name='document_file']");
+
+                if (requiresDocument && documentFile.files.length === 0) {
+
+                    e.preventDefault();
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Dokumen Wajib Upload',
+                        text: 'Jenis cuti ini mewajibkan upload surat bukti!'
+                    });
+                }
+            });
+
         });
-
-        toggleDeduction();
     </script>
+
 @endsection

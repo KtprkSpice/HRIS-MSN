@@ -4,7 +4,7 @@
 
     <!-- ===================== -->
     <!-- STATISTIK MODERN -->
-   
+
     <div class="row mb-4 g-4">
 
         <div class="col-md-4">
@@ -12,7 +12,7 @@
                 <div class="card-body d-flex justify-content-between align-items-center p-4">
                     <div>
                         <p class="stat-label mb-1">Total Karyawan</p>
-                        <h2 class="fw-bold mb-0">{{ $employees->count() }}</h2>
+                        <h2 class="fw-bold mb-0">{{ $countTotalEmployee }}</h2>
                     </div>
                     <div class="stat-icon">
                         <i class="fa-solid fa-users"></i>
@@ -27,7 +27,7 @@
                     <div>
                         <p class="stat-label mb-1">Karyawan Aktif</p>
                         <h2 class="fw-bold mb-0">
-                            {{ $employees->where('status','active')->count() }}
+                            {{ $countActiveEmployee }}
                         </h2>
                     </div>
                     <div class="stat-icon">
@@ -43,7 +43,7 @@
                     <div>
                         <p class="stat-label mb-1">Karyawan Nonaktif</p>
                         <h2 class="fw-bold mb-0">
-                            {{ $employees->where('status','inactive')->count() }}
+                            {{ $countNonActiveEmployee }}
                         </h2>
                     </div>
                     <div class="stat-icon">
@@ -57,7 +57,7 @@
 
     <!-- ===================== -->
     <!-- CARD TAMBAH -->
-    
+
     <div class="card shadow-sm border-0 rounded-4 mb-4">
         <div class="card-body d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-semibold">
@@ -72,7 +72,7 @@
 
     <!-- ===================== -->
     <!-- TABEL -->
-    
+
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body">
 
@@ -102,10 +102,8 @@
                                     <div class="d-flex align-items-center gap-3">
 
                                         @if ($employee->photo)
-                                            <img 
-                                                src="{{ asset('storage/employees/' . $employee->photo) }}"
-                                                class="avatar-photo"
-                                                alt="Profile {{ $employee->fullname }}">
+                                            <img src="{{ asset('storage/employees/' . $employee->photo) }}"
+                                                class="avatar-photo" alt="Profile {{ $employee->fullname }}">
                                         @else
                                             <div class="avatar-placeholder">
                                                 <i class="fa-solid fa-user"></i>
@@ -124,31 +122,28 @@
                                 <td>{{ ucwords($employee->division->name) }}</td>
                                 <td>{{ ucwords($employee->gender) }}</td>
 
-                               <td>
-                                <span @class([
-                                    'badge rounded-pill px-3 py-2 fw-medium status-badge' => true,
-                                    'status-active' => $employee->status == 'active',
-                                    'status-inactive' => $employee->status == 'inactive',
-                                ])>
-                                    {{ ucwords($employee->status) }}
-                                </span>
-                            </td>
+                                <td>
+                                    <span @class([
+                                        'badge rounded-pill px-3 py-2 fw-medium status-badge' => true,
+                                        'status-active' => $employee->status == 'active',
+                                        'status-inactive' => $employee->status == 'inactive',
+                                    ])>
+                                        {{ ucwords($employee->status) }}
+                                    </span>
+                                </td>
 
                                 <!-- AKSI PRESISI -->
                                 <td>
                                     <div class="action-wrapper">
-                                        <a href="{{ route('employee.edit', $employee->id) }}"
-                                            class="btn-action btn-edit">
+                                        <a href="{{ route('employee.edit', $employee->id) }}" class="btn-action btn-edit">
                                             <i class="fa-solid fa-pen"></i>
                                         </a>
 
-                                        <form action="{{ route('employee.destroy', $employee->id) }}"
-                                            method="POST"
+                                        <form action="{{ route('employee.destroy', $employee->id) }}" method="POST"
                                             id="deleteForm{{ $employee->id }}">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button"
-                                                onclick="confirmDelete({{ $employee->id }})"
+                                            <button type="button" onclick="confirmDelete({{ $employee->id }})"
                                                 class="btn-action btn-delete">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
@@ -167,9 +162,8 @@
 
     <!-- ===================== -->
     <!-- STYLE -->
-    
-    <style>
 
+    <style>
         .status-badge {
             font-size: 13px;
             backdrop-filter: blur(6px);
@@ -197,7 +191,7 @@
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
         }
 
         .stat-total {
@@ -225,7 +219,7 @@
             width: 55px;
             height: 55px;
             border-radius: 14px;
-            background: rgba(255,255,255,0.6);
+            background: rgba(255, 255, 255, 0.6);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -306,7 +300,7 @@
 
         .btn-action:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
             background: #e2e8f0;
         }
 
@@ -321,6 +315,7 @@
             border-radius: 14px;
             overflow: hidden;
         }
+
         /* ========================= */
         /* AVATAR FOTO PRESISI       */
         /* ========================= */
@@ -334,7 +329,7 @@
             object-position: center;
             display: block;
             border: 2px solid #ffffff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             transition: all 0.25s ease;
         }
 
@@ -351,7 +346,7 @@
             font-size: 20px;
             color: #64748b;
             border: 2px solid #ffffff;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
         /* Hover effect */
@@ -362,6 +357,7 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+
             .avatar-photo,
             .avatar-placeholder {
                 width: 42px;
@@ -370,8 +366,6 @@
                 font-size: 18px;
             }
         }
-        
-
     </style>
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>

@@ -82,7 +82,7 @@ class SalaryController extends Controller
             $employees = Employee::all();
         }
 
-        return view('salary.edit', compact('salary', 'employees'));
+        return view('Salary.edit', compact('salary', 'employees'));
     }
 
     public function update(Request $request, Salary $salary)
@@ -154,7 +154,11 @@ class SalaryController extends Controller
                 return back()->with('error', 'Gaji periode ini sudah digenerate');
             }
 
-            $employees = Employee::where('status', 'active')->get();
+            $employees = Employee::whereHas('user.role', function ($q) {
+                $q->whereIn('name', ['hr', 'employee']);
+            })
+                ->where('status', 'active')
+                ->get();
 
             foreach ($employees as $employee) {
                 try {
@@ -197,7 +201,7 @@ class SalaryController extends Controller
                     }
 
                     // Final Saalry
-                    $baseSalary = 5000000;
+                    $baseSalary = $employee->position->base_salary;
                     $totalCuts = $lateCuts + $leaveCuts;
                     $net = $baseSalary - $totalCuts;
 

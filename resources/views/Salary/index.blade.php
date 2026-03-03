@@ -2,150 +2,177 @@
 @section('header', 'Slip Gaji')
 @section('content')
 
-<style>
-    /* Styling Header Tabel Gradasi Merah Profesional */
-    #salaryTable thead th {
-        background: linear-gradient(180deg, #bc5e6b 0%, #a34a57 100%);
-        color: white;
-        border: none;
-        white-space: nowrap;
-        padding: 15px;
-    }
-    
-    .btn-action {
-        border-radius: 6px;
-        padding: 6px 10px;
-        border: none;
-        transition: all 0.2s;
-    }
-    
-    /* Warna tombol aksi yang soft */
-    .btn-view { background-color: #e3f2fd; color: #1976d2; }
-    .btn-view:hover { background-color: #bbdefb; }
-    
-    .btn-edit { background-color: #fff3e0; color: #f57c00; }
-    .btn-edit:hover { background-color: #ffe0b2; }
-    
-    .btn-delete { background-color: #ffebee; color: #d32f2f; }
-    .btn-delete:hover { background-color: #ffcdd2; }
+    <style>
+        /* Styling Header Tabel Gradasi Merah Profesional */
+        #salaryTable thead th {
+            background: linear-gradient(180deg, #bc5e6b 0%, #a34a57 100%);
+            color: white;
+            border: none;
+            white-space: nowrap;
+            padding: 15px;
+        }
 
-    /* Badge Divisi */
-    .badge-divisi {
-        background-color: #f8f9fa;
-        color: #6c757d;
-        border: 1px solid #dee2e6;
-        font-weight: 600;
-        padding: 5px 10px;
-    }
-</style>
+        .btn-action {
+            border-radius: 6px;
+            padding: 6px 10px;
+            border: none;
+            transition: all 0.2s;
+        }
 
-@if (in_array($userRole, ['hr', 'owner']))
-<div class="card shadow mb-4 border-0">
-    <div class="card-header text-white" style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%); border: none;">
-        <i class="fa-solid fa-plus-circle me-2"></i> Manajemen Slip Gaji
-    </div>
-    <div class="card-body">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        /* Warna tombol aksi yang soft */
+        .btn-view {
+            background-color: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .btn-view:hover {
+            background-color: #bbdefb;
+        }
+
+        .btn-edit {
+            background-color: #fff3e0;
+            color: #f57c00;
+        }
+
+        .btn-edit:hover {
+            background-color: #ffe0b2;
+        }
+
+        .btn-delete {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        .btn-delete:hover {
+            background-color: #ffcdd2;
+        }
+
+        /* Badge Divisi */
+        .badge-divisi {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            font-weight: 600;
+            padding: 5px 10px;
+        }
+    </style>
+
+    @if (in_array($userRole, ['hr', 'owner']))
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header text-white"
+                style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%); border: none;">
+                <i class="fa-solid fa-plus-circle me-2"></i> Manajemen Slip Gaji
             </div>
-        @endif
-        <div class="d-flex flex-wrap gap-2">
-            <a href="{{ route('salary.create') }}" class="btn btn-primary shadow-sm">
-                <i class="fa-solid fa-plus me-1"></i> Tambah Slip
-            </a>
-            <a href="{{ route('salary.generate') }}" class="btn btn-success shadow-sm">
-                <i class="fa-solid fa-arrows-rotate me-1"></i> Generate Gaji Bulanan
-            </a>
+            <div class="card-body">
+                @if (session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ route('salary.create') }}" class="btn btn-primary shadow-sm">
+                        <i class="fa-solid fa-plus me-1"></i> Tambah Slip
+                    </a>
+                    <a href="{{ route('salary.generate') }}" class="btn btn-success shadow-sm">
+                        <i class="fa-solid fa-arrows-rotate me-1"></i> Generate Gaji Bulanan
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-@endif
+    @endif
 
-<div class="card shadow border-0">
-    <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="fw-semibold mb-0">
-                <i class="fa-solid fa-file-invoice-dollar me-2" style="color: #bc5e6b;"></i> Daftar Slip Gaji
-            </h5>
-        </div>
-        
-        <div class="table-responsive">
-            <table id="salaryTable" class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Nama Karyawan</th>
-                        <th>Divisi</th>
-                        <th>Gaji Pokok</th>
-                        <th>Potongan</th>
-                        <th>Total Diterima</th>
-                        @if (in_array($userRole, ['hr', 'owner']))
-                            <th class="text-center">Aksi</th>
-                        @endif
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($salaries as $salary)
+    <div class="card shadow border-0">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-semibold mb-0">
+                    <i class="fa-solid fa-file-invoice-dollar me-2" style="color: #bc5e6b;"></i> Daftar Slip Gaji
+                </h5>
+            </div>
+
+            <div class="table-responsive">
+                <table id="salaryTable" class="table table-hover align-middle">
+                    <thead>
                         <tr>
-                            <td class="fw-bold text-dark">{{ ucwords($salary->employee->fullname) }}</td>
-                            <td><span class="badge badge-divisi">{{ strtoupper($salary->employee->division->name) }}</span></td>
-                            <td>Rp {{ number_format($salary->net_salary, 0, ',', '.') }}</td>
-                            <td class="text-danger">Rp {{ number_format($salary->cuts, 0, ',', '.') }}</td>
-                            <td class="fw-bold text-success">Rp {{ number_format($salary->total, 0, ',', '.') }}</td>
-                            
+                            <th>No</th>
+                            <th>Nama Karyawan</th>
+                            <th>Divisi</th>
+                            <th>Gaji Pokok</th>
+                            <th>Potongan</th>
+                            <th>Total Diterima</th>
                             @if (in_array($userRole, ['hr', 'owner']))
-                            <td class="text-center">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <a href="{{ route('salary.edit', $salary->id) }}" class="btn btn-action btn-view btn-sm" title="Lihat">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('salary.edit', $salary->id) }}" class="btn btn-action btn-edit btn-sm" title="Edit">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <form action="{{ route('salary.destroy', $salary->id) }}" method="POST" class="d-inline" id="deleteForm{{ $salary->id }}">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-action btn-delete btn-sm" type="button" onclick="confirmDelete({{ $salary->id }})" title="Hapus">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                                <th class="text-center">Aksi</th>
                             @endif
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($salaries as $salary)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td class="fw-bold text-dark">{{ ucwords($salary->employee->fullname) }}</td>
+                                <td><span
+                                        class="badge badge-divisi">{{ strtoupper($salary->employee->division->name) }}</span>
+                                </td>
+                                <td>Rp {{ number_format($salary->net_salary, 0, ',', '.') }}</td>
+                                <td class="text-danger">Rp {{ number_format($salary->cuts, 0, ',', '.') }}</td>
+                                <td class="fw-bold text-success">Rp {{ number_format($salary->total, 0, ',', '.') }}</td>
+
+                                @if (in_array($userRole, ['hr', 'owner']))
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <a href="{{ route('salary.edit', $salary->id) }}"
+                                                class="btn btn-action btn-view btn-sm" title="Lihat">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <a href="{{ route('salary.edit', $salary->id) }}"
+                                                class="btn btn-action btn-edit btn-sm" title="Edit">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form action="{{ route('salary.destroy', $salary->id) }}" method="POST"
+                                                class="d-inline" id="deleteForm{{ $salary->id }}">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-action btn-delete btn-sm" type="button"
+                                                    onclick="confirmDelete({{ $salary->id }})" title="Hapus">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<script src="{{ asset('js/jquery.min.js') }}"></script>
-<script src="{{ asset('DataTables/datatables.min.js') }}"></script>
-<script>
-    $(document).ready(function() {
-        $('#salaryTable').DataTable({
-            "pageLength": 10,
-            "ordering": true,
-            "responsive": true,
-            language: {
-                search: "Cari:",
-                lengthMenu: "Tampilkan _MENU_ data",
-                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                paginate: {
-                    previous: "Sebelumnya",
-                    next: "Berikutnya",
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#salaryTable').DataTable({
+                "pageLength": 10,
+                "ordering": true,
+                "responsive": true,
+                language: {
+                    search: "Cari:",
+                    lengthMenu: "Tampilkan _MENU_ data",
+                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                    paginate: {
+                        previous: "Sebelumnya",
+                        next: "Berikutnya",
+                    },
                 },
-            },
-            @if (in_array($userRole, ['hr', 'owner']))
-                columnDefs: [{
-                    targets: 5,
-                    orderable: false,
-                    searchable: false
-                }]
-            @endif
+                @if (in_array($userRole, ['hr', 'owner']))
+                    columnDefs: [{
+                        targets: 5,
+                        orderable: false,
+                        searchable: false
+                    }]
+                @endif
+            });
         });
-    });
-</script>
+    </script>
 @endsection

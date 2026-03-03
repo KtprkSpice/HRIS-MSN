@@ -33,9 +33,9 @@
         }
 
         /* body.bg-dark { */
-            /* background-color: #1b1b2f; */
-            /* color: #e0e0e0; */
-        
+        /* background-color: #1b1b2f; */
+        /* color: #e0e0e0; */
+
 
         /* ===== SIDEBAR ===== */
         .sidebar {
@@ -59,8 +59,10 @@
             max-height: 45px;
             margin-right: 10px;
             transition: transform 0.3s ease;
-            background-color: #ffffff;   /* Warna background */
-            padding: 8px;                /* Jarak dalam */
+            background-color: #ffffff;
+            /* Warna background */
+            padding: 8px;
+            /* Jarak dalam */
             border-radius: 12px;
         }
 
@@ -121,7 +123,7 @@
             gap: 20px;
             padding: 12px 0;
             margin-bottom: 24px;
-            border-bottom: 1px solid rgba(0,0,0, 0.08);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
             transition: border-color 0.5s;
         }
 
@@ -225,8 +227,8 @@
         /* ===== DROPDOWN MENU ===== */
         .dropdown-menu {
             border-radius: 8px;
-            border: 1px solid rgba(0,0,0, 0.1);
-            box-shadow: 0 4px 12px rgba(0,0,0, 0.15);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         /* body.bg-dark .dropdown-menu {
@@ -261,10 +263,10 @@
         }
 
         /* body.bg-dark .notice-board { */
-            /* background: #2f2f3d; */
-            /* color: #f1f1f1; */
-            /* border-color: #444464; */
-        
+        /* background: #2f2f3d; */
+        /* color: #f1f1f1; */
+        /* border-color: #444464; */
+
 
         /* ===== CARDS ===== */
         .cards .card {
@@ -275,9 +277,9 @@
         }
 
         /* body.bg-dark .cards .card { */
-            /* background: #2a2a3d; */
-            /* color: #f1f1f1; */
-        
+        /* background: #2a2a3d; */
+        /* color: #f1f1f1; */
+
 
         .cards .card:hover {
             transform: translateY(-5px);
@@ -300,8 +302,8 @@
         }
 
         /* body.bg-dark .table thead { */
-            /* background: linear-gradient(to right, #5a1820, #7a1f2a); */
-        
+        /* background: linear-gradient(to right, #5a1820, #7a1f2a); */
+
 
         /* .table tbody tr:hover {
             background: #f1f3f5;
@@ -326,8 +328,8 @@
         }
 
         /* body.bg-dark .carousel-caption { */
-            /* background: rgba(0, 0, 0, 0.5); */
-        
+        /* background: rgba(0, 0, 0, 0.5); */
+
 
         /* ===== Dark Mode Icons ===== */
         #moon-icon,
@@ -336,12 +338,12 @@
         }
 
         /* body.bg-dark #moon-icon { */
-            /* color: #f1c40f; */
-        
+        /* color: #f1c40f; */
+
 
         /* body.bg-dark #sun-icon { */
-            /* color: #f39c12; */
-        
+        /* color: #f39c12; */
+
 
         /* Tabe leftg */
         table thead th,
@@ -354,7 +356,7 @@
                 height: 300px;
             }
         }
-        
+
         /* Sidebar collapse */
         .sidebar.collapsed {
             margin-left: -250px;
@@ -367,6 +369,7 @@
         /* ===== RESPONSIVE DESIGN ===== */
         /* Mobile devices: 576px and below */
         @media (max-width: 576px) {
+
             /* Sidebar: convert to full overlay on very small screens */
             .sidebar {
                 width: 100%;
@@ -494,7 +497,8 @@
                 font-size: 0.85rem;
             }
 
-            table th, table td {
+            table th,
+            table td {
                 padding: 8px 6px !important;
             }
 
@@ -645,7 +649,7 @@
             </div>
         </div>
         <ul>
-            @if (in_array($userRole,['hr','owner']))
+            @if (in_array($userRole, ['hr', 'owner']))
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
@@ -717,7 +721,8 @@
                 <div class="dropdown profile">
                     <a class="d-flex align-items-center text-decoration-none dropdown-toggle" href="#"
                         role="button" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://i.pravatar.cc/40" alt="User" class="rounded-circle">
+                        <img src="https://i.pravatar.cc/300?img={{ auth()->user()->employee->id }}" alt="User"
+                            class="rounded-circle">
                         <div>
                             <strong>{{ ucwords(auth()->user()->employee->fullname) }}</strong>
                             <small class="text-muted">{{ ucwords(auth()->user()->role->name) }}</small>
@@ -769,16 +774,16 @@
 
     {{-- Data Table Logic --}}
     <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggleBtn = document.getElementById("toggleSidebar");
-        const sidebar = document.querySelector(".sidebar");
-        const mainContainer = document.querySelector(".main-container");
-        const body = document.body;
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleBtn = document.getElementById("toggleSidebar");
+            const sidebar = document.querySelector(".sidebar");
+            const mainContainer = document.querySelector(".main-container");
+            const body = document.body;
 
-        // Create backdrop overlay for mobile
-        const backdrop = document.createElement("div");
-        backdrop.className = "sidebar-backdrop";
-        backdrop.style.cssText = `
+            // Create backdrop overlay for mobile
+            const backdrop = document.createElement("div");
+            backdrop.className = "sidebar-backdrop";
+            backdrop.style.cssText = `
             position: fixed;
             top: 0;
             left: 0;
@@ -790,62 +795,63 @@
             opacity: 0;
             transition: opacity 0.3s ease;
         `;
-        body.appendChild(backdrop);
+            body.appendChild(backdrop);
 
-        // For mobile (< 576px): use overlay mode
-        // For tablet/desktop (>= 576px): use collapse mode
-        toggleBtn.addEventListener("click", function () {
-            const screenWidth = window.innerWidth;  // Check screen width on every click
-            if (screenWidth < 576) {
-                sidebar.classList.toggle("show");
-                if (sidebar.classList.contains("show")) {
-                    backdrop.style.display = "block";
-                    setTimeout(() => backdrop.style.opacity = "1", 10);
+            // For mobile (< 576px): use overlay mode
+            // For tablet/desktop (>= 576px): use collapse mode
+            toggleBtn.addEventListener("click", function() {
+                const screenWidth = window.innerWidth; // Check screen width on every click
+                if (screenWidth < 576) {
+                    sidebar.classList.toggle("show");
+                    if (sidebar.classList.contains("show")) {
+                        backdrop.style.display = "block";
+                        setTimeout(() => backdrop.style.opacity = "1", 10);
+                    } else {
+                        backdrop.style.opacity = "0";
+                        setTimeout(() => backdrop.style.display = "none", 300);
+                    }
                 } else {
-                    backdrop.style.opacity = "0";
-                    setTimeout(() => backdrop.style.display = "none", 300);
+                    sidebar.classList.toggle("collapsed");
+                    mainContainer.classList.toggle("full");
                 }
-            } else {
-                sidebar.classList.toggle("collapsed");
-                mainContainer.classList.toggle("full");
-            }
-        });
+            });
 
-        // Close sidebar when clicking on backdrop or outside on mobile
-        backdrop.addEventListener("click", function () {
-            sidebar.classList.remove("show");
-            backdrop.style.opacity = "0";
-            setTimeout(() => backdrop.style.display = "none", 300);
-        });
+            // Close sidebar when clicking on backdrop or outside on mobile
+            backdrop.addEventListener("click", function() {
+                sidebar.classList.remove("show");
+                backdrop.style.opacity = "0";
+                setTimeout(() => backdrop.style.display = "none", 300);
+            });
 
-        document.addEventListener("click", function (e) {
-            const screenWidth = window.innerWidth;  // Check screen width dynamically
-            if (screenWidth < 576 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !backdrop.contains(e.target)) {
-                if (sidebar.classList.contains("show")) {
+            document.addEventListener("click", function(e) {
+                const screenWidth = window.innerWidth; // Check screen width dynamically
+                if (screenWidth < 576 && !sidebar.contains(e.target) && !toggleBtn.contains(e.target) && !
+                    backdrop.contains(e.target)) {
+                    if (sidebar.classList.contains("show")) {
+                        sidebar.classList.remove("show");
+                        backdrop.style.opacity = "0";
+                        setTimeout(() => backdrop.style.display = "none", 300);
+                    }
+                }
+            });
+
+            // Handle window resize
+            window.addEventListener("resize", function() {
+                const newScreenWidth = window.innerWidth;
+                if (newScreenWidth < 576) {
+                    sidebar.classList.remove("collapsed");
+                    mainContainer.classList.remove("full");
                     sidebar.classList.remove("show");
+                    backdrop.style.display = "none";
                     backdrop.style.opacity = "0";
-                    setTimeout(() => backdrop.style.display = "none", 300);
+                } else {
+                    sidebar.classList.remove("show");
+                    backdrop.style.display = "none";
+                    backdrop.style.opacity = "0";
                 }
-            }
+            });
         });
-
-        // Handle window resize
-        window.addEventListener("resize", function () {
-            const newScreenWidth = window.innerWidth;
-            if (newScreenWidth < 576) {
-                sidebar.classList.remove("collapsed");
-                mainContainer.classList.remove("full");
-                sidebar.classList.remove("show");
-                backdrop.style.display = "none";
-                backdrop.style.opacity = "0";
-            } else {
-                sidebar.classList.remove("show");
-                backdrop.style.display = "none";
-                backdrop.style.opacity = "0";
-            }
-        });
-    });
-</script>
+    </script>
 </body>
 
 </html>
