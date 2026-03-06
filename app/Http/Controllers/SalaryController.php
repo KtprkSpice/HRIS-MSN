@@ -36,7 +36,7 @@ class SalaryController extends Controller
             $employees = Employee::all();
         }
 
-        return view('salary.create', compact('employees'));
+        return view('Salary.create', compact('employees'));
     }
 
     public function store(Request $request)

@@ -277,6 +277,8 @@
                                 <tr>
                                     <th>Nama Karyawan</th>
                                     <th>Shift</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Keluar</th>
                                     <th>Tanggal</th>
                                 </tr>
                             </thead>
@@ -286,6 +288,10 @@
                                     <tr>
                                         <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
                                         <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->start_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->end_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
                                         <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
                                     </tr>
                                 @endforeach
@@ -296,6 +302,10 @@
                                     <tr>
                                         <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
                                         <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->start_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->end_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
                                         <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
                                     </tr>
                                 @endforeach
@@ -306,6 +316,10 @@
                                     <tr>
                                         <td>{{ $schedule->employee->fullname ?? 'N/A' }}</td>
                                         <td>{{ $schedule->shift->name ?? 'N/A' }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->start_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($schedule->shift->end_time)->format('H:i') ?? 'N/A' }}
+                                        </td>
                                         <td>{{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
                                     </tr>
                                 @endforeach

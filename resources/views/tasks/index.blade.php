@@ -161,11 +161,13 @@
                                     {{ ucwords(Str::limit($task->description, 50)) }}
                                 </td>
 
-                                <td>
+                                <td data-search="{{ Carbon\Carbon::parse($task->start_time)->translatedFormat('d F Y') }}"
+                                    data-order="{{ $task->start_time }}">
                                     {{ Carbon\Carbon::parse($task->start_time)->format('d M Y') }}
                                 </td>
 
-                                <td>
+                                <td data-search="{{ Carbon\Carbon::parse($task->end_time)->format('d F Y') }}"
+                                    data-order="{{ $task->end_time }}">
                                     {{ Carbon\Carbon::parse($task->end_time)->format('d M Y') }}
                                 </td>
 

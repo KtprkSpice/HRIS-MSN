@@ -18,7 +18,7 @@ class EmployeeController extends Controller
         $roles = auth()->user()->role->name;
 
         if ($roles === 'employee') {
-            abort(403);
+            abort(403, 'Anda tidak memiliki akses ke halaman ini');
         } elseif ($roles === 'owner') {
             // Owner
             $employees = Employee::whereHas('user.role', function ($q) {

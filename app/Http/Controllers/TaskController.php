@@ -132,7 +132,7 @@ class TaskController extends Controller
 
             $employees = Employee::whereHas('user.role', function ($q) {
                 $q->where('name', 'employee');
-            })->get();
+            })->where('status', 'active')->get();
             $locations = Tasklocation::where('task_id', $task->id)->first();
         }
 
