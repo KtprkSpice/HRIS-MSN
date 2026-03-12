@@ -133,7 +133,7 @@ class generateSalary extends Command
                 }
 
                 $allowanceCuts = round($bpjsValue);
-                $totalCuts = $lateCuts + $leaveCuts + $absencesCuts + $allowanceCuts;
+                $totalCuts = round($lateCuts + $leaveCuts + $absencesCuts + $allowanceCuts);
                 $net = $baseSalary - $totalCuts;
 
                 Salary::create([
