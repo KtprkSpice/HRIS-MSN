@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Allowance;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\Presence;
@@ -53,6 +54,10 @@ class generateSalary extends Command
             ->where('status', 'active')
             ->get();
 
+        // Allowance
+        $bpjsKesehatan = Allowance::where('allowance_type', 'BPJS Kesehatan')->first();
+        $bpjsKetenagakerjaan = Allowance::where('allowance_type', 'BPJS Ketenagakerjaan')->first();
+
         foreach ($employees as $employee) {
             try {
 
@@ -64,8 +69,10 @@ class generateSalary extends Command
                 // Absence Cuts
                 $absencesCuts = Presence::where('employee_id', $employee->id)
                     ->where('status', 'absent')
-                    ->whereBetween('date', $start, $end)
-                    ->get();
+                    ->whereBetween('date', [$start, $end])
+                    ->count() * 50000;
+
+                // Allowance Cuts
 
                 $lateMinutes = $presences->sum('late_minutes');
                 $lateCuts = $lateMinutes * 1000;
@@ -101,7 +108,32 @@ class generateSalary extends Command
 
                 // Final Saalry
                 $baseSalary = $employee->position->base_salary;
-                $totalCuts = $lateCuts + $leaveCuts + $absencesCuts;
+                $allowanceCuts = 0;
+
+                // Bpjs Kesehatan
+                if (! is_null($employee->bpjs_kesehatan) && $bpjsKesehatan) {
+                    if ($bpjsKesehatan->calculation_type === 'fixed') {
+                        $bpjsValue = $allowanceCuts += $bpjsKesehatan->amount;
+                    }
+
+                    if ($bpjsKesehatan->calculation_type === 'percentage') {
+                        $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKesehatan->percentage_value) / 100;
+                    }
+                }
+
+                // Bpjs Ketengakerjaan
+                if (! is_null($employee->bpjs_ketenagakerjaan) && $bpjsKetenagakerjaan) {
+                    if ($bpjsKetenagakerjaan->calculation_type === 'fixed') {
+                        $bpjsValue = $allowanceCuts += $bpjsKetenagakerjaan->amount;
+                    }
+
+                    if ($bpjsKetenagakerjaan->calculation_type === 'percentage') {
+                        $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKetenagakerjaan->percentage_value) / 100;
+                    }
+                }
+
+                $allowanceCuts = round($bpjsValue);
+                $totalCuts = $lateCuts + $leaveCuts + $absencesCuts + $allowanceCuts;
                 $net = $baseSalary - $totalCuts;
 
                 Salary::create([
@@ -120,6 +152,7 @@ class generateSalary extends Command
                     'leave_cuts' => $leaveCuts,
                     'total_cuts' => $totalCuts,
                     'total' => $net,
+                    'allowance_cuts' => $allowanceCuts,
                 ]);
 
             } catch (\Throwable $e) {

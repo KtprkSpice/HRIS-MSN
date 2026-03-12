@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('allowance_employee', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
-            $table->foreignId('allowance_id')->constrained('allowances')->onDelete('cascade');
-            $table->timestamps();
-            $table->softDeletes();
-        });
+        // Schema::create('allowance_employee', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('employee_id')->constrained('employees')->onDelete('cascade');
+        //     $table->foreignId('allowance_id')->constrained('allowances')->onDelete('cascade');
+        //     $table->timestamps();
+        //     $table->softDeletes();
+        // });
     }
 
     /**

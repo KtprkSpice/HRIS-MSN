@@ -5,17 +5,17 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
 // php artisan schedule:run
-
+$start = today()->startOfWeek();
 Schedule::command('app:auto-schedule')
-    ->everyMinute()
+    ->weekly($start)
     ->withoutOverlapping();
 
 Schedule::command('app:qr-generate')
-    ->everyMinute()
+    ->dailyAt('00:00')
     ->withoutOverlapping();
 
 Schedule::command('app:auto-absent')
-    ->everyMinute()
+    ->dailyAt('00:00')
     ->withoutOverlapping();
 
 Schedule::command('app:generate-salary')

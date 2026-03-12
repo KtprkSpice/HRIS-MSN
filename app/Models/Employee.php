@@ -50,7 +50,7 @@ class Employee extends Model
 
     public function division(): BelongsTo
     {
-        return $this->belongsTo(Division::class, 'division_id');
+        return $this->belongsTo(division::class, 'division_id');
     }
 
     public function user()
