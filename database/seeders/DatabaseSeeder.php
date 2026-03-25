@@ -38,7 +38,7 @@ class DatabaseSeeder extends Seeder
             // PresencesSeeder::class,
             TaskLocationSeeder::class,
             AllowanceSeeder::class,
-            AllowanceEmployeeSeeder::class,
+            // AllowanceEmployeeSeeder::class,
         ]);
     }
 }

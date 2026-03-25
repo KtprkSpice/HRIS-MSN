@@ -188,7 +188,7 @@
                     Kinerja Terendah</div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table id="karyawanTable" class="table table-striped table-hover mb-0">
+                        <table id="kpiTable" class="table table-striped table-hover mb-0">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Nama</th>
@@ -197,11 +197,13 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                @foreach($employees as $employee)
                                 <tr>
-                                    <td>nama</td>
-                                    <td>Departemen</td>
-                                    <td>skor</td>
+                                    <td>{{ $employee->fullname }}</td>
+                                    <td>{{ $employee->division->name }}</td>
+                                    <td>Score</td>
                                 </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -253,6 +255,24 @@
     </div>
 
     <script>
+        // DataTabele
+         let table = new DataTable('#kpiTable', {
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
+                },
+            },
+            columnDefs: [{
+                targets: 6,
+                orderable: false,
+                searchable: false
+            }]
+        });
+
         // Digital Clock WIB
         function updateDigitalClock() {
             const now = new Date();

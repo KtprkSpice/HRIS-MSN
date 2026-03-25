@@ -44,7 +44,7 @@ class employee_seeder extends Seeder
                 'bpjs_kesehatan' => $faker->numerify('##########'),
                 'bpjs_ketenagakerjaan' => $faker->numerify('##########'),
                 'npwp' => $faker->numerify('##.###.###.#-###.###'),
-                'status' => $faker->randomElement(['active', 'inactive']),
+                'status' => 'active',
                 'gender' => $faker->randomElement(['laki-laki', 'perempuan']),
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

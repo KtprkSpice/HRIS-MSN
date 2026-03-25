@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schedule;
 // php artisan schedule:run
 $start = today()->startOfWeek();
 Schedule::command('app:auto-schedule')
-    ->weekly($start)
+    ->everyMinute()
     ->withoutOverlapping();
 
 Schedule::command('app:qr-generate')
@@ -15,7 +15,7 @@ Schedule::command('app:qr-generate')
     ->withoutOverlapping();
 
 Schedule::command('app:auto-absent')
-    ->dailyAt('00:00')
+    ->everyMinute()
     ->withoutOverlapping();
 
 Schedule::command('app:generate-salary')

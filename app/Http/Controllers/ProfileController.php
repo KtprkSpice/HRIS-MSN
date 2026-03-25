@@ -11,7 +11,7 @@ class ProfileController extends Controller
     {
         $employee = Employee::findOrFail($id);
 
-        return view('profile.edit', compact('employee'));
+        return view('Profile.edit', compact('employee'));
     }
 
     public function update(Request $request, $id)
