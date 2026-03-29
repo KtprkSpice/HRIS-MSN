@@ -56,59 +56,59 @@
             </div>
         </div>
         <!--<div class="col-md-2 d-flex">
-                                                                <div class="card shadow-sm flex-fill">
-                                                                    <div class="card-header">
-                                                                        <h5 class="mb-0">Notifikasi Terbaru</h5>
-                                                                    </div>
-                                                                    <div class="accordion" id="accordionExample">
-                                                                         <div class="accordion-item">
-                                                                            <h2 class="accordion-header">
-                                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                                                    data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                                                                    <i class="fa-solid fa-user-check text-primary me-2"></i>
-                                                                                    <strong>Absensi</strong>
-                                                                                </button>
-                                                                            </h2>
-                                                                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                <div class="accordion-body">
-                                                                                    <p>Ada 3 karyawan terlambat hari ini.</p>
-                                                                                </div>
+                                                                        <div class="card shadow-sm flex-fill">
+                                                                            <div class="card-header">
+                                                                                <h5 class="mb-0">Notifikasi Terbaru</h5>
                                                                             </div>
-                                                                        </div>
-                                                                        <div class="accordion-item">
-                                                                            <h2 class="accordion-header">
-                                                                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                                                    <i class="fa-solid fa-calendar-check text-success me-2"></i>
-                                                                                    <strong>Pengajuan Cuti</strong>
-                                                                                </button>
-                                                                            </h2>
-                                                                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                <div class="accordion-body">
-                                                                                    <p>2 pengajuan cuti menunggu persetujuan.</p>
+                                                                            <div class="accordion" id="accordionExample">
+                                                                                 <div class="accordion-item">
+                                                                                    <h2 class="accordion-header">
+                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                                            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                                                                            <i class="fa-solid fa-user-check text-primary me-2"></i>
+                                                                                            <strong>Absensi</strong>
+                                                                                        </button>
+                                                                                    </h2>
+                                                                                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                                                        <div class="accordion-body">
+                                                                                            <p>Ada 3 karyawan terlambat hari ini.</p>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </div>
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="accordion-item">
-                                                                            <h2 class="accordion-header">
-                                                                                <button class="accordion-button collapsed text-black" type="button" data-bs-toggle="collapse"
-                                                                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                                                    <i class="fa-solid fa-file-lines text-info me-2"></i>
-                                                                                    <strong>Laporan Tugas</strong>
-                                                                                </button>
-                                                                            </h2>
-                                                                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                <div class="accordion-body">
-                                                                                    <p>5 laporan tugas baru telah diunggah.</p>
+                                                                                <div class="accordion-item">
+                                                                                    <h2 class="accordion-header">
+                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                                                                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                                                                            <i class="fa-solid fa-calendar-check text-success me-2"></i>
+                                                                                            <strong>Pengajuan Cuti</strong>
+                                                                                        </button>
+                                                                                    </h2>
+                                                                                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                                                        <div class="accordion-body">
+                                                                                            <p>2 pengajuan cuti menunggu persetujuan.</p>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="accordion-item">
+                                                                                    <h2 class="accordion-header">
+                                                                                        <button class="accordion-button collapsed text-black" type="button" data-bs-toggle="collapse"
+                                                                                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                                                                            <i class="fa-solid fa-file-lines text-info me-2"></i>
+                                                                                            <strong>Laporan Tugas</strong>
+                                                                                        </button>
+                                                                                    </h2>
+                                                                                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                                                                        <div class="accordion-body">
+                                                                                            <p>5 laporan tugas baru telah diunggah.</p>
+                                                                                        </div>
+                                                                                    </div>
                                                                                 </div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <!-- Cards -->
+                                                                <!-- Cards -->
         <div class="row g-3 mb-4 cards">
             <div class="col-md-3">
                 <div class="card shadow-sm">
@@ -299,6 +299,74 @@
                     const chart = new ApexCharts(genderChart, options);
                     chart.render();
                 }
+
+                // Update clock every 1 second
+                setInterval(updateDigitalClock, 1000);
+                updateDigitalClock(); // Initial call
+
+                // Mini Calendar
+                function generateMiniCalendar() {
+                    const now = new Date();
+                    const year = now.getFullYear();
+                    const month = now.getMonth();
+                    const firstDay = new Date(year, month, 1);
+                    const lastDay = new Date(year, month + 1, 0);
+                    const daysInMonth = lastDay.getDate();
+                    const startingDayOfWeek = firstDay.getDay();
+
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov',
+                        'Des'
+                    ];
+                    const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+                    let calendarHTML =
+                        `<div style="text-align: center; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: #f9f9f9;">`;
+                    calendarHTML += `<h6 style="margin: 0 0 10px 0; color: #aa2c36;">${monthNames[month]} ${year}</h6>`;
+                    calendarHTML += `<table style="width: 100%; border-collapse: collapse;">`;
+                    calendarHTML += `<tr>`;
+
+                    // Day headers
+                    dayNames.forEach(day => {
+                        calendarHTML +=
+                            `<th style="padding: 5px; font-weight: bold; font-size: 0.75rem;">${day}</th>`;
+                    });
+                    calendarHTML += `</tr>`;
+
+                    // Empty cells for days before month starts
+                    calendarHTML += `<tr>`;
+                    for (let i = 0; i < startingDayOfWeek; i++) {
+                        calendarHTML += `<td style="padding: 5px; text-align: center; font-size: 0.75rem;"></td>`;
+                    }
+
+                    // Days of month
+                    let dayOfWeek = startingDayOfWeek;
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const isToday = day === now.getDate();
+                        const bgColor = isToday ? '#aa2c36' : '#f0f0f0';
+                        const textColor = isToday ? '#fff' : '#333';
+
+                        calendarHTML +=
+                            `<td style="padding: 5px; text-align: center; border: 1px solid #eee; background-color: ${bgColor}; color: ${textColor}; font-size: 0.75rem; font-weight: ${isToday ? 'bold' : 'normal'}; border-radius: 4px;">${day}</td>`;
+
+                        dayOfWeek++;
+                        if (dayOfWeek > 6) {
+                            calendarHTML += `</tr><tr>`;
+                            dayOfWeek = 0;
+                        }
+                    }
+
+                    // Fill remaining cells
+                    while (dayOfWeek > 0 && dayOfWeek < 7) {
+                        calendarHTML += `<td style="padding: 5px; text-align: center; font-size: 0.75rem;"></td>`;
+                        dayOfWeek++;
+                    }
+
+                    calendarHTML += `</tr></table></div>`;
+
+                    document.getElementById('miniCalendar').innerHTML = calendarHTML;
+                }
+
+                generateMiniCalendar();
             });
 
             // DataTabele
@@ -332,70 +400,5 @@
 
                 document.getElementById('digitalClock').textContent = `${hours}:${minutes}:${seconds}`;
             }
-
-            // Update clock every 1 second
-            setInterval(updateDigitalClock, 1000);
-            updateDigitalClock(); // Initial call
-
-            // Mini Calendar
-            function generateMiniCalendar() {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = now.getMonth();
-                const firstDay = new Date(year, month, 1);
-                const lastDay = new Date(year, month + 1, 0);
-                const daysInMonth = lastDay.getDate();
-                const startingDayOfWeek = firstDay.getDay();
-
-                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-                const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-
-                let calendarHTML =
-                    `<div style="text-align: center; border: 1px solid #ddd; border-radius: 8px; padding: 10px; background: #f9f9f9;">`;
-                calendarHTML += `<h6 style="margin: 0 0 10px 0; color: #aa2c36;">${monthNames[month]} ${year}</h6>`;
-                calendarHTML += `<table style="width: 100%; border-collapse: collapse;">`;
-                calendarHTML += `<tr>`;
-
-                // Day headers
-                dayNames.forEach(day => {
-                    calendarHTML += `<th style="padding: 5px; font-weight: bold; font-size: 0.75rem;">${day}</th>`;
-                });
-                calendarHTML += `</tr>`;
-
-                // Empty cells for days before month starts
-                calendarHTML += `<tr>`;
-                for (let i = 0; i < startingDayOfWeek; i++) {
-                    calendarHTML += `<td style="padding: 5px; text-align: center; font-size: 0.75rem;"></td>`;
-                }
-
-                // Days of month
-                let dayOfWeek = startingDayOfWeek;
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const isToday = day === now.getDate();
-                    const bgColor = isToday ? '#aa2c36' : '#f0f0f0';
-                    const textColor = isToday ? '#fff' : '#333';
-
-                    calendarHTML +=
-                        `<td style="padding: 5px; text-align: center; border: 1px solid #eee; background-color: ${bgColor}; color: ${textColor}; font-size: 0.75rem; font-weight: ${isToday ? 'bold' : 'normal'}; border-radius: 4px;">${day}</td>`;
-
-                    dayOfWeek++;
-                    if (dayOfWeek > 6) {
-                        calendarHTML += `</tr><tr>`;
-                        dayOfWeek = 0;
-                    }
-                }
-
-                // Fill remaining cells
-                while (dayOfWeek > 0 && dayOfWeek < 7) {
-                    calendarHTML += `<td style="padding: 5px; text-align: center; font-size: 0.75rem;"></td>`;
-                    dayOfWeek++;
-                }
-
-                calendarHTML += `</tr></table></div>`;
-
-                document.getElementById('miniCalendar').innerHTML = calendarHTML;
-            }
-
-            generateMiniCalendar();
         </script>
     @endsection

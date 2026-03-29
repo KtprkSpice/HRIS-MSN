@@ -692,7 +692,7 @@
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
-                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                {{-- <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li> --}}
             @endif
         </ul>
     </aside>
