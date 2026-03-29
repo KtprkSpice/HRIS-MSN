@@ -179,9 +179,8 @@
 
                                 <td>
                                     <span
-                                        class="badge {{ $finalStatus === 'confirmed' ? 'text-white' : ($finalStatus === 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}"
-                                        style="{{ $finalStatus === 'confirmed' ? 'background-color: #aa2c36;' : '' }}">
-                                        {{ ucfirst($finalStatus) }}
+                                        class="badge {{ $finalStatus === 'approved' ? 'bg-info' : ($finalStatus === 'rejected' ? 'bg-danger' : 'bg-warning text-dark') }}">
+                                        {{ ucfirst($finalStatus ?? 'pending') }}
                                     </span>
                                 </td>
 
