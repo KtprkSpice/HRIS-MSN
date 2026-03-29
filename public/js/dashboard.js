@@ -16,31 +16,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
     // 📊 ApexCharts - Gender
-    const genderChart = document.querySelector("#genderChart");
-    if (genderChart) {
-        const options = {
-            chart: {
-                type: 'pie',
-                height: 300
-            },
-            // Dummy data (ubah nanti sesuai data backend)
-            series: [12, 8],
-            labels: ['Laki-laki', 'Perempuan'],
-            colors: ['#120588', '#e83e8c'],
-            legend: {
-                position: 'bottom'
-            },
-            responsive: [{
-                breakpoint: 768,
-                options: {
-                    chart: { height: 250 }
-                }
-            }]
-        };
-
-        const chart = new ApexCharts(genderChart, options);
-        chart.render();
-    }
+    
 });
 
 // 🔔 Toggle Detail Notifikasi
