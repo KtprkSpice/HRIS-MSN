@@ -11,7 +11,7 @@ Schedule::command('app:auto-schedule')
     ->withoutOverlapping();
 
 Schedule::command('app:qr-generate')
-    ->dailyAt('00:00')
+    ->everyMinute()
     ->withoutOverlapping();
 
 Schedule::command('app:auto-absent')

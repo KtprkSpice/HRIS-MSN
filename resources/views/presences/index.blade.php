@@ -173,8 +173,7 @@
                                 <td class="text-start fw-bold text-dark">{{ ucwords($presence->employee->fullname) }}</td>
                                 <td class="small">{{ ucwords($presence->task->name) }}</td>
                                 <td>{{ \Carbon\Carbon::parse($presence->date)->format('d F Y') }}</td>
-                                <td class="text-primary fw-bold">
-                                    {{ \Carbon\Carbon::parse($presence->check_in)->format('H:i') }}</td>
+                                <td>{{ $presence->check_in ? $presence->check_in->format('H:i') : '-' }}</td>
                                 <td>{{ $presence->check_out ? \Carbon\Carbon::parse($presence->check_out)->format('H:i') : '-' }}
                                 </td>
                                 <td><span class="badge bg-light text-dark border">{{ ucwords($presence->type) }}</span></td>

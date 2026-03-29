@@ -59,6 +59,8 @@ class autoAbsent extends Command
                     'schedule_id' => $schedule->id,
                     'shift_id' => $schedule->shift_id,
                     'date' => today(),
+                    'check_in' => null,
+                    'check_out' => null,
                     'status' => 'absent',
                     'late_minutes' => 0,
                 ]);
