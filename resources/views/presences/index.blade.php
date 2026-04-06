@@ -94,15 +94,20 @@
     </style>
 
     <div class="card shadow-sm mb-4 border-0" style="border-radius: 12px;">
-        <div class="card-header card-custom-header d-flex justify-content-between align-items-center">
-            <span><i class="fa-solid fa-clipboard-user me-2"></i> Daftar Kehadiran Karyawan</span>
-            @if (in_array($userRole, ['hr', 'owner']))
-                <a href="{{ route('presence.create') }}" class="btn btn-primary btn-sm fw-bold shadow-sm"
-                    style="border-radius: 8px;">
-                    <i class="fa-solid fa-plus-circle me-1"></i> Tambah Kehadiran
-                </a>
-            @endif
-        </div>
+    <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+
+    <span class="d-flex align-items-center">
+        <i class="fa-solid fa-clipboard-user me-2"></i> 
+        Daftar Kehadiran Karyawan
+    </span>
+
+    @if (in_array($userRole, ['hr', 'owner']))
+        <a href="{{ route('presence.create') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="fa-solid fa-plus me-2"></i> Tambah Kehadiran
+        </a>
+    @endif
+
+</div>
 
         <div class="card-body p-4">
             @if (session('success'))

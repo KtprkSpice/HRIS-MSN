@@ -58,29 +58,38 @@
     </style>
 
     @if (in_array($userRole, ['hr', 'owner']))
-        <div class="card shadow mb-4 border-0">
-            <div class="card-header text-white"
-                style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%); border: none;">
-                <i class="fa-solid fa-plus-circle me-2"></i> Manajemen Slip Gaji
-            </div>
-            <div class="card-body">
-                @if (session('success'))
-                    <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        {{ session('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-                <div class="d-flex flex-wrap gap-2">
-                    <a href="{{ route('salary.create') }}" class="btn btn-primary shadow-sm">
-                        <i class="fa-solid fa-plus me-1"></i> Tambah Slip
-                    </a>
-                    <a href="{{ route('salary.generate') }}" class="btn btn-success shadow-sm">
-                        <i class="fa-solid fa-arrows-rotate me-1"></i> Generate Gaji Bulanan
-                    </a>
-                </div>
-            </div>
+<div class="card shadow-sm border-0 rounded-4 mb-4">
+
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+            <i class="fa-solid fa-plus-circle me-2"></i>
+            Manajemen Slip Gaji
+        </h5>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('salary.create') }}" class="btn btn-primary rounded-pill px-4">
+                <i class="fa-solid fa-plus me-2"></i> Tambah Slip
+            </a>
+
+            <a href="{{ route('salary.generate') }}" class="btn btn-outline-success rounded-pill px-4">
+                <i class="fa-solid fa-arrows-rotate me-2"></i> Generate
+            </a>
         </div>
+
+    </div>
+
+    @if (session('success'))
+    <div class="card-body pt-0">
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
     @endif
+
+</div>
+@endif
 
     <div class="card shadow border-0">
         <div class="card-body">

@@ -44,25 +44,33 @@
         }
     </style>
 
-    <div class="card shadow mb-4">
-        <div class="card-header text-white"
-            style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%); border: none;">
-            <i class="fa-solid fa-plus-circle me-2"></i> Tambah Jadwal
-        </div>
-        <div class="card-body">
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
-            <div class="col-md-1 d-grid">
-                <a href="{{ route('schedule.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Tambah
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+            <i class="fa-solid fa-plus-circle me-2 text-dark"></i>
+            Tambah Jadwal
+        </h5>
+
+        <div class="d-flex align-items-center gap-2">
+            <div class="d-grid">
+                <a href="{{ route('schedule.create') }}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fa-solid fa-plus me-2"></i> Tambah
                 </a>
             </div>
         </div>
+
     </div>
+
+    <div class="card-body pt-0">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+    </div>
+</div>
 
     <div class="card shadow">
         <div class="card-body">

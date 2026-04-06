@@ -80,21 +80,23 @@
 
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
-            <div class="card-body p-3 d-flex justify-content-between align-items-center">
+        <div class="card border-0 shadow-sm rounded-4">
+            <div class="card-body d-flex justify-content-between align-items-center p-3">
+
                 <div class="d-flex align-items-center">
                     <div class="bg-light p-2 rounded-3 me-3">
-                        <i class="fa-solid fa-sitemap fs-4" style="color: #bc5e6b;"></i>
+                        <i class="fa-solid fa-sitemap fs-5 text-dark"></i>
                     </div>
                     <div>
-                        <h5 class="mb-0 fw-bold">Data Divisi</h5>
+                        <h5 class="mb-0 fw-semibold">Data Divisi</h5>
                         <p class="text-muted small mb-0">Kelola departemen organisasi</p>
                     </div>
                 </div>
-                <a href="{{ route('division.create') }}" class="btn text-white px-4 shadow-sm fw-bold" 
-   style="background: linear-gradient(90deg, #0d6efd 0%, #0a58ca 100%); border: none; border-radius: 8px;">
-    <i class="fa-solid fa-plus-circle me-2" style="color: #ffffff;"></i> Tambah Divisi
-</a>
+
+                <a href="{{ route('division.create') }}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fa-solid fa-plus me-2"></i> Tambah Divisi
+                </a>
+
             </div>
         </div>
     </div>

@@ -79,20 +79,22 @@
                     Daftar Karyawan
                 </h5>
 
-                <div class="table-responsive">
-                    <table id="employeeTable" class="table align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th style="width:120px;">
-                                    <input type="checkbox" id="selectAll" class="form-check-input me-2">
-                                    Pilih Semua
-                                </th>
-                                <th>Nama Karyawan</th>
-                                <th>Divisi</th>
-                                <th>Posisi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                            <div class="table-responsive">
+                        <table id="employeeTable" class="table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width:90px;" class="text-nowrap">
+                                        <div class="d-flex align-items-center gap-1 small">
+                                            <input type="checkbox" id="selectAll" class="form-check-input" style="transform: scale(0.9);">
+                                            <span>Pilih</span>
+                                        </div>
+                                    </th>
+                                    <th>Nama Karyawan</th>
+                                    <th>Divisi</th>
+                                    <th>Posisi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                             @foreach ($employees as $employee)
                                 <tr>
                                     <td>
@@ -126,6 +128,8 @@
                 </h5>
 
                 <div id="map" style="height:400px;border-radius:14px;"></div>
+
+                
 
                 <div class="row mt-4 g-4">
                     <div class="col-md-4">
@@ -200,8 +204,10 @@
 
 
         <div class="col-12">
+            <div style="display:flex; justify-content:flex-end;">
             <button type="submit" class="btn btn-primary">Submit</button>
         </div>
+</div>
     </form>
     {{-- Maps --}}
     <script src="{{ asset('leaflet/leaflet.js') }}"></script>

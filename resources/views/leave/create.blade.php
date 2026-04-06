@@ -2,199 +2,321 @@
 @section('header', 'Tambah Cuti')
 
 @section('content')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
+<style>
+    /* Card Container - Modern & Solid */
+    .form-container-card {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+    }
 
-    <form class="row g-3" action="{{ route('leave-request.store') }}" method="POST" enctype="multipart/form-data"
-        id="leaveForm">
+    /* Label Styling with Icons */
+    .form-label {
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #374151;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
 
-        @csrf
+    .form-label i {
+        margin-right: 8px;
+        color: #bc5e6b;
+        width: 18px;
+        text-align: center;
+    }
 
-        @if (in_array($userRole, ['hr', 'owner']))
-            <div class="col-md-6">
-                <label class="form-label">Nama Karyawan</label>
-                <select name="employee_id" class="form-select" required>
-                    <option value="">Choose...</option>
-                    @foreach ($employees as $employee)
-                        <option value="{{ $employee->id }}">
-                            {{ ucwords($employee->fullname) }}
-                        </option>
-                    @endforeach
-                </select>
+    /* Custom Styling untuk Select2 agar serasi dengan Bootstrap 5 */
+    .select2-container--default .select2-selection--single {
+        border-radius: 10px !important;
+        height: 45px !important;
+        border: 1px solid #d1d5db !important;
+        display: flex;
+        align-items: center;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        padding-left: 14px !important;
+        color: #1f2937 !important;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 43px !important;
+    }
+
+    .select2-dropdown {
+        border-radius: 10px !important;
+        border: 1px solid #e5e7eb !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+        overflow: hidden;
+    }
+
+    .select2-search__field {
+        border-radius: 6px !important;
+    }
+
+    /* Input & File Styling */
+    .form-control {
+        border-radius: 10px;
+        padding: 10px 14px;
+        border: 1px solid #d1d5db;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus {
+        border-color: #bc5e6b;
+        box-shadow: 0 0 0 4px rgba(188, 94, 107, 0.1);
+    }
+
+    /* Button Styling */
+    .btn-submit {
+        background: linear-gradient(135deg, #bc5e6b 0%, #8e444f 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 24px;
+        font-weight: 700;
+        color: white;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.1);
+        color: white;
+    }
+
+    .btn-back {
+        color: #6b7280;
+        font-size: 0.85rem;
+        text-decoration: none;
+    }
+    
+</style>
+<style>
+@keyframes pulseWarning {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(220,53,69,0.6); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(220,53,69,0); }
+    100% { transform: scale(1); }
+}
+
+.badge-warning-animate {
+    animation: pulseWarning 1.2s infinite;
+}
+</style>
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="mb-4 p-4 rounded-4 ">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h6 class="fw-bold mb-0">
+            <i class="fa-solid fa-circle-info me-2 text-primary"></i>
+            Informasi Pengajuan Cuti
+        </h6>
+
+        <span id="badgeWarning" class="badge bg-danger d-none">
+            Melebihi Kuota!
+        </span>
+    </div>
+
+    <!-- Note -->
+    <div class="alert alert-warning rounded-3 py-2 px-3 mb-3">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+        Pengajuan cuti harus sesuai dengan kebijakan perusahaan dan sisa cuti yang tersedia.
+    </div>
+
+    <!-- Statistik -->
+    <div class="row text-center">
+        <div class="col-md-4 mb-2">
+            <div class="p-2 border rounded-3">
+                <small class="text-muted">Kuota Cuti Tahunan</small>
+                <h6 class="mb-0 fw-bold text-primary" id="kuotaCuti">12</h6>
             </div>
-        @endif
-
-        <div class="col-md-6">
-            <label class="form-label">Tanggal Mulai</label>
-            <input type="date" name="start_date" class="form-control" min="{{ date('Y-m-d') }}" required>
         </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Tanggal Selesai</label>
-            <input type="date" name="end_date" class="form-control" min="{{ date('Y-m-d') }}" required>
+        <div class="col-md-4 mb-2">
+            <div class="p-2 border rounded-3">
+                <small class="text-muted">Digunakan</small>
+                <h6 class="mb-0 fw-bold text-danger" id="cutiTerpakai">4</h6>
+            </div>
         </div>
-
-        <div class="col-md-6">
-            <label class="form-label">Jenis Cuti</label>
-            <select name="leave_id" class="form-select" required>
-                <option value="">Choose...</option>
-                @foreach ($types as $type)
-                    <option value="{{ $type->id }}" data-requires="{{ $type->document }}"
-                        data-max="{{ $type->max_days }}" data-limit="{{ $type->limit_days }}"
-                        data-period="{{ $type->limit_type }}">
-                        {{ $type->name }}
-                    </option>
-                @endforeach
-            </select>
+        <div class="col-md-4 mb-2">
+            <div class="p-2 border rounded-3">
+                <small class="text-muted">Sisa Cuti</small>
+                <h6 class="mb-0 fw-bold text-success" id="sisaCuti">8</h6>
+            </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <label class="form-label">Upload Surat Bukti</label>
-            <input type="file" name="document_file" class="form-control" accept="image/*, application/pdf">
+    <!-- Estimasi -->
+    <div class="mt-3">
+        <small class="text-muted">Estimasi pengajuan:</small>
+        <span id="estimasiHari" class="fw-bold text-dark">0 hari</span>
+    </div>
+    </div>
+
+</div>
+
+
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="form-container-card">
+            
+            @if ($errors->any())
+                <div class="alert alert-danger mb-4 rounded-3 border-0">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li><i class="fa-solid fa-circle-exclamation me-2"></i> {{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form class="row g-4" action="{{ route('leave-request.store') }}" method="POST" enctype="multipart/form-data" id="leaveForm">
+                @csrf
+
+                @if (in_array($userRole, ['hr', 'owner']))
+                    <div class="col-md-12">
+                        <label class="form-label"><i class="fa-solid fa-user-tie"></i> Nama Karyawan</label>
+                        <select name="employee_id" class="form-select select-search" required>
+                            <option value="">Cari Nama Karyawan...</option>
+                            @foreach ($employees as $employee)
+                                <option value="{{ $employee->id }}">
+                                    {{ ucwords($employee->fullname) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                <div class="col-md-6">
+                    <label class="form-label"><i class="fa-solid fa-calendar-plus"></i> Tanggal Mulai</label>
+                    <input type="date" name="start_date" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label"><i class="fa-solid fa-calendar-check"></i> Tanggal Selesai</label>
+                    <input type="date" name="end_date" class="form-control" required>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label"><i class="fa-solid fa-list-check"></i> Jenis Cuti</label>
+                    <select name="leave_id" class="form-select select-search" required>
+                        <option value="">Cari Jenis Cuti...</option>
+                        @foreach ($types as $type)
+                            <option value="{{ $type->id }}" data-requires="{{ $type->document }}">
+                                {{ $type->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label"><i class="fa-solid fa-file-arrow-up"></i> Upload Surat Bukti</label>
+                    <input type="file" name="document_file" class="form-control" accept="image/*, application/pdf">
+                </div>
+
+                <div class="col-12 mt-5 d-flex align-items-center justify-content-between">
+                    <a href="{{ url()->previous() }}" class="btn-back">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Kembali
+                    </a>
+                    <button type="submit" class="btn btn-submit">
+                        Kirim Pengajuan <i class="fa-solid fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
+</div>
 
-        {{-- INFO CUTI --}}
-        <div class="col-md-12">
-            <div id="leaveInfo" class="alert alert-info d-none"></div>
-        </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        {{-- INFO JUMLAH HARI --}}
-        <div class="col-md-12">
-            <div id="dayInfo" class="alert alert-warning d-none"></div>
-        </div>
-
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">
-                Submit
-            </button>
-        </div>
-    </form>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-
-            const leaveSelect = document.querySelector("select[name='leave_id']");
-            const leaveInfo = document.getElementById("leaveInfo");
-            const dayInfo = document.getElementById("dayInfo");
-
-            const startInput = document.querySelector("input[name='start_date']");
-            const endInput = document.querySelector("input[name='end_date']");
-            const form = document.getElementById("leaveForm");
-
-            // =========================
-            // Update End Date Minimum
-            // =========================
-            startInput.addEventListener("change", function() {
-                endInput.min = this.value;
-                calculateDays();
-            });
-
-            endInput.addEventListener("change", calculateDays);
-
-            // =========================
-            // Hitung Jumlah Hari
-            // =========================
-            function calculateDays() {
-
-                if (!startInput.value || !endInput.value) {
-                    dayInfo.classList.add("d-none");
-                    return;
-                }
-
-                const start = new Date(startInput.value);
-                const end = new Date(endInput.value);
-
-                const diffTime = end - start;
-                const diffDays = (diffTime / (1000 * 60 * 60 * 24)) + 1;
-
-                if (diffDays <= 0) {
-                    dayInfo.classList.add("d-none");
-                    return;
-                }
-
-                const selected = leaveSelect.options[leaveSelect.selectedIndex];
-                const max = selected.dataset.max;
-
-                let message = `Anda mengajukan ${diffDays} hari cuti.`;
-
-                if (max && diffDays > max) {
-                    message += ` (Melebihi maksimal ${max} hari per pengajuan!)`;
-                    dayInfo.classList.remove("alert-warning");
-                    dayInfo.classList.add("alert-danger");
-                } else {
-                    dayInfo.classList.remove("alert-danger");
-                    dayInfo.classList.add("alert-warning");
-                }
-
-                dayInfo.innerHTML = message;
-                dayInfo.classList.remove("d-none");
-            }
-
-            // =========================
-            // Info Kuota Saat Pilih Jenis
-            // =========================
-            leaveSelect.addEventListener("change", function() {
-
-                const selected = this.options[this.selectedIndex];
-
-                if (!selected.value) {
-                    leaveInfo.classList.add("d-none");
-                    return;
-                }
-
-                const max = selected.dataset.max;
-                const limit = selected.dataset.limit;
-                const period = selected.dataset.period;
-
-                let periodText = '';
-
-                if (period === 'yearly') periodText = 'per tahun';
-                if (period === 'monthly') periodText = 'per bulan';
-
-                leaveInfo.innerHTML = `
-            <strong>Informasi Cuti:</strong><br>
-            Kuota: ${limit ? limit + ' hari ' + periodText : 'Tidak dibatasi'}<br>
-            Maksimal sekali pengajuan: ${max ? max + ' hari' : 'Tidak dibatasi'}
-        `;
-
-                leaveInfo.classList.remove("d-none");
-
-                calculateDays();
-            });
-
-            // =========================
-            // Validasi Dokumen
-            // =========================
-            form.addEventListener("submit", function(e) {
-
-                const selected = leaveSelect.options[leaveSelect.selectedIndex];
-
-                if (!selected.value) return;
-
-                const requiresDocument = selected.dataset.requires === "1";
-                const documentFile = document.querySelector("input[name='document_file']");
-
-                if (requiresDocument && documentFile.files.length === 0) {
-
-                    e.preventDefault();
-
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Dokumen Wajib Upload',
-                        text: 'Jenis cuti ini mewajibkan upload surat bukti!'
-                    });
-                }
-            });
-
+<script>
+    $(document).ready(function() {
+        // Inisialisasi Search pada Dropdown
+        $('.select-search').select2({
+            width: '100%',
+            placeholder: "Ketik untuk mencari...",
+            allowClear: true
         });
-    </script>
 
+        // Logika Validasi Submit
+        document.getElementById("leaveForm").addEventListener("submit", function(e) {
+            // Karena menggunakan select2, ambil value lewat jquery agar lebih aman
+            const leaveSelect = $("select[name='leave_id']");
+            const selectedOption = leaveSelect.find(':selected');
+
+            if (!selectedOption.val()) return;
+
+            const requiresDocument = selectedOption.data('requires') == "1";
+            const document_file = document.querySelector("input[name='document_file']");
+
+            if (requiresDocument && document_file.files.length === 0) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Dokumen Wajib Upload',
+                    text: 'Jenis cuti ini mewajibkan upload surat bukti sebagai persyaratan!',
+                    confirmButtonColor: '#bc5e6b'
+                });
+            }
+        });
+    });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const startInput = document.querySelector("input[name='start_date']");
+    const endInput = document.querySelector("input[name='end_date']");
+    const badge = document.getElementById("badgeWarning");
+
+    let sisaCuti = parseInt(document.getElementById("sisaCuti").innerText);
+
+    function hitungHari() {
+        const start = new Date(startInput.value);
+        const end = new Date(endInput.value);
+
+        if (!startInput.value || !endInput.value) return 0;
+
+        const diffTime = end - start;
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+        return diffDays > 0 ? diffDays : 0;
+    }
+
+    function updateUI() {
+        const totalHari = hitungHari();
+
+        document.getElementById("estimasiHari").innerText = totalHari;
+
+        if (totalHari > sisaCuti) {
+            badge.classList.remove("d-none");
+
+            // warna estimasi jadi merah
+            document.getElementById("estimasiHari").classList.remove("text-dark");
+            document.getElementById("estimasiHari").classList.add("text-danger");
+
+        } else {
+            badge.classList.add("d-none");
+
+            document.getElementById("estimasiHari").classList.remove("text-danger");
+            document.getElementById("estimasiHari").classList.add("text-dark");
+        }
+    }
+
+    startInput.addEventListener("change", updateUI);
+    endInput.addEventListener("change", updateUI);
+
+});
+</script>
 @endsection

@@ -85,26 +85,36 @@
         }
     </style>
 
-    <div class="card shadow mb-4 border-0">
-        <div class="card-header card-custom-header d-flex justify-content-between align-items-center">
-            <span><i class="fa-solid fa-layer-group me-2"></i> Pengaturan Tipe Cuti</span>
-            <a href="{{ route('leave-type.create') }}" class="btn add-btn-custom shadow-sm">
-                <i class="fa-solid fa-plus me-1"></i> Tambah Baru
-            </a>
-        </div>
-        @if (session('success'))
-            <div class="px-4 pt-3">
-                <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
-                    <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            </div>
-        @endif
-        <div class="card-body py-3">
-            <p class="text-muted mb-0 small"><i class="fa-solid fa-circle-info me-1 text-primary"></i> Kelola kategori cuti,
-                jumlah maksimal hari, dan potongan gaji per hari di sini.</p>
-        </div>
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+
+    <div class="card-header d-flex justify-content-between align-items-center fw-semibold">
+        <span class="d-flex align-items-center">
+            <i class="fa-solid fa-layer-group me-2"></i> 
+            Pengaturan Tipe Cuti
+        </span>
+
+        <a href="{{ route('leave-type.create') }}" class="btn btn-primary rounded-pill px-4">
+            <i class="fa-solid fa-plus me-2"></i> Tambah Baru
+        </a>
     </div>
+
+    @if (session('success'))
+        <div class="px-4 pt-2">
+            <div class="alert alert-success alert-dismissible fade show rounded-3 mb-0" role="alert">
+                <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </div>
+    @endif
+
+    <div class="card-body pt-2 pb-3">
+        <p class="text-muted mb-0 small">
+            <i class="fa-solid fa-circle-info me-1 text-primary"></i> 
+            Kelola kategori cuti, jumlah maksimal hari, dan potongan gaji per hari di sini.
+        </p>
+    </div>
+
+</div>
 
     <div class="card shadow border-0">
         <div class="card-body p-4">

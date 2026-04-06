@@ -77,7 +77,7 @@
         }
 
         .sidebar ul li {
-            margin-bottom: 6px;
+            margin-bottom: 3px;
         }
 
         .sidebar ul li a {

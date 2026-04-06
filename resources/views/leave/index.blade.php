@@ -83,27 +83,33 @@
         }
     </style>
 
-    <div class="card shadow mb-4 border-0">
-        <div class="card-header text-white d-flex justify-content-between align-items-center"
-            style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%); border: none;">
-            <span><i class="fa-solid fa-calendar-check me-2"></i> Manajemen Cuti</span>
-        </div>
-        <div class="card-body py-3">
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show mb-3" role="alert">
-                    <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
 
-            @if (in_array($userRole, ['hr', 'employee']))
-                <a href="{{ route('leave-request.create') }}" class="btn text-white shadow-sm"
-                    style="background-color: #215cda; border-radius: 8px;">
-                    <i class="fa-solid fa-plus me-1"></i> Ajukan Cuti
-                </a>
-            @endif
+    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+            <i class="fa-solid fa-calendar-check me-2"></i>
+            Manajemen Cuti
+        </h5>
+
+        @if (in_array($userRole, ['hr', 'employee']))
+            <a href="{{ route('leave-request.create') }}" class="btn btn-primary rounded-pill px-4">
+    <i class="fa-solid fa-plus me-2"></i> Ajukan Cuti
+</a>
+        @endif
+
+    </div>
+
+    @if (session('success'))
+    <div class="card-body pt-0">
+        <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+            <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     </div>
+    @endif
+
+</div>
 
     <div class="card shadow border-0">
         <div class="card-body p-3">
@@ -197,45 +203,48 @@
                                 </td>
 
                                 @if (in_array($userRole, ['hr', 'owner']))
-                                    <td>
-                                        @if ($leave->status === 'pending')
-                                            @if (
-                                                ($userRole === 'hr' && $leave->current_step == 1 && $leave->employee->user_id !== auth()->id()) ||
-                                                    ($userRole === 'owner' && $leave->current_step == 2))
-                                                {{-- Tombol Approve Aktif --}}
-                                                <form action="{{ route('leave-request.approve', $leave->id) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-success btn-action shadow-sm"
-                                                        title="Setujui">
-                                                        <i class="fa-solid fa-check"></i>
-                                                    </button>
-                                                </form>
+                                <td>
+                                    @if ($leave->status === 'pending')
+                                        @if (($userRole === 'hr' && $leave->current_step == 1 && $leave->employee->user_id !== auth()->id()) || ($userRole === 'owner' && $leave->current_step == 2))
+                                            
+                                            {{-- Tombol Approve --}}
+                                            <form action="{{ route('leave-request.approve', $leave->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-success btn-action shadow-sm" title="Setujui">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </button>
+                                            </form>
 
-                                                {{-- Tombol Reject (Hanya Tampilan/Visual) --}}
-                                                <form action="{{ route('leave-request.rejected', $leave->id) }}"
-                                                    method="POST" class="d-inline">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-danger btn-action shadow-sm"
-                                                        title="Tolak">
-                                                        <i class="fa-solid fa-x"></i>
-                                                    </button>
-                                                </form>
-                                            @else
-                                                <span class="text-muted small">-</span>
-                                            @endif
+                                            {{-- Tombol Reject (Visual) --}}
+                                            <button type="button" class="btn btn-danger btn-action shadow-sm ms-1" title="Tolak (Fungsi Belum Aktif)">
+                                                <i class="fa-solid fa-xmark"></i>
+                                            </button>
+
+                                            {{-- Tombol Delete --}}
+                                            <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-secondary btn-action shadow-sm ms-1" title="Hapus">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
+
                                         @else
-                                            <i class="fa-solid fa-lock text-muted small"></i>
+                                            <span class="text-muted small">-</span>
                                         @endif
-                                    </td>
-                                @endif
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+                                    @else
+                                        <i class="fa-solid fa-lock text-muted small"></i>
+                                    @endif
+                                </td>
+                            @endif
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
+
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>

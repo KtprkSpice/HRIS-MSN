@@ -95,24 +95,24 @@
 
     @if (in_array($userRole, ['hr', 'owner']))
         <div class="card shadow-sm border-0 rounded-4 mb-4">
-            <div class="card-body p-5">
+            <div class="card-body p-4">
 
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="fw-semibold mb-0">
-                        <i class="fa-solid fa-plus-circle me-2 text-danger"></i>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-5">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="fa-solid fa-plus-circle me-2 text-dark"></i>
                         Manajemen Tugas
                     </h5>
 
-                    <div class="d-flex gap-2">
-                        <a href="{{ route('task.create') }}" class="btn btn-primary rounded-3 px-3">
-                            <i class="fa-solid fa-plus me-1"></i> Tambah
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ route('task.create') }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-plus me-2"></i> Tambah
                         </a>
 
-                        <a href="{{ route('qr.generate') }}" class="btn btn-outline-primary rounded-3 px-3">
+                        <a href="{{ route('qr.generate') }}" class="btn btn-outline-primary rounded-pill px-4">
                             Generate QR
                         </a>
 
-                        <a href="{{ route('schedule.generate') }}" class="btn btn-outline-secondary rounded-3 px-3">
+                        <a href="{{ route('schedule.generate') }}" class="btn btn-outline-secondary rounded-pill px-4">
                             Generate Jadwal
                         </a>
                     </div>
@@ -142,6 +142,7 @@
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
                             <th>Status</th>
+                            <th>Show QR</th>
                             <th>Presensi</th>
                             @if (in_array($userRole, ['hr', 'owner']))
                                 <th>Aksi</th>
@@ -182,6 +183,18 @@
                                     </span>
                                 </td>
 
+                                <!-- STATUS -->
+
+
+                                <!-- SHOW QR (BARU) -->
+                                <td>
+                                    <a href="{{ route('qr.show', $task->id) }}"
+                                        class="btn btn-sm btn-dark rounded-3 btn-show-qr">
+                                        <i class="fa-solid fa-qrcode"></i>
+                                    </a>
+                                </td>
+
+                                <!-- PRESENSI (TETAP ASLI, JANGAN DIUBAH) -->
                                 <td>
                                     @if ($task->status == 'on duty')
                                         <a href="{{ route('presences.scan', $task->id) }}"
@@ -247,13 +260,13 @@
             },
             @if ($userRole === 'owner')
                 columnDefs: [{
-                    targets: 6,
+                    targets: 7,
                     orderable: false,
                     searchable: false
                 }]
             @else
                 columnDefs: [{
-                    targets: 5,
+                    targets: 6,
                     orderable: false,
                     searchable: false
                 }]
