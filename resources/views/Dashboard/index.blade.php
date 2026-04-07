@@ -56,59 +56,59 @@
             </div>
         </div>
         <!--<div class="col-md-2 d-flex">
-                                                                        <div class="card shadow-sm flex-fill">
-                                                                            <div class="card-header">
-                                                                                <h5 class="mb-0">Notifikasi Terbaru</h5>
-                                                                            </div>
-                                                                            <div class="accordion" id="accordionExample">
-                                                                                 <div class="accordion-item">
-                                                                                    <h2 class="accordion-header">
-                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                                                            data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                                                                            <i class="fa-solid fa-user-check text-primary me-2"></i>
-                                                                                            <strong>Absensi</strong>
-                                                                                        </button>
-                                                                                    </h2>
-                                                                                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                        <div class="accordion-body">
-                                                                                            <p>Ada 3 karyawan terlambat hari ini.</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="accordion-item">
-                                                                                    <h2 class="accordion-header">
-                                                                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                                                                            data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                                                            <i class="fa-solid fa-calendar-check text-success me-2"></i>
-                                                                                            <strong>Pengajuan Cuti</strong>
-                                                                                        </button>
-                                                                                    </h2>
-                                                                                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                        <div class="accordion-body">
-                                                                                            <p>2 pengajuan cuti menunggu persetujuan.</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div class="accordion-item">
-                                                                                    <h2 class="accordion-header">
-                                                                                        <button class="accordion-button collapsed text-black" type="button" data-bs-toggle="collapse"
-                                                                                            data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                                                                            <i class="fa-solid fa-file-lines text-info me-2"></i>
-                                                                                            <strong>Laporan Tugas</strong>
-                                                                                        </button>
-                                                                                    </h2>
-                                                                                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-                                                                                        <div class="accordion-body">
-                                                                                            <p>5 laporan tugas baru telah diunggah.</p>
-                                                                                        </div>
-                                                                                    </div>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
+                <div class="card shadow-sm flex-fill">
+                    <div class="card-header">
+                        <h5 class="mb-0">Notifikasi Terbaru</h5>
+                    </div>
+                    <div class="accordion" id="accordionExample">
+                            <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    <i class="fa-solid fa-user-check text-primary me-2"></i>
+                                    <strong>Absensi</strong>
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <p>Ada 3 karyawan terlambat hari ini.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    <i class="fa-solid fa-calendar-check text-success me-2"></i>
+                                    <strong>Pengajuan Cuti</strong>
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <p>2 pengajuan cuti menunggu persetujuan.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed text-black" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    <i class="fa-solid fa-file-lines text-info me-2"></i>
+                                    <strong>Laporan Tugas</strong>
+                                </button>
+                            </h2>
+                            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+                                    <p>5 laporan tugas baru telah diunggah.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                                                                <!-- Cards -->
+        <!-- Cards -->
         <div class="row g-3 mb-4 cards">
             <div class="col-md-3">
                 <div class="card shadow-sm">
@@ -237,35 +237,36 @@
         </div>
 
         <!-- Carousel -->
-    <div class="row g-4 mt-4">
-        <div class="col-12">
-            <div class="card shadow-sm border-0">
-                <div class="card-header text-white d-flex justify-content-between align-items-center" style="background-color: #aa2c36;">
-                    <span><i class="fa-solid fa-bullhorn"></i>Informasi</span>
-                    <small class="text-light">PT. Megajaya Sarana Nusantara</small>
-                </div>
-                <div class="card-body p-0">
-                    <div id="carouselIklanFull" class="carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active"><a href="#"><img
-                                        src="{{ asset('build/assets/img/struktur.png') }}"
-                                        class="d-block w-100 carousel-img-full" alt="Iklan 1"></a></div>
-                            <div class="carousel-item"><a href="#"><img
-                                        src="{{ asset('build/assets/img/partner.png') }}"
-                                        class="d-block w-100 carousel-img-full" alt="Iklan 2"></a></div>
-                            <div class="carousel-item"><a href="#"><img
-                                        src="{{ asset('build/assets/img/iso.PNG') }}"
-                                        class="d-block w-100 carousel-img-full" alt="Iklan 3"></a></div>
+        <div class="row g-4 mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header text-white d-flex justify-content-between align-items-center"
+                        style="background-color: #aa2c36;">
+                        <span><i class="fa-solid fa-bullhorn"></i>Informasi</span>
+                        <small class="text-light">PT. Megajaya Sarana Nusantara</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="carouselIklanFull" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active"><a href="#"><img
+                                            src="{{ asset('build/assets/img/struktur.png') }}"
+                                            class="d-block w-100 carousel-img-full" alt="Iklan 1"></a></div>
+                                <div class="carousel-item"><a href="#"><img
+                                            src="{{ asset('build/assets/img/partner.png') }}"
+                                            class="d-block w-100 carousel-img-full" alt="Iklan 2"></a></div>
+                                <div class="carousel-item"><a href="#"><img
+                                            src="{{ asset('build/assets/img/iso.PNG') }}"
+                                            class="d-block w-100 carousel-img-full" alt="Iklan 3"></a></div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselIklanFull"
+                                data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselIklanFull"
+                                data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
                         </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselIklanFull"
-                            data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#carouselIklanFull"
-                            data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
         <script>
             document.addEventListener("DOMContentLoaded", function() {

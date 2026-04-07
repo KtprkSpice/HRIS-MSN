@@ -25,7 +25,7 @@ class employee_seeder extends Seeder
 
             $user = User::create([
                 'name' => $name,
-                'email' => str_replace(' ', '', strtolower($name)).'@mail.com',
+                'email' => preg_replace('/[^a-z0-9]/', '', strtolower($name)),
                 'password' => Hash::make('password'),
                 'role_id' => $faker->numberBetween(1, 2),
             ]);

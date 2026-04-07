@@ -24,7 +24,7 @@ class EmployeOnlySeeder extends Seeder
             $name = $faker->unique()->name;
             $user = User::create([
                 'name' => $name,
-                'email' => str_replace(' ', '', strtolower($name)).'@mail.com',
+                'email' => preg_replace('/[^a-z0-9]/', '', strtolower($name)),
                 'password' => Hash::make('password'),
                 'role_id' => 3,
             ]);
