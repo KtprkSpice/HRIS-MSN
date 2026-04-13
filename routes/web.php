@@ -8,6 +8,7 @@ use App\Http\Controllers\LeaveTypeController;
 use App\Http\Controllers\PresecesController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QrController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SalaryController;
 use App\Http\Controllers\SchedulesController;
 use App\Http\Controllers\TaskController;
@@ -67,4 +68,7 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
     // Schedules
     Route::get('/schedule/generate', [SchedulesController::class, 'generate'])->name('schedule.generate');
     Route::resource('/schedule', SchedulesController::class);
+
+    // Laporan
+    Route::resource('/report', ReportController::class);
 });

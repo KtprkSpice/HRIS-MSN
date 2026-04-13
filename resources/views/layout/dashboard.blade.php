@@ -673,7 +673,15 @@
                 <li><a href="{{ route('division.index') }}" class="{{ request()->is('division') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-check"></i> Divisi</a></li>
                 <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
-                <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        @method('POST')
+                        <button type="submit" class="dropdown-item text-danger"><i
+                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        </button>
+                    </form>
+                </li>
             @endif
             @if ($userRole === 'employee')
                 <li><a href="{{ route('dashboard.index') }}"
@@ -692,7 +700,15 @@
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
-                {{-- <li><a href="{{ route('logout') }}"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li> --}}
+                <li>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        @method('POST')
+                        <button type="submit" class="dropdown-item text-danger"><i
+                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        </button>
+                    </form>
+                </li>
             @endif
         </ul>
     </aside>
