@@ -1,3 +1,9 @@
-<div>
-    <!-- Be present above all else. - Naval Ravikant -->
-</div>
+@extends('layout.dashboard');
+
+@section('header', 'Laporan')
+
+@section('content')
+    <div>
+        Test Laporan
+    </div>
+@endsection

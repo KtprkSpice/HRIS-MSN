@@ -672,13 +672,15 @@
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="{{ route('division.index') }}" class="{{ request()->is('division') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-check"></i> Divisi</a></li>
-                <li><a href="#"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
+                <li><a href="{{ route('report.index') }}"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
                 <li>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         @method('POST')
-                        <button type="submit" class="dropdown-item text-danger"><i
-                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        <button type="submit"
+                            class="flex items-center w-full px-4 py-2 text-left hover:bg-red-700 rounded-lg transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                            Logout
                         </button>
                     </form>
                 </li>
@@ -704,8 +706,10 @@
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         @method('POST')
-                        <button type="submit" class="dropdown-item text-danger"><i
-                                class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                        <button type="submit"
+                            class="flex items-center w-full px-4 py-2 text-left hover:bg-red-700 rounded-lg transition">
+                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                            Logout
                         </button>
                     </form>
                 </li>
