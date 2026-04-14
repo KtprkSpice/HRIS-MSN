@@ -58,38 +58,38 @@
     </style>
 
     @if (in_array($userRole, ['hr', 'owner']))
-<div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
 
-    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-        <h5 class="mb-0 fw-semibold d-flex align-items-center">
-            <i class="fa-solid fa-plus-circle me-2"></i>
-            Manajemen Slip Gaji
-        </h5>
+                <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                    <i class="fa-solid fa-plus-circle me-2"></i>
+                    Manajemen Slip Gaji
+                </h5>
 
-        <div class="d-flex align-items-center gap-2">
-            <a href="{{ route('salary.create') }}" class="btn btn-primary rounded-pill px-4">
-                <i class="fa-solid fa-plus me-2"></i> Tambah Slip
-            </a>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="{{ route('salary.create') }}" class="btn btn-primary rounded-pill px-4">
+                        <i class="fa-solid fa-plus me-2"></i> Tambah Slip
+                    </a>
 
-            <a href="{{ route('salary.generate') }}" class="btn btn-outline-success rounded-pill px-4">
-                <i class="fa-solid fa-arrows-rotate me-2"></i> Generate
-            </a>
+                    <a href="{{ route('salary.generate') }}" class="btn btn-outline-success rounded-pill px-4">
+                        <i class="fa-solid fa-arrows-rotate me-2"></i> Generate
+                    </a>
+                </div>
+
+            </div>
+
+            @if (session('success'))
+                <div class="card-body pt-0">
+                    <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            @endif
+
         </div>
-
-    </div>
-
-    @if (session('success'))
-    <div class="card-body pt-0">
-        <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
     @endif
-
-</div>
-@endif
 
     <div class="card shadow border-0">
         <div class="card-body">
@@ -129,7 +129,7 @@
                                 @if (in_array($userRole, ['hr', 'owner']))
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
-                                            <a href="{{ route('salary.edit', $salary->id) }}"
+                                            <a href="{{ route('salary.show', $salary->id) }}"
                                                 class="btn btn-action btn-view btn-sm" title="Lihat">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>

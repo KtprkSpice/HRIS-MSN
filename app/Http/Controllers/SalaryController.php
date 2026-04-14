@@ -27,6 +27,11 @@ class SalaryController extends Controller
         return view('Salary.index', compact('salaries'));
     }
 
+    public function show(Salary $salary)
+    {
+        return view('Salary.show', compact('salary'));
+    }
+
     public function create()
     {
         $roles = auth()->user()->role->name;

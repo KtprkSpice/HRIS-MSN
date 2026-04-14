@@ -55,6 +55,11 @@ class EmployeeController extends Controller
 
     }
 
+    public function show(Employee $employee)
+    {
+        return view('Employees.show', compact('employee'));
+    }
+
     public function create()
     {
         $user = auth()->user();
