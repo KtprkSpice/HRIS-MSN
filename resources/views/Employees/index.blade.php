@@ -81,7 +81,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="leaveTable" class="table align-middle mb-0">
+                <table id="employeeTable" class="table align-middle mb-0">
                     <thead class="bg-primary">
                         <tr>
                             <th>Nama Karyawan</th>
@@ -226,17 +226,17 @@
             font-size: 22px;
         }
 
-        #leaveTable th,
-        #leaveTable td {
+        #employeeTable th,
+        #employeeTable td {
             padding: 16px;
             font-size: 14px;
         }
 
-        #leaveTable thead {
+        #employeeTable thead {
             background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
         }
 
-        #leaveTable thead th {
+        #employeeTable thead th {
             background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
             color: white !important;
             font-weight: 600;
@@ -244,7 +244,7 @@
             letter-spacing: 0.5px;
         }
 
-        #leaveTable tbody tr:hover {
+        #employeeTable tbody tr:hover {
             background-color: #f8f9fa;
         }
 
@@ -372,7 +372,7 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        let table = new DataTable('#leaveTable', {
+        let table = new DataTable('#employeeTable', {
             language: {
                 search: "Cari:",
                 lengthMenu: "Tampilkan _MENU_ data",
