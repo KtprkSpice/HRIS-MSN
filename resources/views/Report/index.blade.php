@@ -415,9 +415,9 @@
                             ])>
                                     {{ ucwords($employee->status) }}
                                 </span></td>
-                            <td>2</td>
-                            <td>5.000.000</td>
-                            <td>1</td>
+                            <td>{{ $employee->leave_total ?: '-' }}</td>
+                            <td>{{ number_format($employee->salary_total, 0, ',', '.') }}</td>
+                            <td>{{ $employee->absent_total }}</td>
                         </tr>
                     @endforeach
                 </tbody>
