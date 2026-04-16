@@ -10,9 +10,11 @@ class ReportController extends Controller
 {
     public function index()
     {
+        $startMonth = today()->startOfMonth();
+        $endMonth = today()->endOfMonth(28);
         $activeEmployees = Employee::where('status', 'active')->count();
         $leaveTotal = LeaveRequest::where('status', 'approved')->count();
-        $salaries = Salary::whereNull('deleted_at')->sum('total');
+        $salaries = Salary::whereNull('deleted_at')->whereIn('date', [$startMonth, $endMonth])->sum('total');
         $employees = Employee::all();
 
         return view('Report.index', compact('activeEmployees', 'leaveTotal', 'salaries', 'employees'));
