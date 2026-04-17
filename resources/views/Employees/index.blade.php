@@ -81,7 +81,7 @@
             </div>
 
             <div class="table-responsive">
-                <table id="employeeTable" class="table align-middle mb-0">
+                <table id="leaveTable" class="table align-middle mb-0">
                     <thead class="bg-primary">
                         <tr>
                             <th>Nama Karyawan</th>
@@ -226,17 +226,17 @@
             font-size: 22px;
         }
 
-        #employeeTable th,
-        #employeeTable td {
+        #leaveTable th,
+        #leaveTable td {
             padding: 16px;
             font-size: 14px;
         }
 
-        #employeeTable thead {
+        #leaveTable thead {
             background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
         }
 
-        #employeeTable thead th {
+        #leaveTable thead th {
             background: linear-gradient(100deg, #b83e48 0%, #eb8697 100%) !important;
             color: white !important;
             font-weight: 600;
@@ -244,7 +244,7 @@
             letter-spacing: 0.5px;
         }
 
-        #employeeTable tbody tr:hover {
+        #leaveTable tbody tr:hover {
             background-color: #f8f9fa;
         }
 
@@ -356,7 +356,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 1920px) {
 
             .avatar-photo,
             .avatar-placeholder {
@@ -365,6 +365,48 @@
                 min-width: 42px;
                 font-size: 18px;
             }
+
+            /* Membuat tabel bisa digeser horizontal pada mobile */
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                /* Smooth scrolling pada iOS */
+            }
+
+            /* Pastikan tabel tidak terlalu lebar */
+            #leaveTable {
+                min-width: 800px;
+                /* Atur min-width agar tabel bisa digeser */
+                font-size: 12px;
+                /* Perkecil font untuk menghemat ruang */
+            }
+
+            #leaveTable th,
+            #leaveTable td {
+                padding: 8px;
+                /* Kurangi padding untuk menghemat ruang */
+                white-space: nowrap;
+                /* Mencegah teks wrap */
+            }
+
+            /* Sembunyikan scrollbar default dan tambahkan custom jika perlu */
+            .table-responsive::-webkit-scrollbar {
+                height: 8px;
+            }
+
+            .table-responsive::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                border-radius: 10px;
+            }
+
+            .table-responsive::-webkit-scrollbar-thumb {
+                background: #c1c1c1;
+                border-radius: 10px;
+            }
+
+            .table-responsive::-webkit-scrollbar-thumb:hover {
+                background: #a8a8a8;
+            }
         }
     </style>
 
@@ -372,7 +414,7 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        let table = new DataTable('#employeeTable', {
+        let table = new DataTable('#leaveTable', {
             language: {
                 search: "Cari:",
                 lengthMenu: "Tampilkan _MENU_ data",

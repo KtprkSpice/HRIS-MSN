@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ asset('build/assets/img/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -80,7 +81,8 @@
             margin-bottom: 3px;
         }
 
-        .sidebar ul li a {
+        .sidebar ul li a,
+        .sidebar ul li form button {
             color: #e3f2fd;
             display: flex;
             align-items: center;
@@ -93,7 +95,8 @@
             transition: all 0.3s ease;
         }
 
-        .sidebar ul li a i {
+        .sidebar ul li a i,
+        .sidebar ul li form button i {
             margin-right: 12px;
             font-size: 16px;
             width: 22px;
@@ -101,11 +104,20 @@
         }
 
         .sidebar ul li a:hover,
-        .sidebar ul li a.active {
+        .sidebar ul li a.active,
+        .sidebar ul li form button:hover {
             background: rgba(255, 255, 255, 0.2);
             color: #fff;
             transform: translateX(5px);
             box-shadow: inset 2px 0 0 #fff;
+        }
+
+        .sidebar ul li form button {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
         }
 
         /* ===== MAIN CONTAINER ===== */
@@ -636,6 +648,29 @@
                 font-size: 0.85rem;
             }
         }
+
+        <>
+
+        /* Hover tombol */
+        .btn-hover-effect {
+            transition: all 0.3s ease !important;
+        }
+
+        .btn-hover-effect:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Glow effect */
+        .swal2-popup {
+            border-radius: 18px !important;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Animasi halus */
+        .animate__animated {
+            animation-duration: 0.5s;
+        }
     </style>
 </head>
 
@@ -674,12 +709,10 @@
                             class="fa-solid fa-user-check"></i> Divisi</a></li>
                 <li><a href="{{ route('report.index') }}"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
                 <li>
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin:0;">
                         @csrf
-                        @method('POST')
-                        <button type="submit"
-                            class="flex items-center w-full px-4 py-2 text-left hover:bg-red-700 rounded-lg transition">
-                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                        <button type="button" class="sidebar-link" onclick="confirmLogout()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
                             Logout
                         </button>
                     </form>
@@ -703,12 +736,10 @@
                 <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
                 <li>
-                    <form action="{{ route('logout') }}" method="POST">
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin:0;">
                         @csrf
-                        @method('POST')
-                        <button type="submit"
-                            class="flex items-center w-full px-4 py-2 text-left hover:bg-red-700 rounded-lg transition">
-                            <i class="fa-solid fa-right-from-bracket mr-2"></i>
+                        <button type="button" onclick="confirmLogout()" class="sidebar-link">
+                            <i class="fa-solid fa-right-from-bracket"></i>
                             Logout
                         </button>
                     </form>
@@ -759,11 +790,11 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <form action="{{ route('logout') }}" method="POST">
+                            <form id="dropdown-logout-form" action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                @method('POST')
-                                <button type="submit" class="dropdown-item text-danger"><i
-                                        class="fa-solid fa-right-from-bracket me-2"></i> Logout
+                                <button type="button" onclick="confirmLogoutDropdown()"
+                                    class="dropdown-item text-danger">
+                                    <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                                 </button>
                             </form>
                         </li>
@@ -772,6 +803,75 @@
             </div>
         </header>
         @yield('content')
+
+        <script>
+            function confirmLogoutDropdown() {
+                Swal.fire({
+                    title: 'Logout Sekarang?',
+                    html: '<small>Sesi kamu akan berakhir dan harus login kembali.</small>',
+                    icon: 'question',
+
+                    // 🎨 Samakan style
+                    background: 'rgba(255, 255, 255, 0.85)',
+                    color: '#495057',
+
+                    backdrop: `
+            rgba(0,0,0,0.7)
+            blur(8px)
+        `,
+
+                    showCancelButton: true,
+                    confirmButtonText: 'Ya, Logout',
+                    cancelButtonText: 'Batal',
+
+                    confirmButtonColor: '#eb2549',
+                    cancelButtonColor: '#6c757d',
+
+                    // 🔥 Animasi SAMA
+                    showClass: {
+                        popup: `
+                animate__animated
+                animate__zoomIn
+                animate__faster
+            `
+                    },
+                    hideClass: {
+                        popup: `
+                animate__animated
+                animate__zoomOut
+                animate__faster
+            `
+                    },
+
+                    // 🔥 Class SAMA
+                    customClass: {
+                        popup: 'rounded-4 shadow-lg',
+                        confirmButton: 'btn-hover-effect',
+                        cancelButton: 'btn-hover-effect'
+                    }
+
+                }).then((result) => {
+                    if (result.isConfirmed) {
+
+                        // 🔄 Loading SAMA
+                        Swal.fire({
+                            title: 'Logging out...',
+                            text: 'Tunggu sebentar ya',
+                            background: 'rgba(255, 255, 255, 0.9)',
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        setTimeout(() => {
+                            document.getElementById('dropdown-logout-form').submit();
+                        }, 1200);
+                    }
+                });
+            }
+        </script>
 
 
         {{-- Footer --}}
@@ -871,6 +971,76 @@
                 }
             });
         });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+    <script>
+        function confirmLogout() {
+            Swal.fire({
+                title: 'Logout Sekarang?',
+                html: '<small>Sesi kamu akan berakhir dan harus login kembali.</small>',
+                icon: 'question',
+                background: 'rgba(255, 255, 255, 0.85)',
+                color: '#495057',
+                backdrop: `
+            rgba(0,0,0,0.7)
+            blur(8px)
+        `,
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Logout',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#eb2549',
+                cancelButtonColor: '#6c757d',
+
+                // 🔥 Animasi masuk
+                showClass: {
+                    popup: `
+                animate__animated
+                animate__zoomIn
+                animate__faster
+            `
+                },
+
+                // 🔥 Animasi keluar
+                hideClass: {
+                    popup: `
+                animate__animated
+                animate__zoomOut
+                animate__faster
+            `
+                },
+
+                // 🔥 Hover effect button
+                customClass: {
+                    popup: 'rounded-4 shadow-lg',
+                    confirmButton: 'btn-hover-effect',
+                    cancelButton: 'btn-hover-effect'
+                }
+
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    // 🔥 Loading sebelum logout (biar smooth)
+                    Swal.fire({
+                        title: 'Logging out...',
+                        text: 'Tunggu sebentar ya',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    setTimeout(() => {
+                        document.getElementById('logout-form').submit();
+                    }, 1200);
+                }
+            });
+        }
     </script>
 </body>
 

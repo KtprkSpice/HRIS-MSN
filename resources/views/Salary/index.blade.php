@@ -95,7 +95,8 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h5 class="fw-semibold mb-0">
-                    <i class="fa-solid fa-file-invoice-dollar me-2" style="color: #bc5e6b;"></i> Daftar Slip Gaji
+                    <i class="fa-solid fa-file-invoice-dollar me-2" style="color: #bc5e6b;"></i>
+                    Daftar Slip Gaji
                 </h5>
             </div>
 
@@ -109,49 +110,73 @@
                             <th>Gaji Pokok</th>
                             <th>Potongan</th>
                             <th>Total Diterima</th>
-                            @if (in_array($userRole, ['hr', 'owner']))
+
+                            @if (in_array($userRole, ['hr', 'owner', 'employee']))
                                 <th class="text-center">Aksi</th>
                             @endif
                         </tr>
                     </thead>
+
                     <tbody>
                         @foreach ($salaries as $salary)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td class="fw-bold text-dark">{{ ucwords($salary->employee->fullname) }}</td>
-                                <td><span
-                                        class="badge badge-divisi">{{ strtoupper($salary->employee->division->name) }}</span>
+                                <td class="fw-bold text-dark">
+                                    {{ ucwords($salary->employee->fullname) }}
                                 </td>
-                                <td>Rp {{ number_format($salary->net_salary, 0, ',', '.') }}</td>
-                                <td class="text-danger">Rp {{ number_format($salary->cuts, 0, ',', '.') }}</td>
-                                <td class="fw-bold text-success">Rp {{ number_format($salary->total, 0, ',', '.') }}</td>
 
-                                @if (in_array($userRole, ['hr', 'owner']))
+                                <td>
+                                    <span class="badge badge-divisi">
+                                        {{ strtoupper($salary->employee->division->name) }}
+                                    </span>
+                                </td>
+
+                                <td>Rp {{ number_format($salary->net_salary, 0, ',', '.') }}</td>
+                                <td class="text-danger">
+                                    Rp {{ number_format($salary->cuts, 0, ',', '.') }}
+                                </td>
+
+                                <td class="fw-bold text-success">
+                                    Rp {{ number_format($salary->total, 0, ',', '.') }}
+                                </td>
+
+                                @if (in_array($userRole, ['hr', 'owner', 'employee']))
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center gap-2">
+
+                                            {{-- ICON MATA (EMPLOYEE + HR + OWNER) --}}
                                             <a href="{{ route('salary.show', $salary->id) }}"
                                                 class="btn btn-action btn-view btn-sm" title="Lihat">
                                                 <i class="fa-solid fa-eye"></i>
                                             </a>
-                                            <a href="{{ route('salary.edit', $salary->id) }}"
-                                                class="btn btn-action btn-edit btn-sm" title="Edit">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a>
-                                            <form action="{{ route('salary.destroy', $salary->id) }}" method="POST"
-                                                class="d-inline" id="deleteForm{{ $salary->id }}">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button class="btn btn-action btn-delete btn-sm" type="button"
-                                                    onclick="confirmDelete({{ $salary->id }})" title="Hapus">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
+
+                                            {{-- EDIT + DELETE HANYA HR / OWNER --}}
+                                            @if (in_array($userRole, ['hr', 'owner']))
+                                                <a href="{{ route('salary.edit', $salary->id) }}"
+                                                    class="btn btn-action btn-edit btn-sm" title="Edit">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+
+                                                <form action="{{ route('salary.destroy', $salary->id) }}" method="POST"
+                                                    class="d-inline" id="deleteForm{{ $salary->id }}">
+                                                    @csrf
+                                                    @method('DELETE')
+
+                                                    <button class="btn btn-action btn-delete btn-sm" type="button"
+                                                        onclick="confirmDelete({{ $salary->id }})" title="Hapus">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
                                         </div>
                                     </td>
                                 @endif
+
                             </tr>
                         @endforeach
                     </tbody>
+
                 </table>
             </div>
         </div>
@@ -159,6 +184,7 @@
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
+
     <script>
         $(document).ready(function() {
             $('#salaryTable').DataTable({
@@ -184,4 +210,5 @@
             });
         });
     </script>
+
 @endsection
