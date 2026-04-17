@@ -356,7 +356,7 @@
         }
 
         /* Responsive */
-        @media (max-width: 1920px) {
+        @media (max-width: 768px) {
 
             .avatar-photo,
             .avatar-placeholder {
