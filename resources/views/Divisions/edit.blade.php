@@ -1,5 +1,5 @@
 @extends('layout.dashboard')
-@section('header', 'Tambah Divisi')
+@section('header', 'Edit Divisi')
 
 @section('content')
     <style>
@@ -65,7 +65,6 @@
             color: #bc5e6b;
         }
     </style>
-
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card shadow-sm border-0" style="border-radius: 12px;">
@@ -86,15 +85,17 @@
                         </div>
                     @endif
 
-                    <form class="row g-4" action="{{ route('division.store') }}" method="post">
+                    {{-- Form --}}
+                    <form class="row g-4" action="{{ route('division.update', $division->id) }}" method="post">
                         @csrf
-
+                        @method('PUT')
                         <div class="col-md-6">
                             <label for="name" class="form-label">
                                 <i class="fa-solid fa-sitemap me-2 accent-icon"></i> Nama Divisi
                             </label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name"
-                                name="name" placeholder="Masukkan nama divisi..." value="{{ old('name') }}" required>
+                                name="name" placeholder="Masukkan nama divisi..."
+                                value="{{ old('name', $division->name) }}" required>
                             @error('name')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -106,7 +107,7 @@
                             </label>
                             <input type="text" class="form-control @error('description') is-invalid @enderror"
                                 name="description" id="description" placeholder="Keterangan singkat..."
-                                value="{{ old('description') }}">
+                                value="{{ old('description', $division->description) }}">
                             @error('description')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror

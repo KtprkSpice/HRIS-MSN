@@ -11,8 +11,8 @@ class division extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'nama',
+        'name',
         'description',
-        'status'
+        'status',
     ];
 }
