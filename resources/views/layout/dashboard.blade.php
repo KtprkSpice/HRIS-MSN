@@ -707,7 +707,9 @@
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li><a href="{{ route('division.index') }}" class="{{ request()->is('division') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-check"></i> Divisi</a></li>
-                <li><a href="{{ route('report.index') }}"><i class="fa-solid fa-chart-line"></i> Laporan</a></li>
+                <li><a href="{{ route('report.index') }}" class="{{ request()->is('report') ? 'active' : '' }}"><i
+                            class="fa-solid fa-chart-line"></i>
+                        Laporan</a></li>
                 <li>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin:0;">
                         @csrf

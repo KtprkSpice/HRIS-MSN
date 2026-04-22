@@ -13,7 +13,9 @@ class ReportController extends Controller
     {
         $startMonth = today()->startOfMonth();
         $endMonth = today()->endOfMonth();
-        $activeEmployees = Employee::where('status', 'active')->count();
+        $activeEmployees = Employee::whereHas('user.role', function ($q) {
+            $q->where('name', 'employee');
+        })->count();
         $leaveTotal = LeaveRequest::where('status', 'approved')->where(function ($querry) use ($startMonth, $endMonth) {
             $querry->whereBetween('start_date', [$startMonth, $endMonth])
                 ->orWhereBetween('end_date', [$startMonth, $endMonth])
@@ -26,6 +28,12 @@ class ReportController extends Controller
         $employees = Employee::whereHas('user.role', function ($q) {
             $q->whereIn('name', ['employee', 'hr']);
         })->get();
+
+        $absentTotal = Presence::whereHas('employee', function ($q) {
+            $q->where('status', 'active');
+        })->where('status', 'absent')
+            ->count();
+
         foreach ($employees as $employee) {
             $employee->salary_total = Salary::where('employee_id', $employee->id)
                 ->whereBetween('date', [$startMonth, $endMonth])
@@ -45,6 +53,6 @@ class ReportController extends Controller
             $employee->absent_total = Presence::where('employee_id', $employee->id)->where('status', 'absent')->count();
         }
 
-        return view('Report.index', compact('activeEmployees', 'leaveTotal', 'salaries', 'employees'));
+        return view('Report.index', compact('activeEmployees', 'leaveTotal', 'salaries', 'employees', 'absentTotal'));
     }
 }

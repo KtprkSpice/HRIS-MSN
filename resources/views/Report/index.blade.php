@@ -334,7 +334,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <small>Total Absen</small>
-                        <h4>12</h4>
+                        <h4>{{ $absentTotal }}</h4>
                     </div>
                     <div class="stat-icon text-warning">
                         <i class="fa-solid fa-user-clock"></i>
@@ -441,17 +441,14 @@
 
     </div>
 
-    <!-- JS -->
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
-
-    <!-- BUTTONS -->
 
     <script>
         let table;
 
         $(document).ready(function() {
-
+            // Inisialisasi DataTable
             table = $('#table').DataTable({
                 dom: 'Bfrtip',
                 buttons: [{
@@ -459,18 +456,21 @@
                     text: '<i class="fa fa-file-excel"></i> Export Excel',
                     title: 'Laporan Karyawan PT Megajaya Sarana Nusantara',
                     className: 'btn btn-success'
-                }]
+                }],
+                pageLength: 10,
+                ordering: true,
+                responsive: true
             });
 
-            // tombol custom
-            $('#btnExcel').on('click', function() {
+            // Tombol export manual
+            $('#btnExcel').on('click', function(e) {
+                e.preventDefault();
                 table.button('.buttons-excel').trigger();
             });
-
         });
 
+        // Set tanggal
         document.addEventListener("DOMContentLoaded", function() {
-
             const bulan = [
                 "Januari", "Februari", "Maret", "April", "Mei", "Juni",
                 "Juli", "Agustus", "September", "Oktober", "November", "Desember"
@@ -478,34 +478,54 @@
 
             const now = new Date();
 
-            document.getElementById("periode").innerText =
-                bulan[now.getMonth()] + " " + now.getFullYear();
+            const periodeElement = document.getElementById("periode");
+            if (periodeElement) {
+                periodeElement.innerText = bulan[now.getMonth()] + " " + now.getFullYear();
+            }
 
-            document.getElementById("lastUpdate").innerText =
-                now.toLocaleDateString('id-ID', {
+            const lastUpdateElement = document.getElementById("lastUpdate");
+            if (lastUpdateElement) {
+                lastUpdateElement.innerText = now.toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric'
-                }) + " " +
-                now.toLocaleTimeString('id-ID', {
+                }) + " " + now.toLocaleTimeString('id-ID', {
                     hour: '2-digit',
                     minute: '2-digit'
                 });
+            }
 
-            document.addEventListener("DOMContentLoaded", function() {
-                const now = new Date();
-
-                document.getElementById("printDate").innerText =
-                    "Dicetak pada: " + now.toLocaleString('id-ID');
-            });
-            window.onbeforeprint = function() {
-                if ($.fn.DataTable.isDataTable('#table')) {
-                    $('#table').DataTable().destroy();
-                }
-            };
-            let table;
-
-
+            const printDateElement = document.getElementById("printDate");
+            if (printDateElement) {
+                printDateElement.innerText = "Dicetak pada: " + now.toLocaleString('id-ID');
+            }
         });
+
+        // Handler untuk print - FIX
+        window.onbeforeprint = function() {
+            // Simpan state DataTable
+            if ($.fn.DataTable.isDataTable('#table')) {
+                var tablePrint = $('#table').DataTable();
+                tablePrint.destroy();
+            }
+        };
+
+        window.onafterprint = function() {
+            // Re-inisialisasi DataTable setelah print selesai
+            if (!$.fn.DataTable.isDataTable('#table')) {
+                table = $('#table').DataTable({
+                    dom: 'Bfrtip',
+                    buttons: [{
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel"></i> Export Excel',
+                        title: 'Laporan Karyawan PT Megajaya Sarana Nusantara',
+                        className: 'btn btn-success'
+                    }],
+                    pageLength: 10,
+                    ordering: true,
+                    responsive: true
+                });
+            }
+        };
     </script>
 @endsection
