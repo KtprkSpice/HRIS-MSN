@@ -224,12 +224,12 @@
 
                     <div class="col-md-3">
                         <div class="label-title">Nama Karyawan</div>
-                        <div class="detail-box">Andi Saputra</div>
+                        <div class="detail-box">{{ ucwords($salary->employee->fullname) }}</div>
                     </div>
 
                     <div class="col-md-3">
                         <div class="label-title">Divisi</div>
-                        <div class="detail-box">Security</div>
+                        <div class="detail-box">{{ ucwords($salary->employee->division->name) }}</div>
                     </div>
 
                     <div class="col-md-3">
@@ -239,7 +239,7 @@
 
                     <div class="col-md-3">
                         <div class="label-title">Status</div>
-                        <div class="detail-box">Aktif</div>
+                        <div class="detail-box">{{ ucwords($salary->employee->status) }}</div>
                     </div>
 
                 </div>
@@ -252,18 +252,25 @@
 
                         <div class="d-flex justify-content-between">
                             <span>Gaji Pokok</span>
-                            <strong>Rp 4.000.000</strong>
+                            <strong>Rp. {{ number_format($salary->employee->position->base_salary, 0, ',', '.') }}</strong>
                         </div>
+                        @foreach ($cuts as $cut)
+                            <div class="d-flex justify-content-between text-potongan">
+                                <span>{{ $cut['name'] }}</span>
+                                <strong>- Rp {{ number_format($cut['value'], 0, ',', '.') }}</strong>
+                            </div>
+                        @endforeach
 
-                        <div class="d-flex justify-content-between">
+
+                        {{-- <div class="d-flex justify-content-between">
                             <span>Tunjangan</span>
-                            <strong>Rp 1.000.000</strong>
-                        </div>
+                            <strong>Rp. 1.000.000</strong>
+                        </div> --}}
 
-                        <div class="d-flex justify-content-between">
+                        {{-- <div class="d-flex justify-content-between">
                             <span>Lembur</span>
                             <strong>Rp 500.000</strong>
-                        </div>
+                        </div> --}}
                     </div>
 
                     <div class="col-md-6">
@@ -271,17 +278,13 @@
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>Potongan Absen</span>
-                            <strong>- Rp 200.000</strong>
+                            <strong>Rp. {{ $absenceCutsTotal }}</strong>
                         </div>
 
-                        <div class="d-flex justify-content-between text-potongan">
-                            <span>BPJS</span>
-                            <strong>- Rp 100.000</strong>
-                        </div>
 
                         <div class="d-flex justify-content-between text-potongan">
-                            <span>Pajak</span>
-                            <strong>- Rp 150.000</strong>
+                            <span>PPh 21</span>
+                            <strong>- Rp {{ number_format($tax, 0, ',', '.') }}</strong>
                         </div>
                     </div>
 
@@ -292,7 +295,7 @@
                     <strong>Total Diterima (Take Home Pay)</strong>
 
                     <h5 class="mb-0 total-nominal">
-                        Rp 5.050.000
+                        {{ number_format($totalSalary, 0, ',', '.') }}
                     </h5>
                 </div>
 
@@ -302,7 +305,7 @@
                     <div class="col-6">
                         <p>Diterima Oleh,</p>
                         <br><br>
-                        <strong>( Andi Saputra )</strong>
+                        <strong>( {{ $salary->employee->fullname }} )</strong>
                     </div>
 
                     <div class="col-6">

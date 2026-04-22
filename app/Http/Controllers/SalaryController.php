@@ -29,7 +29,38 @@ class SalaryController extends Controller
 
     public function show(Salary $salary)
     {
-        return view('Salary.show', compact('salary'));
+        $employee = Employee::with('position')->find($salary->employee_id);
+        $absencesCuts = Presence::where('employee_id', $salary->employee_id)
+            ->where('status', 'absent')
+            ->count();
+
+        $allowances = Allowance::all();
+        $baseSalary = $employee->position->base_salary;
+
+        $cuts = [];
+
+        foreach ($allowances as $item) {
+            if ($item->calculation_type === 'fixed') {
+                $value = $item->amount;
+            } else {
+                // percentage
+                $value = ($item->percentage_value / 100) * $baseSalary;
+            }
+
+            $cuts[] = [
+                'name' => $item->allowance_type,
+                'value' => $value,
+            ];
+        }
+
+        $allowanceCuts = collect($cuts)->sum('value');
+
+        $absenceCutsTotal = $absencesCuts * 50000;
+        $beforeTax = $baseSalary - $absenceCutsTotal - $allowanceCuts;
+        $tax = 0.05 * $beforeTax;
+        $totalSalary = $beforeTax - $tax;
+
+        return view('Salary.show', compact('salary', 'absenceCutsTotal', 'cuts', 'totalSalary', 'tax'));
     }
 
     public function create()
