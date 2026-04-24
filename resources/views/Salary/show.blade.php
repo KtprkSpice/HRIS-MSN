@@ -278,7 +278,7 @@
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>Potongan Absen</span>
-                            <strong>Rp. {{ $absenceCutsTotal }}</strong>
+                            <strong>Rp. {{number_format( $absencesCuts, 0, ',','.') }}</strong>
                         </div>
 
 

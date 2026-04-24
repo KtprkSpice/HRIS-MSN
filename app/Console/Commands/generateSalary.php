@@ -72,6 +72,7 @@ class generateSalary extends Command
                     ->whereBetween('date', [$start, $end])
                     ->count() * 50000;
 
+
                 // Allowance Cuts
 
                 $lateMinutes = $presences->sum('late_minutes');
@@ -110,31 +111,30 @@ class generateSalary extends Command
                 $baseSalary = $employee->position->base_salary;
                 $allowanceCuts = 0;
 
+                $cuts = [];
+                $allowances = Allowance::all();
+
+
+                foreach ($allowances as $item) {
+                    if ($item->calculation_type === 'fixed') {
+                        $value = $item->amount;
+                    } else {
+                        // percentage
+                        $value = ($item->percentage_value / 100) * $baseSalary;
+                    }
+
+                    $cuts[] = [
+                        'name' => $item->allowance_type,
+                        'value' => $value,
+                    ];
+                }
                 // Bpjs Kesehatan
-                if (! is_null($employee->bpjs_kesehatan) && $bpjsKesehatan) {
-                    if ($bpjsKesehatan->calculation_type === 'fixed') {
-                        $bpjsValue = $allowanceCuts += $bpjsKesehatan->amount;
-                    }
 
-                    if ($bpjsKesehatan->calculation_type === 'percentage') {
-                        $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKesehatan->percentage_value) / 100;
-                    }
-                }
-
-                // Bpjs Ketengakerjaan
-                if (! is_null($employee->bpjs_ketenagakerjaan) && $bpjsKetenagakerjaan) {
-                    if ($bpjsKetenagakerjaan->calculation_type === 'fixed') {
-                        $bpjsValue = $allowanceCuts += $bpjsKetenagakerjaan->amount;
-                    }
-
-                    if ($bpjsKetenagakerjaan->calculation_type === 'percentage') {
-                        $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKetenagakerjaan->percentage_value) / 100;
-                    }
-                }
-
-                $allowanceCuts = round($bpjsValue);
-                $totalCuts = round($lateCuts + $leaveCuts + $absencesCuts + $allowanceCuts);
-                $net = $baseSalary - $totalCuts;
+                $allowanceCuts = collect($cuts)->sum('value');
+                $beforeTax = round($baseSalary - $lateCuts - $leaveCuts - $absencesCuts - $allowanceCuts);
+                $tax = 0.05 * $beforeTax;
+                $net = $beforeTax - $tax;
+                $totalCuts = $baseSalary - $net;
 
                 Salary::create([
                     'employee_id' => $employee->id,
@@ -150,10 +150,12 @@ class generateSalary extends Command
                     'period' => $start->format('Y-m'),
                     'late_cuts' => $lateCuts,
                     'leave_cuts' => $leaveCuts,
-                    'total_cuts' => $totalCuts,
-                    'total' => $net,
+                    'absencesCuts' => $absencesCuts,
                     'allowance_cuts' => $allowanceCuts,
-                ]);
+                    'total_cuts include tax' => $totalCuts,
+                    'net salary' => $baseSalary,
+                    'total' => $net,
+                    ]);
 
             } catch (\Throwable $e) {
                 Log::error('Generate Salary Error', [

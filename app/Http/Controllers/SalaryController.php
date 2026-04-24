@@ -29,11 +29,14 @@ class SalaryController extends Controller
 
     public function show(Salary $salary)
     {
-        $employee = Employee::with('position')->find($salary->employee_id);
-        $absencesCuts = Presence::where('employee_id', $salary->employee_id)
-            ->where('status', 'absent')
-            ->count();
+        $today = today();
+        $start = $today->copy()->startOfMonth();
+        $end = $today->copy()->day(28);
 
+        $employee = Employee::with('position')->find($salary->employee_id);
+        $absencesCuts = Presence::where('employee_id', $employee->id)
+            ->where('status', 'absent')
+            ->count() * 50000;
         $allowances = Allowance::all();
         $baseSalary = $employee->position->base_salary;
 
@@ -55,12 +58,11 @@ class SalaryController extends Controller
 
         $allowanceCuts = collect($cuts)->sum('value');
 
-        $absenceCutsTotal = $absencesCuts * 50000;
-        $beforeTax = $baseSalary - $absenceCutsTotal - $allowanceCuts;
+        $beforeTax = $baseSalary - $absencesCuts - $allowanceCuts;
         $tax = 0.05 * $beforeTax;
         $totalSalary = $beforeTax - $tax;
 
-        return view('Salary.show', compact('salary', 'absenceCutsTotal', 'cuts', 'totalSalary', 'tax'));
+        return view('Salary.show', compact('salary', 'absencesCuts', 'cuts', 'totalSalary', 'tax'));
     }
 
     public function create()
@@ -249,29 +251,30 @@ class SalaryController extends Controller
                     // Final Saalry
                     $baseSalary = $employee->position->base_salary;
                     $allowanceCuts = 0;
-                    // Allowance Cuts
 
-                    if (! is_null($employee->bpjs_kesehatan) && $bpjsKesehatan) {
-                        if ($bpjsKesehatan->calculation_type === 'fixed') {
-                            $bpjsValue = $allowanceCuts += $bpjsKesehatan->amount;
+                    $cuts = [];
+                    $allowances = Allowance::all();
+
+                    foreach ($allowances as $item) {
+                        if ($item->calculation_type === 'fixed') {
+                            $value = $item->amount;
+                        } else {
+                            // percentage
+                            $value = ($item->percentage_value / 100) * $baseSalary;
                         }
 
-                        if ($bpjsKesehatan->calculation_type === 'percentage') {
-                            $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKesehatan->percentage_value / 100);
-                        }
+                        $cuts[] = [
+                            'name' => $item->allowance_type,
+                            'value' => $value,
+                        ];
                     }
+                    // Bpjs Kesehatan
 
-                    if (! is_null($employee->bpjs_ketenagakerjaan) && $bpjsKetenagakerjaan) {
-                        if ($bpjsKetenagakerjaan->calculation_type === 'fixed') {
-                            $bpjsValue = $allowanceCuts += $bpjsKetenagakerjaan->amount;
-                        }
-                        if ($bpjsKetenagakerjaan->calculation_type === 'percentage') {
-                            $bpjsValue = $allowanceCuts += ($baseSalary * $bpjsKetenagakerjaan->percentage_value / 100);
-                        }
-                    }
-                    $allowanceCuts = round($bpjsValue);
-                    $totalCuts = round($lateCuts + $leaveCuts + $absencesCuts + $allowanceCuts);
-                    $net = $baseSalary - $totalCuts;
+                    $allowanceCuts = collect($cuts)->sum('value');
+                    $beforeTax = round($baseSalary - $lateCuts - $leaveCuts - $absencesCuts - $allowanceCuts);
+                    $tax = 0.05 * $beforeTax;
+                    $net = $beforeTax - $tax;
+                    $totalCuts = $baseSalary - $net;
 
                     Salary::create([
                         'employee_id' => $employee->id,
@@ -287,10 +290,12 @@ class SalaryController extends Controller
                         'period' => $start->format('Y-m'),
                         'late_cuts' => $lateCuts,
                         'leave_cuts' => $leaveCuts,
-                        'total_cuts' => $totalCuts,
+                        'absencesCuts' => $absencesCuts,
+                        'allowance_cuts' => $allowanceCuts,
+                        'total_cuts include tax' => $totalCuts,
+                        'net salary' => $baseSalary,
                         'total' => $net,
                     ]);
-
                 } catch (\Throwable $e) {
                     Log::error('Generate Salary Error', [
                         'employee_id' => $employee->id,
