@@ -1,0 +1,18 @@
+	+ Dashboard 
+		-10 karyawan kinerja terendah ubah atau buat fungsinya jadi ambil berapa kali dia telah absent dan disitu ada percentage kehadiran untuk menghitung karyawan ini kehadirannya berapa% pada bulan ini
+	+ Data Karyawan 
+		-tambah field position 
+		- jika division yang dipilih x maka position yang muncul di field adalah position yang memiliki division_id match jadi mislakan saya piliuh division_id 1 maka muncul position yang punya division_id yang match
+	+ task/tugas
+		- waktu edit/create pas pilih karyawan ketika klik tombol pilih semua data yang masu tidak semuanya hanya yang muncul pada dataatable 1 contohnya saya mau ketika klik pilih semua maka semua karyawan yang ada di table akan masuk ke db nantinya, dan begitu juga kalau misalkan sa ambild id_karyawan 1 di slide 1 dan ambil data id_karyawan 20 di slide 2 yang masuk hanya slide yang saya sedang view perbaiki
+		- ketika penjadwalan 1 shift memiliki 1 shift leader dan 1 tugas memiliki 1 team leader dan dalam 1 task ada 3 shift leader
+	+ slip gaji
+		- pada slip gaji tambahkan potongan telat berdasarkan menit telat di presensi
+	
+/// pt 2
+
+	+fiture task/tugas
+		- ketika pacuan untuk saat ini adaha create yang edit atau show belum di edit atau ubah, ok jadi gini karena pacuan di create saya mau di samakan semuanya untukedit dan show berdasarkan fungsinya create untuk buat baru edit untu edit show untuk sow, ini harus diubah employee yang dishow di table itu hanya employee yang tidak punya tugas aktif atau pending
+		- ketika karyawan mengajukan cuti jadwa dia automatis tidak masuk pada tanggal yang ditentukan jadi dia gak aakan masuk jadwal kerja kecuali jadwalnya udah di generate duluan dia gak bisa ngajuin cuti kecuali dadakan,
+		- pada table karyawan. karyawan yang di task show edit atau create, team leader dan supervisor tidak akan muncul di table
+		- dan untuk shift leader per shift akan ada 1 team leader jadi wajib memasukan 3 team leader buat notif kalo team leaedr cuma dipilih 1 atau kuran dari 3 atau lebih dari 3 karena wajib 3
