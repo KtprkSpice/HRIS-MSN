@@ -7,6 +7,7 @@ use App\Models\Schedule;
 use App\Models\Task;
 use App\Models\Tasklocation;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -14,6 +15,21 @@ use function Symfony\Component\Clock\now;
 
 class TaskController extends Controller
 {
+    private function availableEmployeeQuery(?Task $task = null): Builder
+    {
+        return Employee::where('status', 'active')
+            ->whereHas('user.role', function ($q) {
+                $q->where('name', 'employee');
+            })
+            ->whereDoesntHave('tasks', function ($q) use ($task) {
+                $q->where('tasks.status', 'on duty')
+                    ->whereNull('employees_tasks.deleted_at')
+                    ->when($task, function ($q) use ($task) {
+                        $q->where('tasks.id', '!=', $task->id);
+                    });
+            });
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -66,9 +82,7 @@ class TaskController extends Controller
             abort('403');
         } else {
 
-            $employees = Employee::where('status', 'active')->whereHas('user.role', function ($q) {
-                $q->where('name', 'employee');
-            })->get();
+            $employees = $this->availableEmployeeQuery()->get();
         }
 
         return view('tasks.create', compact('employees'));
@@ -130,9 +144,7 @@ class TaskController extends Controller
             abort(403);
         } else {
 
-            $employees = Employee::whereHas('user.role', function ($q) {
-                $q->where('name', 'employee');
-            })->where('status', 'active')->get();
+            $employees = $this->availableEmployeeQuery($task)->get();
             $locations = Tasklocation::where('task_id', $task->id)->first();
         }
 

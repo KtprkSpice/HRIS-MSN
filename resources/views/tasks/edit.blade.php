@@ -249,18 +249,10 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        document.getElementById('selectAll').addEventListener('click', function() {
-
-            let isChecked = this.checked;
-
-            // Ambil SEMUA checkbox dari semua page
-            table.$('input[name="selected_employee[]"]').on('change', function() {
-                let total = table.$('input[name="selected_employee[]"]').length;
-                let checked = table.$('input[name="selected_employee[]"]:checked').length;
-
-                document.getElementById('selectAll').checked = total === checked;
-            });
-        });
+        const form = document.querySelector('form');
+        const selectAll = document.getElementById('selectAll');
+        const allEmployeeIds = @json($employees->pluck('id')->map(fn ($id) => (string) $id)->values());
+        const selectedEmployeeIds = new Set(@json(collect(old('selected_employee', $task->employees->pluck('id')->toArray()))->map(fn ($id) => (string) $id)->values()));
 
         // Table
         let table = new DataTable('#employeeTable', {
@@ -280,6 +272,52 @@
             }]
         });
 
+        function currentPageCheckboxes() {
+            return Array.from(table.rows({
+                page: 'current'
+            }).nodes()).map(row => row.querySelector('input[name="selected_employee[]"]')).filter(Boolean);
+        }
+
+        function syncCurrentPageCheckboxes() {
+            currentPageCheckboxes().forEach(checkbox => {
+                checkbox.checked = selectedEmployeeIds.has(checkbox.value);
+            });
+            updateSelectAllState();
+        }
+
+        function updateSelectAllState() {
+            const selectedCount = allEmployeeIds.filter(id => selectedEmployeeIds.has(id)).length;
+
+            selectAll.checked = allEmployeeIds.length > 0 && selectedCount === allEmployeeIds.length;
+            selectAll.indeterminate = selectedCount > 0 && selectedCount < allEmployeeIds.length;
+        }
+
+        document.getElementById('employeeTable').addEventListener('change', function(event) {
+            if (!event.target.matches('input[name="selected_employee[]"]')) {
+                return;
+            }
+
+            if (event.target.checked) {
+                selectedEmployeeIds.add(event.target.value);
+            } else {
+                selectedEmployeeIds.delete(event.target.value);
+            }
+
+            updateSelectAllState();
+        });
+
+        selectAll.addEventListener('change', function() {
+            if (this.checked) {
+                allEmployeeIds.forEach(id => selectedEmployeeIds.add(id));
+            } else {
+                selectedEmployeeIds.clear();
+            }
+
+            syncCurrentPageCheckboxes();
+        });
+
+        table.on('draw', syncCurrentPageCheckboxes);
+        syncCurrentPageCheckboxes();
 
         const map = L.map('map').setView([-6.2, 106.8], 13);
 
@@ -312,29 +350,20 @@
             }
         });
 
-        document.querySelector('form').addEventListener('submit', function() {
-
-            let selected = [];
-
-            // ambil semua checkbox dari semua page
-            table.$('input[name="selected_employee[]"]:checked').each(function() {
-                selected.push(this.value);
+        form.addEventListener('submit', function() {
+            form.querySelectorAll('.selected-employee-hidden').forEach(input => input.remove());
+            document.querySelectorAll('input[name="selected_employee[]"]').forEach(input => {
+                input.disabled = true;
             });
 
-            // hapus semua checkbox yang ada (hindari double data)
-            document.querySelectorAll('input[name="selected_employee[]"]').forEach(el => {
-                el.checked = false;
-            });
-
-            // buat hidden input untuk semua yang dipilih
-            selected.forEach(function(value) {
+            selectedEmployeeIds.forEach(function(value) {
                 let input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = 'selected_employee[]';
                 input.value = value;
-                document.querySelector('form').appendChild(input);
+                input.className = 'selected-employee-hidden';
+                form.appendChild(input);
             });
-
         });
     </script>
 
