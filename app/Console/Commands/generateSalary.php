@@ -60,22 +60,56 @@ class generateSalary extends Command
         $bpjsKetenagakerjaan = Allowance::where('allowance_type', 'BPJS Ketenagakerjaan')->first();
 
         foreach ($employees as $employee) {
-            try {
 
-                // PRESENCE CUTS
-                $presences = Presence::where('employee_id', $employee->id)
+            try {
+                $preseces = Presence::where('employee_id', $employee->id)
                     ->whereBetween('date', [$start, $end])
                     ->get();
 
-                // Absence Cuts
-                $absencesCuts = AttendancePolicy::payableAbsenceQuery($employee->id, $start, $end)
-                    ->count() * 50000;
+                $absentCuts = AttendancePolicy::payableAbsenceQuery(
+                    $employee->id,
+                    $start,
+                    $end,
+                )->count() * 50000;
 
+                $lateMinutes = $preseces->sum('late_minutes');
+                $cutPerMinutes = $employee->position->cut_per_minute ?? 0;
+                $lateCuts = $lateMinutes * $cutPerMinutes;
 
-                // Allowance Cuts
+                $baseSalary = $employee->position->base_salary;
 
-                $lateMinutes = $presences->sum('late_minutes');
-                $lateCuts = $lateMinutes * 1000;
+                // Default Bonuis value
+                $bonus = 0;
+
+                // default BPJS VBalue
+
+                $bpjsKesehatanCuts = 0;
+
+                if ($bpjsKesehatan) {
+
+                    if ($bpjsKesehatan->calculation_type === 'fixed') {
+
+                        $bpjsKesehatanCuts =
+                            $bpjsKesehatan->amount;
+
+                    } else {
+
+                        $bpjsKesehatanCuts =
+                            ($bpjsKesehatan->percentage_value / 100)
+                            * $baseSalary;
+                    }
+                }
+
+                // BPJS KETENAGAKERJAAN DEFAULT CUts
+                $bpjsKetenagakerjaanCuts = 0;
+
+                if ($bpjsKetenagakerjaan) {
+                    if ($bpjsKetenagakerjaan->calculation_type === 'fixed') {
+                        $bpjsKetenagakerjaanCuts = $bpjsKetenagakerjaan->amount;
+                    } else {
+                        $bpjsKetenagakerjaanCuts = ($bpjsKetenagakerjaan->percentage_value / 100) * $baseSalary;
+                    }
+                }
 
                 //    LeaveCuts Default
                 $leaveCuts = 0;
@@ -106,62 +140,72 @@ class generateSalary extends Command
                     $leaveCuts += $days * $type->deduction;
                 }
 
-                // Final Saalry
-                $baseSalary = $employee->position->base_salary;
-                $allowanceCuts = 0;
+                // TOTAL CUTS
+                $totalCuts =
+                $bpjsKesehatanCuts +
+                $bpjsKetenagakerjaanCuts +
+                $absentCuts +
+                $lateCuts +
+                $leaveCuts;
 
-                $cuts = [];
-                $allowances = Allowance::all();
+                // BEFORE TAXs
+                $beforeTax = round(
+                    $baseSalary +
+                    $bonus -
+                    $totalCuts
+                );
 
+                // PAJAK PPH
+                $tax = round(0.05 * $beforeTax);
 
-                foreach ($allowances as $item) {
-                    if ($item->calculation_type === 'fixed') {
-                        $value = $item->amount;
-                    } else {
-                        // percentage
-                        $value = ($item->percentage_value / 100) * $baseSalary;
-                    }
-
-                    $cuts[] = [
-                        'name' => $item->allowance_type,
-                        'value' => $value,
-                    ];
-                }
-                // Bpjs Kesehatan
-
-                $allowanceCuts = collect($cuts)->sum('value');
-                $beforeTax = round($baseSalary - $lateCuts - $leaveCuts - $absencesCuts - $allowanceCuts);
-                $tax = 0.05 * $beforeTax;
-                $net = $beforeTax - $tax;
-                $totalCuts = $baseSalary - $net;
+                // Total Salary
+                $total = $beforeTax - $tax;
 
                 Salary::create([
                     'employee_id' => $employee->id,
                     'net_salary' => $baseSalary,
-                    'cuts' => $totalCuts,
-                    'bonus' => 0,
+                    'cuts' => $totalCuts + $tax,
+                    'bonus' => $bonus,
+                    'pph_cuts' => $tax,
+                    'late_cuts' => $lateCuts,
+                    'absent_cuts' => $absentCuts,
+                    'bpjs_ketenagakerjaan_cuts' => $bpjsKetenagakerjaanCuts,
+                    'bpjs_kesehatan_cuts' => $bpjsKesehatanCuts,
+                    'leave_cuts' => $leaveCuts,
+                    'total' => $total,
                     'date' => $start,
-                    'total' => $net,
+                    'updated_at' => now(),
+                    'created_at' => now(),
                 ]);
 
                 Log::info('Salary Generated', [
                     'employee_id' => $employee->id,
-                    'period' => $start->format('Y-m'),
-                    'late_cuts' => $lateCuts,
-                    'leave_cuts' => $leaveCuts,
-                    'absencesCuts' => $absencesCuts,
-                    'allowance_cuts' => $allowanceCuts,
-                    'total_cuts include tax' => $totalCuts,
-                    'net salary' => $baseSalary,
-                    'total' => $net,
-                    ]);
 
+                    'period' => $start->format('Y-m'),
+
+                    'bpjs_kesehatan' => $bpjsKesehatanCuts,
+
+                    'bpjs_ketenagakerjaan' => $bpjsKetenagakerjaanCuts,
+
+                    'late_cuts' => $lateCuts,
+
+                    'absent_cuts' => $absentCuts,
+
+                    'leave_cuts' => $leaveCuts,
+
+                    'pph_21' => $tax,
+
+                    'total' => $total,
+                ]);
             } catch (\Throwable $e) {
                 Log::error('Generate Salary Error', [
+
                     'employee_id' => $employee->id,
+
                     'message' => $e->getMessage(),
                 ]);
             }
+
         }
 
         Log::info('Salary generation ended');

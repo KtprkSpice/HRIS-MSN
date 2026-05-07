@@ -9,17 +9,26 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Salary extends Model
 {
     use HasFactory, SoftDeletes;
+
     protected $table = 'salary';
+
     protected $fillable = [
         'employee_id',
         'net_salary',
         'cuts',
         'bonus',
         'date',
-        'total'
+        'total',
+        'bpjs_kesehatan_cuts',
+        'bpjs_ketenagakerjaan_cuts',
+        'absent_cuts',
+        'late_cuts',
+        'pph_cuts',
+        'leave_cuts',
     ];
 
-    public function employee() {
+    public function employee()
+    {
         return $this->belongsTo(Employee::class, 'employee_id');
     }
 }

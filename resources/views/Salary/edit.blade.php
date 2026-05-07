@@ -21,23 +21,36 @@
         }
 
         .money-input {
-            border-radius: 0 8px 8px 0 !important;
+            border-radius: 0 8px 8px 8px !important;
+        }
+
+        /* 🔥 LANDSCAPE STYLE */
+        .salary-wrapper {
+            max-width: 1200px;
+            margin: auto;
         }
 
         .card {
             border-radius: 16px;
         }
+
+        .card-header {
+            border-radius: 16px 16px 0 0;
+        }
     </style>
 
-    <div class="container-fluid">
+    <div class="container-fluid salary-wrapper">
         <div class="row justify-content-center">
+
+            <!-- 🔥 DIPERLEBAR UNTUK LANDSCAPE -->
             <div class="col-lg-10 col-xl-9">
 
                 <div class="card shadow border-0">
 
                     <div class="card-header text-white" style="background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%);">
                         <h5 class="mb-0 fw-bold">
-                            <i class="fa-solid fa-file-pen me-2"></i> Edit Gaji Karyawan
+                            <i class="fa-solid fa-plus-circle me-2"></i>
+                            Form Input Gaji Karyawan
                         </h5>
                     </div>
 
@@ -64,11 +77,13 @@
                                     Nama Karyawan
                                 </label>
 
-                                <select name="employee_id" class="form-control select2-js">
-                                    <option value="">Choose...</option>
+                                <select name="employee_id" id="employeeSelect" class="form-control select2-js">
+                                    <option value="">-- Cari Nama Karyawan --</option>
+
                                     @foreach ($employees as $employee)
                                         <option value="{{ $employee->id }}"
-                                            {{ old('employee_id', $salary->employee_id) == $employee->id ? 'selected' : '' }}>
+                                            data-salary="{{ $employee->position->base_salary ?? 0 }}"
+                                            {{ old('employee_id', $salary->employee->id == $employee->id ? 'selected' : '') }}>
                                             {{ ucwords($employee->fullname) }}
                                         </option>
                                     @endforeach
@@ -77,117 +92,74 @@
 
                             <div class="row">
 
-                                <!-- GAJI POKOK -->
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-money-bill-wave me-2" style="color:#bc5e6b;"></i>
                                         Gaji Pokok
                                     </label>
-                                    <div class="input-group">
+                                    <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="net_salary" class="form-control money-input"
-                                            value="{{ old('net_salary', number_format($salary->net_salary, 0, ',', '.')) }}">
+                                        <input type="text" name="net_salary" id="netSalary"
+                                            class="form-control money-input"
+                                            value="{{ number_format(old('net_salary', $salary->net_salary), 0, ',', '.') }}"
+                                            readonly>
                                     </div>
                                 </div>
 
-                                <!-- TUNJANGAN -->
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-hand-holding-dollar me-2" style="color:#bc5e6b;"></i>
-                                        Tunjangan
+                                        Potongan BPJS Kesehatan
                                     </label>
-                                    <div class="input-group">
+                                    <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="allowance" class="form-control money-input"
-                                            value="{{ old('allowance', number_format($salary->allowance ?? 0, 0, ',', '.')) }}">
+                                        <input type="text" name="bpjs_kesehatan_cuts" class="form-control money-input"
+                                            value="{{ number_format(old('bpjs_kesehatan_cuts', $salary->bpjs_kesehatan_cuts), 0, ',', '.') }}">
                                     </div>
                                 </div>
 
-                                <!-- LEMBUR -->
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-bold text-secondary">
+                                        <i class="fa-solid fa-hand-holding-dollar me-2" style="color:#bc5e6b;"></i>
+                                        Potongan BPJS Ketenagakerjaan
+                                    </label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" name="bpjs_ketenagakerjaan_cuts"
+                                            class="form-control money-input"
+                                            value="{{ number_format(old('bpjs_ketenagakerjaan_cuts', $salary->bpjs_ketenagakerjaan_cuts), 0, ',', '.') }}">
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-clock me-2" style="color:#bc5e6b;"></i>
-                                        Lembur
+                                        Potongan Telat
                                     </label>
-                                    <div class="input-group">
+                                    <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="overtime" class="form-control money-input"
-                                            value="{{ old('overtime', number_format($salary->overtime ?? 0, 0, ',', '.')) }}">
+                                        <input type="text" name="late_cuts" class="form-control money-input"
+                                            value="{{ number_format(old('late_cuts', $salary->late_cuts), 0, ',', '.') }}">
                                     </div>
                                 </div>
 
-                                <!-- POTONGAN ABSEN -->
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-user-xmark me-2" style="color:#bc5e6b;"></i>
                                         Potongan Absen
                                     </label>
-                                    <div class="input-group">
+                                    <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="absent_deduction" class="form-control money-input"
-                                            value="{{ old('absent_deduction', number_format($salary->absent_deduction ?? 0, 0, ',', '.')) }}">
+                                        <input type="text" name="absent_cuts" class="form-control money-input"
+                                            value="{{ number_format(old('absent_cuts', $salary->absent_cuts), 0, ',', '.') }}">
                                     </div>
                                 </div>
-
-                                <!-- BPJS -->
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-shield-heart me-2" style="color:#bc5e6b;"></i>
-                                        BPJS
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="bpjs" class="form-control money-input"
-                                            value="{{ old('bpjs', number_format($salary->bpjs ?? 0, 0, ',', '.')) }}">
-                                    </div>
-                                </div>
-
-                                <!-- PAJAK -->
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-file-invoice-dollar me-2" style="color:#bc5e6b;"></i>
-                                        Pajak
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="tax" class="form-control money-input"
-                                            value="{{ old('tax', number_format($salary->tax ?? 0, 0, ',', '.')) }}">
-                                    </div>
-                                </div>
-
-                                <!-- POTONGAN -->
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-scissors me-2" style="color:#bc5e6b;"></i>
-                                        Potongan
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="cuts" class="form-control money-input"
-                                            value="{{ old('cuts', number_format($salary->cuts, 0, ',', '.')) }}">
-                                    </div>
-                                </div>
-
-                                <!-- BONUS -->
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-gift me-2" style="color:#bc5e6b;"></i>
-                                        Bonus
-                                    </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="bonus" class="form-control money-input"
-                                            value="{{ old('bonus', number_format($salary->bonus, 0, ',', '.')) }}">
-                                    </div>
-                                </div>
-
                             </div>
 
-                            <!-- TANGGAL -->
                             <div class="mb-4">
                                 <label class="form-label fw-bold text-secondary">
                                     <i class="fa-solid fa-calendar-check me-2" style="color:#bc5e6b;"></i>
-                                    Tanggal Gaji
+                                    Tanggal Pencairan
                                 </label>
 
                                 <input type="date" name="date" class="form-control"
@@ -200,14 +172,17 @@
                                 Update Data Gaji
                             </button>
 
-                            <a href="{{ route('salary.index') }}" class="btn btn-light w-100 mt-3"
-                                style="border-radius:12px; border:1px solid #dee2e6;">
-                                <i class="fa-solid fa-arrow-left me-2"></i>
-                                Kembali
-                            </a>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{{ route('salary.index') }}" class="btn btn-light btn-lg shadow-sm"
+                                    style="border-radius:12px; border:1px solid #dee2e6;">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>
+                                    Kembali
+                                </a>
+                            </div>
 
                         </form>
                     </div>
+
                 </div>
 
             </div>
@@ -219,16 +194,53 @@
 
     <script>
         $(document).ready(function() {
+
+            // INIT SELECT2
             $('.select2-js').select2({
                 width: '100%'
             });
 
+            // FORMAT INPUT UANG
             $('.money-input').on('keyup', function() {
-                let val = $(this).val().replace(/[^0-9]/g, '');
-                if (val !== "") {
-                    $(this).val(new Intl.NumberFormat('id-ID').format(val));
+
+                let value = $(this).val().replace(/[^0-9]/g, '');
+
+                if (value !== '') {
+                    $(this).val(
+                        new Intl.NumberFormat('id-ID').format(value)
+                    );
+                } else {
+                    $(this).val('');
                 }
+
             });
+
+            // AUTO AMBIL GAJI POKOK DARI POSITION
+            $('#employeeSelect').on('change', function() {
+
+                // ambil option yang dipilih
+                let selected = $(this).find(':selected');
+
+                // ambil data-salary
+                let salary = selected.data('salary');
+
+                // cek jika ada salary
+                if (salary && salary != 0) {
+
+                    // format rupiah
+                    let formatted = new Intl.NumberFormat('id-ID').format(salary);
+
+                    // isi ke input gaji
+                    $('#netSalary').val(formatted);
+
+                } else {
+
+                    // kosongkan jika tidak ada
+                    $('#netSalary').val('');
+                }
+
+            });
+
         });
     </script>
 @endsection

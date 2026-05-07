@@ -98,32 +98,44 @@
                                     </label>
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="net_salary" class="form-control money-input"
-                                            value="{{ old('net_salary') }}">
+                                        <input type="text" name="net_salary" id="netSalary"
+                                            class="form-control money-input" value="{{ old('net_salary') }}" readonly>
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-hand-holding-dollar me-2" style="color:#bc5e6b;"></i>
-                                        Tunjangan
+                                        Potongan BPJS Kesehatan
                                     </label>
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="allowance" class="form-control money-input"
-                                            value="{{ old('allowance') }}">
+                                        <input type="text" name="bpjs_kesehatan_cuts" class="form-control money-input"
+                                            value="{{ old('bpjs_kesehatan_cuts') }}">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <label class="form-label fw-bold text-secondary">
+                                        <i class="fa-solid fa-hand-holding-dollar me-2" style="color:#bc5e6b;"></i>
+                                        Potongan BPJS Ketenagakerjaan
+                                    </label>
+                                    <div class="input-group shadow-sm">
+                                        <span class="input-group-text">Rp</span>
+                                        <input type="text" name="bpjs_ketenagakerjaan_cuts"
+                                            class="form-control money-input" value="{{ old('bpjs_ketenagakerjaan_cuts') }}">
                                     </div>
                                 </div>
 
                                 <div class="col-md-6 mb-4">
                                     <label class="form-label fw-bold text-secondary">
                                         <i class="fa-solid fa-clock me-2" style="color:#bc5e6b;"></i>
-                                        Lembur
+                                        Potongan Telat
                                     </label>
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="overtime" class="form-control money-input"
-                                            value="{{ old('overtime') }}">
+                                        <input type="text" name="late_cuts" class="form-control money-input"
+                                            value="{{ old('late_cuts') }}">
                                     </div>
                                 </div>
 
@@ -134,35 +146,10 @@
                                     </label>
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
-                                        <input type="text" name="absent_deduction" class="form-control money-input"
-                                            value="{{ old('absent_deduction') }}">
+                                        <input type="text" name="absent_cuts" class="form-control money-input"
+                                            value="{{ old('absent_cuts') }}">
                                     </div>
                                 </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-shield-heart me-2" style="color:#bc5e6b;"></i>
-                                        BPJS
-                                    </label>
-                                    <div class="input-group shadow-sm">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="bpjs" class="form-control money-input"
-                                            value="{{ old('bpjs') }}">
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 mb-4">
-                                    <label class="form-label fw-bold text-secondary">
-                                        <i class="fa-solid fa-file-invoice-dollar me-2" style="color:#bc5e6b;"></i>
-                                        Pajak
-                                    </label>
-                                    <div class="input-group shadow-sm">
-                                        <span class="input-group-text">Rp</span>
-                                        <input type="text" name="tax" class="form-control money-input"
-                                            value="{{ old('tax') }}">
-                                    </div>
-                                </div>
-
                             </div>
 
                             <div class="mb-4">
@@ -202,16 +189,53 @@
 
     <script>
         $(document).ready(function() {
+
+            // INIT SELECT2
             $('.select2-js').select2({
                 width: '100%'
             });
 
+            // FORMAT INPUT UANG
             $('.money-input').on('keyup', function() {
-                let val = $(this).val().replace(/[^0-9]/g, '');
-                if (val !== "") {
-                    $(this).val(new Intl.NumberFormat('id-ID').format(val));
+
+                let value = $(this).val().replace(/[^0-9]/g, '');
+
+                if (value !== '') {
+                    $(this).val(
+                        new Intl.NumberFormat('id-ID').format(value)
+                    );
+                } else {
+                    $(this).val('');
                 }
+
             });
+
+            // AUTO AMBIL GAJI POKOK DARI POSITION
+            $('#employeeSelect').on('change', function() {
+
+                // ambil option yang dipilih
+                let selected = $(this).find(':selected');
+
+                // ambil data-salary
+                let salary = selected.data('salary');
+
+                // cek jika ada salary
+                if (salary && salary != 0) {
+
+                    // format rupiah
+                    let formatted = new Intl.NumberFormat('id-ID').format(salary);
+
+                    // isi ke input gaji
+                    $('#netSalary').val(formatted);
+
+                } else {
+
+                    // kosongkan jika tidak ada
+                    $('#netSalary').val('');
+                }
+
+            });
+
         });
     </script>
 @endsection

@@ -252,25 +252,25 @@
 
                         <div class="d-flex justify-content-between">
                             <span>Gaji Pokok</span>
-                            <strong>Rp. {{ number_format($salary->employee->position->base_salary, 0, ',', '.') }}</strong>
+                            <strong>
+                                Rp. {{ number_format($salary->employee->position->base_salary, 0, ',', '.') }}
+                            </strong>
                         </div>
-                        @foreach ($cuts as $cut)
-                            <div class="d-flex justify-content-between text-potongan">
-                                <span>{{ $cut['name'] }}</span>
-                                <strong>- Rp {{ number_format($cut['value'], 0, ',', '.') }}</strong>
-                            </div>
-                        @endforeach
 
+                        <div class="d-flex justify-content-between text-potongan">
+                            <span>BPJS Kesehatan</span>
+                            <strong>
+                                - Rp {{ number_format($salary->bpjs_kesehatan_cuts, 0, ',', '.') }}
+                            </strong>
+                        </div>
 
-                        {{-- <div class="d-flex justify-content-between">
-                            <span>Tunjangan</span>
-                            <strong>Rp. 1.000.000</strong>
-                        </div> --}}
+                        <div class="d-flex justify-content-between text-potongan">
+                            <span>BPJS Ketenagakerjaan</span>
+                            <strong>
+                                - Rp {{ number_format($salary->bpjs_ketenagakerjaan_cuts, 0, ',', '.') }}
+                            </strong>
+                        </div>
 
-                        {{-- <div class="d-flex justify-content-between">
-                            <span>Lembur</span>
-                            <strong>Rp 500.000</strong>
-                        </div> --}}
                     </div>
 
                     <div class="col-md-6">
@@ -278,17 +278,22 @@
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>Potongan Absen</span>
-                            <strong>Rp. {{number_format( $absencesCuts, 0, ',','.') }}</strong>
+                            <strong>- Rp. {{ number_format($salary->absent_cuts, 0, ',', '.') }}</strong>
                         </div>
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>Potongan Telat</span>
-                            <strong>Rp. {{ number_format($lateCuts, 0, ',', '.') }}</strong>
+                            <strong>- Rp. {{ number_format($salary->late_cuts, 0, ',', '.') }}</strong>
                         </div>
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>PPh 21</span>
-                            <strong>- Rp {{ number_format($tax, 0, ',', '.') }}</strong>
+                            <strong>- Rp {{ number_format($salary->pph_cuts, 0, ',', '.') }}</strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between text-potongan">
+                            <span>Potongan Cuti</span>
+                            <strong>- Rp {{ number_format($salary->leave_cuts, 0, ',', '.') }}</strong>
                         </div>
                     </div>
 

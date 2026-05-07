@@ -12,11 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('salary', function (Blueprint $table) {
-            $table->decimal('bpjs_kesehatan_cuts', 15, 2)->after('bonus');
-            $table->decimal('bpjs_ketenagakerjaan_cuts', 15, 2)->after('bonus');
-            $table->decimal('absent_cuts', 15, 2)->after('bonus')->nullable();
-            $table->decimal('late_cuts', 15, 2)->after('bonus')->nullable();
-            $table->decimal('pph_cuts', 15, 2)->after('bonus');
+            $table->decimal('leave_cuts', 15, 2)->nullable()->before('total');
         });
     }
 
