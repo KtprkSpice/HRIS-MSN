@@ -234,7 +234,7 @@
 
                     <div class="col-md-3">
                         <div class="label-title">Periode Gaji</div>
-                        <div class="detail-box">April 2026</div>
+                        <div class="detail-box">{{ \Carbon\Carbon::parse($salary->date)->translatedFormat('F Y') }}</div>
                     </div>
 
                     <div class="col-md-3">
@@ -281,6 +281,10 @@
                             <strong>Rp. {{number_format( $absencesCuts, 0, ',','.') }}</strong>
                         </div>
 
+                        <div class="d-flex justify-content-between text-potongan">
+                            <span>Potongan Telat</span>
+                            <strong>Rp. {{ number_format($lateCuts, 0, ',', '.') }}</strong>
+                        </div>
 
                         <div class="d-flex justify-content-between text-potongan">
                             <span>PPh 21</span>

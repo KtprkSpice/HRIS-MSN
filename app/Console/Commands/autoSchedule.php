@@ -7,6 +7,7 @@ use App\Models\EmployeeOffDay;
 use App\Models\Schedule;
 use App\Models\Task;
 use App\Models\TaskShiftRule;
+use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -108,8 +109,13 @@ class autoSchedule extends Command
                         ->where('day_of_week', $dayOfWeek)
                         ->pluck('employee_id');
 
+                    $leaveEmployeeIds = $employees
+                        ->filter(fn ($employee) => AttendancePolicy::hasApprovedLeaveOnDate($employee->id, $date))
+                        ->pluck('id');
+
                     $availableEmployees = $employees
                         ->whereNotIn('id', $offEmployeeIds)
+                        ->whereNotIn('id', $leaveEmployeeIds)
                         ->shuffle()
                         ->values();
 

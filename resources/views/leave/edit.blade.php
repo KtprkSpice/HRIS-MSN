@@ -12,8 +12,14 @@
         </div>
     @endif
 
+    @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <form class="row g-3" action="{{ route('leave-request.update', $leaveRequest->id) }}" method="post"
-        enctype="multipart/form-data">
+        enctype="multipart/form-data" id="leaveForm">
         @method('PUT')
         @csrf
         <div class="col-md-6">
@@ -60,7 +66,7 @@
             @enderror">
                 <option>Choose...</option>
                 @foreach ($types as $type)
-                    <option value="{{ $type->id }}" {{ $type->id == $leaveRequest->leave_id ? 'selected' : '' }}>
+                    <option value="{{ $type->id }}" data-requires="{{ $type->document }}" {{ $type->id == $leaveRequest->leave_id ? 'selected' : '' }}>
                         {{ ucwords($type->name) }}</option>
                 @endforeach
                 @error('leave_id')

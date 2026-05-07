@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\Presence;
 use App\Models\Salary;
+use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -29,14 +30,16 @@ class SalaryController extends Controller
 
     public function show(Salary $salary)
     {
-        $today = today();
-        $start = $today->copy()->startOfMonth();
-        $end = $today->copy()->day(28);
+        $period = Carbon::parse($salary->date);
+        $start = $period->copy()->startOfMonth();
+        $end = $period->copy()->day(28);
 
         $employee = Employee::with('position')->find($salary->employee_id);
-        $absencesCuts = Presence::where('employee_id', $employee->id)
-            ->where('status', 'absent')
-            ->count() * 50000;
+        $presences = Presence::where('employee_id', $employee->id)
+            ->whereBetween('date', [$start, $end])
+            ->get();
+        $absencesCuts = AttendancePolicy::payableAbsenceQuery($employee->id, $start, $end)->count() * 50000;
+        $lateCuts = $presences->sum('late_minutes') * 1000;
         $allowances = Allowance::all();
         $baseSalary = $employee->position->base_salary;
 
@@ -58,11 +61,11 @@ class SalaryController extends Controller
 
         $allowanceCuts = collect($cuts)->sum('value');
 
-        $beforeTax = $baseSalary - $absencesCuts - $allowanceCuts;
+        $beforeTax = $baseSalary - $lateCuts - $absencesCuts - $allowanceCuts;
         $tax = 0.05 * $beforeTax;
         $totalSalary = $beforeTax - $tax;
 
-        return view('Salary.show', compact('salary', 'absencesCuts', 'cuts', 'totalSalary', 'tax'));
+        return view('Salary.show', compact('salary', 'absencesCuts', 'lateCuts', 'cuts', 'totalSalary', 'tax'));
     }
 
     public function create()
@@ -211,9 +214,7 @@ class SalaryController extends Controller
                         ->get();
 
                     // Absences Cuts
-                    $absencesCuts = Presence::where('employee_id', $employee->id)
-                        ->where('status', 'absent')
-                        ->whereBetween('date', [$start, $end])
+                    $absencesCuts = AttendancePolicy::payableAbsenceQuery($employee->id, $start, $end)
                         ->count() * 50000;
 
                     $lateMinutes = $presences->sum('late_minutes');
@@ -224,7 +225,7 @@ class SalaryController extends Controller
 
                     $leaves = LeaveRequest::with('types')
                         ->where('employee_id', $employee->id)
-                        ->where('status', 'confirmed')
+                        ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
                         ->where(function ($q) use ($start, $end) {
                             $q->whereBetween('start_date', [$start, $end])
                                 ->orWhereBetween('end_date', [$start, $end]);

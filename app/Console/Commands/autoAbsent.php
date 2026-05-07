@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Presence;
 use App\Models\Schedule;
+use App\Support\AttendancePolicy;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -37,6 +38,10 @@ class autoAbsent extends Command
             ->get();
 
         foreach ($schedules as $schedule) {
+
+            if (AttendancePolicy::hasApprovedLeaveOnDate($schedule->employee_id, $schedule->date)) {
+                continue;
+            }
 
             $shiftStart = today()->setTimeFromTimeString($schedule->shift->start_time);
 

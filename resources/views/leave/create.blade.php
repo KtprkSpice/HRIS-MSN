@@ -181,6 +181,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="alert alert-danger mb-4 rounded-3 border-0">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i> {{ session('error') }}
+                </div>
+            @endif
+
             <form class="row g-4" action="{{ route('leave-request.store') }}" method="POST" enctype="multipart/form-data" id="leaveForm">
                 @csrf
 

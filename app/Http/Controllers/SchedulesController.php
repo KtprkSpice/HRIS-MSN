@@ -8,6 +8,7 @@ use App\Models\Schedule;
 use App\Models\Shift;
 use App\Models\Task;
 use App\Models\TaskShiftRule;
+use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +71,12 @@ class SchedulesController extends Controller
                 'date' => 'required|date',
             ]);
 
+            if (AttendancePolicy::hasApprovedLeaveOnDate((int) $validated['employee_id'], $validated['date'])) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Karyawan sedang cuti approved pada tanggal tersebut.');
+            }
+
             $validated['source'] = 'manual';
 
             Schedule::create($validated);
@@ -114,6 +121,12 @@ class SchedulesController extends Controller
                 'task_id' => 'required|exists:tasks,id',
                 'date' => 'required|date',
             ]);
+
+            if (AttendancePolicy::hasApprovedLeaveOnDate((int) $validated['employee_id'], $validated['date'])) {
+                return back()
+                    ->withInput()
+                    ->with('error', 'Karyawan sedang cuti approved pada tanggal tersebut.');
+            }
 
             $validated['source'] = 'swap';
 
@@ -222,8 +235,13 @@ class SchedulesController extends Controller
                             ->where('day_of_week', $dayOfWeek)
                             ->pluck('employee_id');
 
+                        $leaveEmployeeIds = $employees
+                            ->filter(fn ($employee) => AttendancePolicy::hasApprovedLeaveOnDate($employee->id, $date))
+                            ->pluck('id');
+
                         $availableEmployees = $employees
                             ->whereNotIn('id', $offEmployeeIds)
+                            ->whereNotIn('id', $leaveEmployeeIds)
                             ->shuffle()
                             ->values();
 

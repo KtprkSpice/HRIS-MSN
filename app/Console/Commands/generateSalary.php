@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\Presence;
 use App\Models\Salary;
+use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -67,9 +68,7 @@ class generateSalary extends Command
                     ->get();
 
                 // Absence Cuts
-                $absencesCuts = Presence::where('employee_id', $employee->id)
-                    ->where('status', 'absent')
-                    ->whereBetween('date', [$start, $end])
+                $absencesCuts = AttendancePolicy::payableAbsenceQuery($employee->id, $start, $end)
                     ->count() * 50000;
 
 
@@ -83,7 +82,7 @@ class generateSalary extends Command
 
                 $leaves = LeaveRequest::with('types')
                     ->where('employee_id', $employee->id)
-                    ->where('status', 'confirmed')
+                    ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
                     ->where(function ($q) use ($start, $end) {
                         $q->whereBetween('start_date', [$start, $end])
                             ->orWhereBetween('end_date', [$start, $end]);

@@ -7,6 +7,7 @@ use App\Models\leaveApproval;
 use App\Models\LeaveRequest;
 use App\Models\LeaveType;
 use App\Models\Role;
+use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -77,6 +78,15 @@ class LeaveRequestController extends Controller
 
         $daysRequested = $start->diffInDays($end) + 1;
 
+        if (
+            ! AttendancePolicy::isSuddenLeaveType($leaveType)
+            && AttendancePolicy::scheduleOverlapQuery($employeeId, $start, $end)->exists()
+        ) {
+            return back()
+                ->withInput()
+                ->with('error', 'Cuti tidak bisa diajukan karena jadwal pada tanggal tersebut sudah digenerate. Gunakan jenis cuti dadakan jika memang mendadak.');
+        }
+
         // ===============================
         // 1️⃣ VALIDASI MAX PER PENGAJUAN
         // ===============================
@@ -95,7 +105,7 @@ class LeaveRequestController extends Controller
 
             $query = LeaveRequest::where('employee_id', $employeeId)
                 ->where('leave_id', $leaveType->id)
-                ->where('status', 'confirmed');
+                ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES);
 
             if ($leaveType->limit_type === 'yearly') {
                 $query->whereYear('start_date', $start->year);
@@ -212,6 +222,15 @@ class LeaveRequestController extends Controller
 
         $daysRequested = $start->diffInDays($end) + 1;
 
+        if (
+            ! AttendancePolicy::isSuddenLeaveType($leaveType)
+            && AttendancePolicy::scheduleOverlapQuery($request->employee_id, $start, $end)->exists()
+        ) {
+            return back()
+                ->withInput()
+                ->with('error', 'Cuti tidak bisa diajukan karena jadwal pada tanggal tersebut sudah digenerate. Gunakan jenis cuti dadakan jika memang mendadak.');
+        }
+
         // ===============================
         // 1️⃣ VALIDASI MAX PER PENGAJUAN
         // ===============================
@@ -230,7 +249,7 @@ class LeaveRequestController extends Controller
 
             $query = LeaveRequest::where('employee_id', $request->employee_id)
                 ->where('leave_id', $leaveType->id)
-                ->where('status', 'confirmed')
+                ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
                 ->where('id', '!=', $leaveRequest->id); // 🔥 EXCLUDE DATA LAMA
 
             if ($leaveType->limit_type === 'yearly') {

@@ -76,10 +76,12 @@
                                     Nama Karyawan
                                 </label>
 
-                                <select name="employee_id" class="form-control select2-js">
+                                <select name="employee_id" id="employeeSelect" class="form-control select2-js">
                                     <option value="">-- Cari Nama Karyawan --</option>
+
                                     @foreach ($employees as $employee)
                                         <option value="{{ $employee->id }}"
+                                            data-salary="{{ $employee->position->base_salary ?? 0 }}"
                                             {{ old('employee_id') == $employee->id ? 'selected' : '' }}>
                                             {{ ucwords($employee->fullname) }}
                                         </option>
