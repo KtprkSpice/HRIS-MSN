@@ -10,6 +10,7 @@ use App\Models\Salary;
 use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 
 class SalaryController extends Controller
@@ -288,6 +289,11 @@ class SalaryController extends Controller
         if ($roles === 'employee') {
             abort(403);
         } else {
+
+            Log::info('Auto Absent Run');
+            Artisan::call('app:auto-absent');
+            Log::info('Auto Absent Stopped');
+
             Log::info('Salary generation started');
 
             $today = today();

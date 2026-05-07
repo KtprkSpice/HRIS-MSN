@@ -287,13 +287,13 @@
                         </div>
 
                         <div class="d-flex justify-content-between text-potongan">
-                            <span>PPh 21</span>
-                            <strong>- Rp {{ number_format($salary->pph_cuts, 0, ',', '.') }}</strong>
+                            <span>Potongan Cuti</span>
+                            <strong>- Rp {{ number_format($salary->leave_cuts, 0, ',', '.') }}</strong>
                         </div>
 
                         <div class="d-flex justify-content-between text-potongan">
-                            <span>Potongan Cuti</span>
-                            <strong>- Rp {{ number_format($salary->leave_cuts, 0, ',', '.') }}</strong>
+                            <span>PPh 21</span>
+                            <strong>- Rp {{ number_format($salary->pph_cuts, 0, ',', '.') }}</strong>
                         </div>
                     </div>
 
