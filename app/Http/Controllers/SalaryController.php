@@ -139,10 +139,10 @@ class SalaryController extends Controller
             $lateCuts = (int) str_replace('.', '', $request->late_cuts);
 
             $totalCuts = $bpjsKesehatanCuts +
-            $bpjsKetenagakerjaanCuts +
-            $absentCuts +
-            $lateCuts +
-            $leaveCuts;
+                $bpjsKetenagakerjaanCuts +
+                $absentCuts +
+                $lateCuts +
+                $leaveCuts;
 
             $beforeTax = round($net_salary + $bonus - $totalCuts);
 
@@ -289,11 +289,17 @@ class SalaryController extends Controller
         if ($roles === 'employee') {
             abort(403);
         } else {
+            // Start schedule
+            Log::info('Auto Schedule Run');
+            Artisan::call('app-auto-schedule');
+            Log::info('Auto Schedule Stopped');
 
+            // Start Absent
             Log::info('Auto Absent Run');
             Artisan::call('app:auto-absent');
             Log::info('Auto Absent Stopped');
 
+            // Start Salry Generation
             Log::info('Salary generation started');
 
             $today = today();
@@ -351,7 +357,6 @@ class SalaryController extends Controller
 
                             $bpjsKesehatanCuts =
                                 $bpjsKesehatan->amount;
-
                         } else {
 
                             $bpjsKesehatanCuts =
@@ -402,17 +407,17 @@ class SalaryController extends Controller
 
                     // TOTAL CUTS
                     $totalCuts =
-                    $bpjsKesehatanCuts +
-                    $bpjsKetenagakerjaanCuts +
-                    $absentCuts +
-                    $lateCuts +
-                    $leaveCuts;
+                        $bpjsKesehatanCuts +
+                        $bpjsKetenagakerjaanCuts +
+                        $absentCuts +
+                        $lateCuts +
+                        $leaveCuts;
 
                     // BEFORE TAXs
                     $beforeTax = round(
                         $baseSalary +
-                        $bonus -
-                        $totalCuts
+                            $bonus -
+                            $totalCuts
                     );
 
                     // PAJAK PPH
@@ -465,7 +470,6 @@ class SalaryController extends Controller
                         'message' => $e->getMessage(),
                     ]);
                 }
-
             }
 
             Log::info('Salary generation ended');
