@@ -33,7 +33,6 @@ class EmployeeController extends Controller
             $countActiveEmployee = $employees->where('status', 'active')->count();
             $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
             $countTotalEmployee = $employees->count();
-
         } else {
             // Hr
             $employees = Employee::whereHas('user.role', function ($q) {
@@ -48,11 +47,9 @@ class EmployeeController extends Controller
             $countActiveEmployee = $employees->where('status', 'active')->count();
             $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
             $countTotalEmployee = $employees->count();
-
         }
 
         return view('Employees.index', compact('employees', 'countActiveEmployee', 'countNonActiveEmployee', 'countTotalEmployee'));
-
     }
 
     public function show(Employee $employee)
