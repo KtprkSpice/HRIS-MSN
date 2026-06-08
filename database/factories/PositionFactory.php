@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\division;
+use App\Models\Division;
 use App\Models\Position;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +22,7 @@ class PositionFactory extends Factory
         return [
             'name' => $this->faker->jobTitle(),
             // Otomatis membuat Division baru jika tidak didefinisikan saat dipanggil
-            'division_id' => division::factory(), 
+            'division_id' => Division::factory(), 
             // Gaji pokok (misal kisaran 5.000.000 sampai 15.000.000)
             'base_salary' => $this->faker->numberBetween(5000000, 15000000),
             // Potongan per menit keterlambatan (misal kisaran 1.000 sampai 5.000)

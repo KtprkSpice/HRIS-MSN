@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\division;
+use App\Models\Division;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Role;
@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
 
-    $divisions = division::factory()->count(3)->create();
+    $divisions = Division::factory()->count(3)->create();
 
         // 2. Buat data master: 3 Position
         // Kita sebar 3 position ini ke division yang baru saja dibuat

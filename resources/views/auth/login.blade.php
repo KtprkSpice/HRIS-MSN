@@ -53,9 +53,12 @@
         .password-wrapper .form-control.is-invalid {
             padding-right: 40px;
         }
+
         .card {
-            background: rgba(255, 255, 255, 0.60); /* transparan */
-            backdrop-filter: blur(10px);           /* efek kaca (glassmorphism) */
+            background: rgba(255, 255, 255, 0.60);
+            /* transparan */
+            backdrop-filter: blur(10px);
+            /* efek kaca (glassmorphism) */
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
@@ -73,7 +76,7 @@
                     style="width: 80px;">
             </div>
 
-           <h4 class="text-center fw-semibold mb-1">Login Dashboard</h4>
+            <h4 class="text-center fw-semibold mb-1">Login Dashboard</h4>
             <p class="text-center text-muted small mb-4">PT. Megajaya Sarana Nusantara</p>
 
             {{-- GLOBAL ERROR --}}
@@ -85,6 +88,13 @@
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             @endif
@@ -116,8 +126,8 @@
                     <label class="form-label">Password</label>
 
                     <div class="position-relative password-wrapper">
-                        <input type="password" id="passwordInput" name="password" class="form-control @error('password') is-invalid @enderror"
-                            required>
+                        <input type="password" id="passwordInput" name="password"
+                            class="form-control @error('password') is-invalid @enderror" required>
                         <button type="button" class="btn-toggle-password" id="togglePasswordBtn">
                             <i class="fa-solid fa-eye"></i>
                         </button>
@@ -156,7 +166,8 @@
 <script src="{{ asset('bootstrap-5.3.8-dist/js/bootstrap.bundle.min.js') }}"></script>
 
 {{-- Font Awesome --}}
-<link rel="stylesheet" href="{{ asset('fontawesome-free-7.1.0-web/css/all.min.css') }}" crossorigin="anonymous" referrerpolicy="no-referrer">
+<link rel="stylesheet" href="{{ asset('fontawesome-free-7.1.0-web/css/all.min.css') }}" crossorigin="anonymous"
+    referrerpolicy="no-referrer">
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -166,11 +177,11 @@
         if (toggleBtn && passwordInput) {
             toggleBtn.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 // Toggle input type antara password dan text
                 const isPassword = passwordInput.type === 'password';
                 passwordInput.type = isPassword ? 'text' : 'password';
-                
+
                 // Ubah icon
                 const icon = toggleBtn.querySelector('i');
                 if (isPassword) {

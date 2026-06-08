@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\division;
+use App\Models\Division;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\User;
@@ -24,7 +24,7 @@ class EmployeeFactory extends Factory
         return [
             "fullname" => $this->faker->name(),
             'nik' => $this->faker->unique()->numerify('################'),
-            'division_id' => division::inRandomOrder()->first()?->id ?? 1,
+            'division_id' => Division::inRandomOrder()->first()?->id ?? 1,
             'position_id' => Position::inRandomOrder()->first()?->id ?? 1,
             'address' => $this->faker->address(),
             'email' => $this->faker->unique()->safeEmail(),

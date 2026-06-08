@@ -8,7 +8,7 @@
     <link rel="icon" href="{{ asset('build/assets/img/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
 
 
     <!-- Bootstrap 5 -->
@@ -684,7 +684,7 @@
             </div>
         </div>
         <ul>
-            @if (in_array($userRole, ['hr', 'owner']))
+            @if ($userRole === 'owner')
                 <li><a href="{{ route('dashboard.index') }}" class="{{ request()->is('dashboard') ? 'active' : '' }}"><i
                             class="fa-solid fa-house"></i> Dashboard</a></li>
                 <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
@@ -720,6 +720,38 @@
                     </form>
                 </li>
             @endif
+            @if ($userRole === 'hr')
+                <li><a href="{{ route('dashboard.index') }}"
+                        class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
+                        Dashboard</a></li>
+                <li><a href="{{ route('employee.index') }}" class="{{ request()->is('employee') ? 'active' : '' }}"><i
+                            class="fa-solid fa-id-card"></i> Data Karyawan</a></li>
+                <li><a href="{{ route('task.index') }}" class="{{ request()->is('task') ? 'active' : '' }}"><i
+                            class="fa-solid fa-tasks"></i> Tugas</a></li>
+                <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                            class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
+                <li><a href="{{ route('salary.index') }}" class="{{ request()->is('salary') ? 'active' : '' }}"><i
+                            class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
+                        Slip Gaji</a></li>
+                <li><a href="{{ route('leave-request.index') }}"
+                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        Pengajuan Cuti</a>
+                </li>
+                <li><a href="{{ route('leave-type.index') }}"
+                        class="{{ request()->is('leave-type') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        Jenis Cuti</a></li>
+                <li><a href="{{ route('presence.index') }}" class="{{ request()->is('presence') ? 'active' : '' }}"><i
+                            class="fa-solid fa-user-check"></i> Kehadiran</a></li>
+                <li>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin:0;">
+                        @csrf
+                        <button type="button" class="sidebar-link" onclick="confirmLogout()">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            @endif
             @if ($userRole === 'employee')
                 <li><a href="{{ route('dashboard.index') }}"
                         class="{{ request()->is('dashboard') ? 'active' : '' }}"><i class="fa-solid fa-house"></i>
@@ -730,12 +762,15 @@
                             class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
                         Slip Gaji</a></li>
                 <li><a href="{{ route('leave-request.index') }}"
-                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i
+                            class="fa-solid fa-plane"></i>
                         Pengajuan Cuti</a>
                 </li>
-                <li><a href="{{ route('presence.index') }}" class="{{ request()->is('presence') ? 'active' : '' }}"><i
+                <li><a href="{{ route('presence.index') }}"
+                        class="{{ request()->is('presence') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
-                <li><a href="{{ route('schedule.index') }}" class="{{ request()->is('schedule') ? 'active' : '' }}"><i
+                <li><a href="{{ route('schedule.index') }}"
+                        class="{{ request()->is('schedule') ? 'active' : '' }}"><i
                             class="fa-solid fa-clipboard-list"></i> Jadwal</a></li>
                 <li>
                     <form id="logout-form" action="{{ route('logout') }}" method="POST" style="margin:0;">
