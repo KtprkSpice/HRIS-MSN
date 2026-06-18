@@ -7,6 +7,7 @@ use App\Models\Task;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
+use Log;
 
 class qrGenerate extends Command
 {
@@ -29,7 +30,7 @@ class qrGenerate extends Command
      */
     public function handle()
     {
-        \Log::info('Generate QR START');
+        Log::info('Generate QR START');
 
         $workDate = today();
 
@@ -37,24 +38,19 @@ class qrGenerate extends Command
 
         foreach ($tasks as $task) {
             foreach (['check_in', 'check_out'] as $type) {
-                // Duplication Check
-                $exsists = QrCode::where('task_id', $task->id)
+
+                $exists = QrCode::where('task_id', $task->id)
                     ->whereDate('date', $workDate)
                     ->where('type', $type)
                     ->exists();
 
-                if ($exsists) {
-                    \Log::info('Qr exsists', [
-                        'task_id' => $task->id,
-                        'type' => $type,
-                    ]);
-
+                if ($exists) {
                     continue;
                 }
 
                 $expiresAt = $type === 'check_in'
-                ? Carbon::now()->endOfDay()
-                : Carbon::now()->endOfDay()->addMinutes(30);
+                    ? Carbon::now()->endOfDay()
+                    : Carbon::now()->endOfDay()->addMinutes(30);
 
                 QrCode::create([
                     'task_id' => $task->id,
@@ -65,16 +61,13 @@ class qrGenerate extends Command
                     'is_active' => 1,
                     'type' => $type,
                 ]);
-
-                \Log::info('Qr Created', [
-                    'task_id' => $task->id,
-                    'type' => $type,
-                ]);
             }
         }
 
-        \Log::info('Generate Qr End');
+        Log::info('Generate QR END');
 
-        return back()->with('success', 'Qr Berhasil Digenerate');
+        $this->info('QR berhasil digenerate');
+
+        return Command::SUCCESS;
     }
 }

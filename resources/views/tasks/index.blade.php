@@ -112,9 +112,9 @@
                             Generate QR
                         </a>
 
-                        <a href="{{ route('schedule.generate') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                        {{-- <a href="{{ route('schedule.generate') }}" class="btn btn-outline-secondary rounded-pill px-4">
                             Generate Jadwal
-                        </a>
+                        </a> --}}
                     </div>
                 </div>
 

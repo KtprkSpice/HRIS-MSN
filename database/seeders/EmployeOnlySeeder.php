@@ -32,7 +32,7 @@ class EmployeOnlySeeder extends Seeder
             Employee::create([
                 'fullname' => $user->name,
                 'nik' => $faker->numerify('##########'),
-                'position_id' => $faker->numberBetween(1, 7),
+                'position_id' => $faker->numberBetween(1, 3),
                 'division_id' => 2,
                 'address' => $faker->address,
                 'email' => $user->email,

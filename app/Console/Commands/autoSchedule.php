@@ -11,6 +11,7 @@ use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class autoSchedule extends Command
 {
@@ -39,13 +40,21 @@ class autoSchedule extends Command
             $weekEnd = Carbon::now()->endOfWeek();
 
             // 0. Validasi jadwal existing
-            if (
-                Schedule::whereBetween('date', [
-                    $weekStart->toDateString(),
-                    $weekEnd->toDateString(),
-                ])->exists()
-            ) {
-                throw new \Exception('Masih ada jadwal minggu ini. Hapus dulu sebelum generate ulang.');
+            $scheduleExists = Schedule::whereBetween('date', [
+                $weekStart->toDateString(),
+                $weekEnd->toDateString(),
+            ])->exists();
+
+            if ($scheduleExists) {
+
+                Log::info('Schedule already exists', [
+                    'week_start' => $weekStart->toDateString(),
+                    'week_end' => $weekEnd->toDateString(),
+                ]);
+
+                $this->info('Schedule minggu ini sudah ada, generate dilewati.');
+
+                return Command::SUCCESS;
             }
 
             // 1. Ambil task aktif

@@ -24,7 +24,7 @@ class RoleMiddleware
         }
 
         // Check Role
-        if (! in_array($user->role->name, $roles)) {
+        if (! strtolower(in_array($user->role->name, $roles))) {
             abort(403, 'Anda tidak dapat mengakses halaman ini');
         }
 

@@ -6,6 +6,7 @@ use App\Models\Presence;
 use App\Models\Schedule;
 use App\Support\AttendancePolicy;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class autoAbsent extends Command
@@ -15,7 +16,7 @@ class autoAbsent extends Command
      *
      * @var string
      */
-    protected $signature = 'app:auto-absent';
+    protected $signature = 'app:auto-absent {date?}';
 
     /**
      * The console command description.
@@ -29,33 +30,53 @@ class autoAbsent extends Command
      */
     public function handle()
     {
-        Log::info('Auto absent check started');
+        $workDate = $this->argument('date')
+            ? Carbon::parse($this->argument('date'))
+            : today();
+
+        Log::info('Auto absent check started', [
+            'date' => $workDate->toDateString(),
+        ]);
 
         $now = now();
 
         $schedules = Schedule::with('shift')
-            ->whereDate('date', today())
+            ->whereDate('date', $workDate)
             ->get();
 
         foreach ($schedules as $schedule) {
 
-            if (AttendancePolicy::hasApprovedLeaveOnDate($schedule->employee_id, $schedule->date)) {
+            if (
+                AttendancePolicy::hasApprovedLeaveOnDate(
+                    $schedule->employee_id,
+                    $schedule->date
+                )
+            ) {
                 continue;
             }
 
-            $shiftStart = today()->setTimeFromTimeString($schedule->shift->start_time);
+            $shiftStart = Carbon::parse($workDate->toDateString())
+                ->setTimeFromTimeString(
+                    $schedule->shift->start_time
+                );
 
-            // kasih toleransi 30 menit
-            if ($now->lessThan($shiftStart->copy()->addMinutes(30))) {
+            if (
+                $workDate->isToday() &&
+                $now->lessThan(
+                    $shiftStart->copy()->addMinutes(30)
+                )
+            ) {
                 continue;
             }
 
-            $presence = Presence::where('employee_id', $schedule->employee_id)
+            $presence = Presence::where(
+                'employee_id',
+                $schedule->employee_id
+            )
                 ->where('schedule_id', $schedule->id)
-                ->whereDate('date', today())
+                ->whereDate('date', $workDate)
                 ->first();
 
-            // kalau belum presensi sama sekali
             if (! $presence) {
 
                 Presence::create([
@@ -63,7 +84,7 @@ class autoAbsent extends Command
                     'task_id' => $schedule->task_id,
                     'schedule_id' => $schedule->id,
                     'shift_id' => $schedule->shift_id,
-                    'date' => today(),
+                    'date' => $workDate,
                     'check_in' => null,
                     'check_out' => null,
                     'status' => 'absent',
