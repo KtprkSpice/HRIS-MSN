@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\Task;
 use App\Models\Tasklocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 use function Illuminate\Support\now;
 
@@ -22,7 +23,6 @@ class PresecesController extends Controller
             $presences = Presence::where('employee_id', $user->employee->id)->get();
         } else {
             $presences = Presence::all();
-
         }
 
         return view('presences.index', compact('presences'));
@@ -32,8 +32,9 @@ class PresecesController extends Controller
     {
         $presences = Presence::all();
         $employees = Employee::all();
+        $tasks = Task::all();
 
-        return view('presences.create', compact('presences', 'employees'));
+        return view('presences.create', compact('presences', 'employees', 'tasks'));
     }
 
     public function store(Request $request)
@@ -94,8 +95,8 @@ class PresecesController extends Controller
         $dlng = deg2rad($lng2 - $lng1);
 
         $a = sin($dLat / 2) * sin($dLat / 2) +
-        cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
-        sin($dlng / 2) * sin($dlng / 2);
+            cos(deg2rad($lat1)) * cos(deg2rad($lat2)) *
+            sin($dlng / 2) * sin($dlng / 2);
 
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
@@ -104,7 +105,7 @@ class PresecesController extends Controller
 
     public function storeQr(Request $request)
     {
-        \Log::info('Data Qr Masuk', $request->all());
+        Log::info('Data Qr Masuk', $request->all());
 
         try {
             //  VALIDASI REQUEST
@@ -293,9 +294,8 @@ class PresecesController extends Controller
                 'status' => 'error',
                 'message' => 'Tipe QR tidak dikenali',
             ]);
-
         } catch (\Throwable $e) {
-            \Log::error('Error Presensi QR', [
+            Log::error('Error Presensi QR', [
                 'message' => $e->getMessage(),
             ]);
 

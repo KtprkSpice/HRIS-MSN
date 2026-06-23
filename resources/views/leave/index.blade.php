@@ -194,7 +194,7 @@
                                     @if ($leave->document_file)
                                         <a class="btn btn-sm p-1 px-2 text-white shadow-sm"
                                             style="background-color: #bc5e6b;"
-                                            href="{{ asset('storage/' . $leave->document_file) }}" target="_blank">
+                                            href="{{ asset('storage/app/public/' . $leave->document_file) }}" target="_blank">
                                             <i class="fa-solid fa-file-pdf"></i>
                                         </a>
                                     @else
