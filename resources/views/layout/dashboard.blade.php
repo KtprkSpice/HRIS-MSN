@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="{{ asset('build/assets/img/logo.png') }}">
+    <link rel="icon" href="{{ asset('build/img/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <script src="{{ asset('js/app.js') }}"></script>
 
@@ -679,7 +679,7 @@
     <aside class="sidebar">
         <div class="d-flex align-items-center justify-content-center mb-4">
             <div class="logo d-flex align-items-center">
-                <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo">
+                <img src="{{ asset('build/img/logo.png') }}" alt="Logo">
                 <span class="fw-bold">PT. Megajaya Sarana Nusantara</span>
             </div>
         </div>

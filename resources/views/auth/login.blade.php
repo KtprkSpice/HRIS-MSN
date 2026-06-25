@@ -16,7 +16,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, .6), rgba(0, 0, 0, .6)),
-                url('{{ asset('build/assets/img/bglogin.png') }}') center/cover no-repeat;
+                url('{{ asset('build/img/bglogin.png') }}') center/cover no-repeat;
         }
 
         /* Password Toggle Icon */
@@ -72,8 +72,7 @@
 
             {{-- Logo --}}
             <div class="text-center mb-3">
-                <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo" class="img-fluid"
-                    style="width: 80px;">
+                <img src="{{ asset('build/img/logo.png') }}" alt="Logo" class="img-fluid" style="width: 80px;">
             </div>
 
             <h4 class="text-center fw-semibold mb-1">Login Dashboard</h4>
