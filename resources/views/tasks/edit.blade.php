@@ -251,8 +251,8 @@
     <script>
         const form = document.querySelector('form');
         const selectAll = document.getElementById('selectAll');
-        const allEmployeeIds = @json($employees->pluck('id')->map(fn ($id) => (string) $id)->values());
-        const selectedEmployeeIds = new Set(@json(collect(old('selected_employee', $task->employees->pluck('id')->toArray()))->map(fn ($id) => (string) $id)->values()));
+        const allEmployeeIds = @json($employees->pluck('id')->map(fn($id) => (string) $id)->values());
+        const selectedEmployeeIds = new Set(@json(collect(old('selected_employee', $task->employees->pluck('id')->toArray()))->map(fn($id) => (string) $id)->values()));
 
         // Table
         let table = new DataTable('#employeeTable', {

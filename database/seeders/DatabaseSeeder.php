@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Opsional: Buat beberapa role tambahan lainnya agar total ada beberapa pilihan role
-        Role::factory()->create(['name' => 'admin']);
+        Role::factory()->create(['name' => 'hr']);
         Role::factory()->create(['name' => 'employee']);
 
         $user = User::factory()->create([

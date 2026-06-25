@@ -15,4 +15,9 @@ class Division extends Model
         'description',
         'status',
     ];
+
+    public function positions()
+    {
+        return $this->hasMany(Position::class);
+    }
 }

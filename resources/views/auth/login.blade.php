@@ -16,7 +16,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, .6), rgba(0, 0, 0, .6)),
-                url('{{ asset('build/assets/img/bg login.png') }}') center/cover no-repeat;
+                url('{{ asset('build/assets/img/bglogin.png') }}') center/cover no-repeat;
         }
 
         /* Password Toggle Icon */

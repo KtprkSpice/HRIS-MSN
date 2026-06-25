@@ -119,7 +119,12 @@
 
                                 <td>{{ $employee->phone }}</td>
                                 <td class="text-muted">{{ $employee->email }}</td>
-                                <td>{{ ucwords($employee->division->name) }}</td>
+                                <td>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-bold">{{ ucwords($employee->division->name) }}</span>
+                                        <span class="fw-light">{{ ucwords($employee->position?->name) }}</span>
+                                    </div>
+                                </td>
                                 <td>{{ ucwords($employee->gender) }}</td>
 
                                 <td>

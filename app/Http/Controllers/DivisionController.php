@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Division;
+use App\Models\Position;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DivisionController extends Controller
 {
@@ -35,55 +37,140 @@ class DivisionController extends Controller
     {
         $roles = auth()->user()->role->name;
 
-        if ($roles === 'owner') {
-            $request->validate([
-                'name' => 'string|required|max:255',
-                'description' => 'nullable|string|max:255',
-            ]);
-
-            Division::create([
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
-
-            return redirect()->route('division.index')->with('success', "Berhasil Membuat Divisi $request->name");
-        } else {
+        if ($roles !== 'owner' || empty($roles)) {
             abort(403);
         }
+
+        $validated = $request->validate([
+            'name' => 'string|required|max:255',
+            'description' => 'nullable|string|max:255',
+
+            // Position
+            'position' => 'required|array|min:1',
+            'position.*' => 'required|string|max:255',
+            'base_salary' => 'required|array|min:1',
+            'base_salary.*' => 'required|string',
+            'deduction_per_minute' => 'required|array|min:1',
+            'deduction_per_minute.*' => 'required|string',
+        ]);
+
+        DB::transaction(function () use ($validated) {
+
+            $division = Division::create([
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+            ]);
+
+            foreach ($validated['position'] as $index => $positionName) {
+                $cleanSalary = (int) str_replace('.', '', $validated['base_salary'][$index]);
+                $cleanDeduction = (int) str_replace('.', '', $validated['deduction_per_minute'][$index]);
+
+                Position::create([
+                    'division_id' => $division->id,
+                    'name' => $positionName,
+                    'base_salary' => $cleanSalary,
+                    'cut_per_minute' => $cleanDeduction,
+                ]);
+            }
+        });
+
+        return redirect()->route('division.index')->with('success', "Berhasil Membuat Divisi $request->name");
     }
 
-    public function edit(Division $division)
+    public function edit($id)
     {
         $roles = auth()->user()->role->name;
-        if ($roles === 'owner') {
-            return view('Divisions.edit', compact('division'));
-
-        } else {
+        if ($roles !== 'owner' || empty($roles)) {
             abort(403);
         }
+
+        $division = Division::with('positions')->findOrFail($id);
+
+        return view('Divisions.edit', compact('division'));
     }
 
-    public function update(Request $request, Division $division)
+    public function update(Request $request, $id)
     {
-
         $roles = auth()->user()->role->name;
 
-        if ($roles === 'owner') {
-
-            $request->validate([
-                'name' => 'required|string|max:255',
-                'description' => 'nullable|string|max:255',
-            ]);
-
-            $division->update([
-                'name' => $request->name,
-                'description' => $request->description,
-            ]);
-        } else {
+        if ($roles !== 'owner' || empty($roles)) {
             abort(403);
         }
 
-        return redirect()->route('division.index')->with('success', "Divisi dengan nama $request->name Telah Diupdate");
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:255',
+
+            //    Position
+            'position_ids' => 'nullable|array',
+            'position_ids.*' => 'nullable|integer',
+            'position' => 'required|array|min:1',
+            'position.*' => 'required|string|max:255',
+            'base_salary' => 'required|array|min:1',
+            'base_salary.*' => 'required|string',
+            'deduction_per_minute' => 'required|array|min:1',
+            'deduction_per_minute.*' => 'required|string',
+        ]);
+
+        $division = Division::findOrFail($id);
+
+        try {
+
+            DB::transaction(function () use ($validated, $division) {
+                $division->update([
+                    'name' => $validated['name'],
+                    'description' => $validated['description'],
+                ]);
+
+                $processedID = [];
+
+                foreach ($validated['position'] as $index => $positionName) {
+                    $posID = $validated['position_ids'][$index] ?? null;
+                    $cleanSalary = str_replace('.', '', $validated['base_salary'][$index]);
+                    $cleanDeduction = str_replace('.', '', $validated['deduction_per_minute'][$index]);
+
+                    $position = Position::updateOrCreate(
+                        [
+                            'id' => $posID,
+                            'division_id' => $division->id,
+                        ],
+                        [
+                            'name' => $positionName,
+                            'base_salary' => $cleanSalary,
+                            'cut_per_minute' => $cleanDeduction,
+                        ]
+                    );
+
+                    $processedID[] = $position->id;
+                }
+                // setelah selesai semua update/create
+                $positionsToDelete = $division->positions()
+                    ->whereNotIn('id', $processedID)
+                    ->get();
+
+                foreach ($positionsToDelete as $posToDelete) {
+
+                    $isUsed = DB::table('employees')
+                        ->where('position_id', $posToDelete->id)
+                        ->exists();
+
+                    if ($isUsed) {
+                        throw new \Exception(
+                            "Posisi '{$posToDelete->name}' tidak dapat dihapus karena masih digunakan oleh karyawan aktif."
+                        );
+                    }
+
+                    $posToDelete->delete();
+                }
+
+            });
+
+            return redirect()->route('division.index')->with('success', "Divisi dengan nama $request->name Telah Diupdate");
+
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->with('error_from_controller', $e->getMessage());
+        }
+
     }
 
     public function destroy(Division $division)

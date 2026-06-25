@@ -93,28 +93,27 @@
         }
 
         .status-badge {
-    border: none;
-    border-radius: 50rem !important;
-    font-size: 12px;
-    cursor: pointer;
-    min-width: 120px;
-}
+            border: none;
+            border-radius: 50rem !important;
+            font-size: 12px;
+            cursor: pointer;
+            min-width: 120px;
+        }
 
-.status-done {
-    background: #dcfce7 !important;
-    color: #166534 !important;
-}
+        .status-done {
+            background: #dcfce7 !important;
+            color: #166534 !important;
+        }
 
-.status-onduty {
-    background: #dbeafe !important;
-    color: #1e3a8a !important;
-}
+        .status-onduty {
+            background: #dbeafe !important;
+            color: #1e3a8a !important;
+        }
 
-.status-pending {
-    background: #fef9c3 !important;
-    color: #854d0e !important;
-}
-
+        .status-pending {
+            background: #fef9c3 !important;
+            color: #854d0e !important;
+        }
     </style>
 
     @if (in_array($userRole, ['hr', 'owner']))
@@ -134,10 +133,6 @@
 
                         <a href="{{ route('qr.generate') }}" class="btn btn-outline-primary rounded-pill px-4">
                             Generate QR
-                        </a>
-
-                        <a href="{{ route('schedule.generate') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                            Generate Jadwal
                         </a>
                     </div>
                 </div>
@@ -197,32 +192,30 @@
                                 </td>
 
                                 <td>
-    <select
-        onchange="changeStatus(this)"
-        @class([
-            'form-select form-select-sm fw-medium text-center status-badge' => true,
-            'status-done' => $task->status == 'done',
-            'status-onduty' => $task->status == 'on duty',
-            'status-pending' => $task->status == 'pending',
-        ])>
+                                    <select onchange="changeStatus(this)" @class([
+                                        'form-select form-select-sm fw-medium text-center status-badge' => true,
+                                        'status-done' => $task->status == 'done',
+                                        'status-onduty' => $task->status == 'on duty',
+                                        'status-pending' => $task->status == 'pending',
+                                    ])>
 
-        <option value="{{ route('task.pending', $task->id) }}"
-            {{ $task->status == 'pending' ? 'selected' : '' }}>
-            Pending
-        </option>
+                                        <option value="{{ route('task.pending', $task->id) }}"
+                                            {{ $task->status == 'pending' ? 'selected' : '' }}>
+                                            Pending
+                                        </option>
 
-        <option value="{{ route('task.onduty', $task->id) }}"
-            {{ $task->status == 'on duty' ? 'selected' : '' }}>
-            On Duty
-        </option>
+                                        <option value="{{ route('task.onduty', $task->id) }}"
+                                            {{ $task->status == 'on duty' ? 'selected' : '' }}>
+                                            On Duty
+                                        </option>
 
-        <option value="{{ route('task.done', $task->id) }}"
-            {{ $task->status == 'done' ? 'selected' : '' }}>
-            Done
-        </option>
+                                        <option value="{{ route('task.done', $task->id) }}"
+                                            {{ $task->status == 'done' ? 'selected' : '' }}>
+                                            Done
+                                        </option>
 
-    </select>
-</td>
+                                    </select>
+                                </td>
                                 <!-- STATUS -->
 
 
@@ -328,9 +321,9 @@
             });
         }
 
-       function changeStatus(select) {
-    window.location.href = select.value;
-}
+        function changeStatus(select) {
+            window.location.href = select.value;
+        }
     </script>
 
 @endsection
