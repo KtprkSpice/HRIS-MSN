@@ -73,4 +73,5 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
 
     // Laporan
     Route::resource('/report', ReportController::class);
+    Route::get('/report/export/excel', [ReportController::class, 'export'])->name('report.export');
 });

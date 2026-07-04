@@ -1,4 +1,4 @@
-@extends('layout.dashboard');
+@extends('layout.dashboard')
 
 @section('header', 'Laporan')
 
@@ -100,15 +100,15 @@
         }
 
         .name-icon {
-            width: 34px;
-            height: 34px;
+            width: 42px;
+            height: 42px;
             border-radius: 50%;
+            overflow: hidden; /* INI KUNCI BIAR BULAT RAPI */
+            flex-shrink: 0;   /* BIAR GA KEPENCET DI TABLE */
             background: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #6c757d;
-            font-size: 14px;
         }
 
         .last-update {
@@ -285,7 +285,7 @@
 
                     <span class="badge bg-light text-dark">
                         <i class="fa-solid fa-shield-halved me-1"></i>
-                        Owner Dashboard
+                        Dashboard Manajemen
                     </span>
                 </div>
             </div>
@@ -431,9 +431,9 @@
     <!-- PRINT BUTTON (BOTTOM ONLY) -->
     <div class="d-flex justify-content-end mt-5 mb-2 no-print gap-3">
 
-        <button id="btnExcel" class="btn btn-success">
+        <a href="{{ route('report.export') }}" class="btn btn-success" id="btnExcel">
             <i class="fa fa-file-excel me-1"></i> Export Excel
-        </button>
+        </a>
 
         <button onclick="window.print()" class="btn btn-danger">
             <i class="fa fa-print me-1"></i> Print
@@ -448,26 +448,29 @@
         let table;
 
         $(document).ready(function() {
-            // Inisialisasi DataTable
+            // Inisialisasi DataTable tanpa buttons extension
             table = $('#table').DataTable({
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'excelHtml5',
-                    text: '<i class="fa fa-file-excel"></i> Export Excel',
-                    title: 'Laporan Karyawan PT Megajaya Sarana Nusantara',
-                    className: 'btn btn-success'
-                }],
                 pageLength: 10,
                 ordering: true,
-                responsive: true
-            });
-
-            // Tombol export manual
-            $('#btnExcel').on('click', function(e) {
-                e.preventDefault();
-                table.button('.buttons-excel').trigger();
+                responsive: true,
+                language: {
+                    "sProcessing": "Memproses...",
+                    "sLengthMenu": "Tampilkan _MENU_ entri",
+                    "sZeroRecords": "Tidak ada entri yang cocok ditemukan",
+                    "sInfo": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    "sInfoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+                    "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "sSearch": "Cari:",
+                    "oPaginate": {
+                        "sFirst": "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext": "Berikutnya",
+                        "sLast": "Terakhir"
+                    }
+                }
             });
         });
+        
 
         // Set tanggal
         document.addEventListener("DOMContentLoaded", function() {
@@ -514,16 +517,24 @@
             // Re-inisialisasi DataTable setelah print selesai
             if (!$.fn.DataTable.isDataTable('#table')) {
                 table = $('#table').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [{
-                        extend: 'excelHtml5',
-                        text: '<i class="fa fa-file-excel"></i> Export Excel',
-                        title: 'Laporan Karyawan PT Megajaya Sarana Nusantara',
-                        className: 'btn btn-success'
-                    }],
                     pageLength: 10,
                     ordering: true,
-                    responsive: true
+                    responsive: true,
+                    language: {
+                        "sProcessing": "Memproses...",
+                        "sLengthMenu": "Tampilkan _MENU_ entri",
+                        "sZeroRecords": "Tidak ada entri yang cocok ditemukan",
+                        "sInfo": "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        "sInfoEmpty": "Menampilkan 0 sampai 0 dari 0 entri",
+                        "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "sSearch": "Cari:",
+                        "oPaginate": {
+                            "sFirst": "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext": "Berikutnya",
+                            "sLast": "Terakhir"
+                        }
+                    }
                 });
             }
         };
