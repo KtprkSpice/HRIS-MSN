@@ -16,7 +16,6 @@ class DivisionController extends Controller
             $divisions = Division::all();
 
             return view('Divisions.index', compact('divisions'));
-
         } else {
             abort(403);
         }
@@ -162,15 +161,12 @@ class DivisionController extends Controller
 
                     $posToDelete->delete();
                 }
-
             });
 
             return redirect()->route('division.index')->with('success', "Divisi dengan nama $request->name Telah Diupdate");
-
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error_from_controller', $e->getMessage());
         }
-
     }
 
     public function destroy(Division $division)
@@ -185,6 +181,41 @@ class DivisionController extends Controller
         } else {
             abort(403);
         }
+    }
 
+    public function active($id)
+    {
+        $user = auth()->user();
+        $roles = auth()->user()->role->name;
+
+        if (in_array($roles, ['hr', 'owner'])) {
+            $division = Division::find($id);
+            $divisionName = $division->name;
+            $division->update([
+                'status' => 'active',
+            ]);
+        } else {
+            abort(403);
+        }
+
+        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Pending");
+    }
+
+    public function inactive($id)
+    {
+        $user = auth()->user();
+        $roles = auth()->user()->role->name;
+
+        if (in_array($roles, ['hr', 'owner'])) {
+            $division = Division::find($id);
+            $divisionName = $division->name;
+            $division->update([
+                'status' => 'active',
+            ]);
+        } else {
+            abort(403);
+        }
+
+        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Pending");
     }
 }

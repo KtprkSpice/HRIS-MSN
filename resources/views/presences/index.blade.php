@@ -198,9 +198,9 @@
                                 @if (in_array($userRole, ['hr', 'owner']))
                                     <td>
                                         <div class="d-flex justify-content-center gap-2">
-                                            <a href="#" class="btn-action btn-view" title="Lihat">
+                                            {{-- <a href="#" class="btn-action btn-view" title="Lihat">
                                                 <i class="fa-solid fa-eye fa-sm"></i>
-                                            </a>
+                                            </a> --}}
                                             <a href="{{ route('presence.edit', $presence->id) }}"
                                                 class="btn-action btn-edit" title="Edit">
                                                 <i class="fa-solid fa-pen fa-sm"></i>

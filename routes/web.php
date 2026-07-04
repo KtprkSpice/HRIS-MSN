@@ -64,6 +64,8 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
 
     // Division
     Route::resource('/division', DivisionController::class);
+    Route::get('/division/{id}/active', [DivisionController::class, 'active'])->name('division.active');
+    Route::get('/division/{id}/inactive', [DivisionController::class, 'inactive'])->name('division.inactive');
 
     // Schedules
     Route::get('/schedule/generate', [SchedulesController::class, 'generate'])->name('schedule.generate');

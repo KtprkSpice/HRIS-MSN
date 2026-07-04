@@ -174,10 +174,23 @@
                                 <td class="ps-4 fw-bold text-dark">{{ ucwords($division->name) }}</td>
                                 <td class="text-muted small">{{ $division->description ?: '-' }}</td>
                                 <td class="text-center">
-                                    <span
-                                        class="badge-status {{ strtolower($division->status) == 'active' ? 'status-active' : 'status-inactive' }}">
-                                        {{ ucwords($division->status) }}
-                                    </span>
+                                    <select onchange="changeStatus(this)" @class([
+                                        'form-select form-select-sm fw-medium text-center status-badge' => true,
+                                        'status-active' => $division->status == 'active',
+                                        'status-inactive' => $division->status == 'inactive',
+                                    ])>
+
+                                      <option value="{{ route('division.active', [$division->id, 'active']) }}" 
+                                         {{ $division->status == 'active' ? 'selected' : '' }}>
+    Active
+</option>
+
+<option value="{{ route('division.inactive', [$division->id, 'inactive']) }}" 
+     {{ $division->status == 'inactive' ? 'selected' : '' }}>
+    Inactive
+</option>
+                                    </select>
+                                </td>
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-2">
@@ -271,6 +284,10 @@
                 }
             });
         }
+
+        function changeStatus(select) {
+            window.location.href = select.value;
+}
     </script>
 
 @endsection
