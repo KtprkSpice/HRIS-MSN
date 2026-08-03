@@ -163,7 +163,7 @@
                             <th>Status</th>
                             <th>Show QR</th>
                             <th>Presensi</th>
-                                <th>Aksi</th>
+                            <th>Aksi</th>
                         </tr>
                     </thead>
 
@@ -238,28 +238,19 @@
                                         </button>
                                     @endif
                                 </td>
-                                  <td>
-                                        <div class="action-wrapper">
 
-                                            <a href="{{ route('task.show', $task->id) }}" class="btn-action btn-view">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
+                                <td>
+                                    <div class="action-wrapper">
 
-                                        </div>
-                                    </td>
-
-                                @if (in_array($userRole, ['hr', 'owner']))
-                                    <td>
-                                        <div class="action-wrapper">
-
-                                            <a href="{{ route('task.show', $task->id) }}" class="btn-action btn-view">
-                                                <i class="fa-solid fa-eye"></i>
-                                            </a>
-
+                                        <a href="{{ route('task.show', $task->id) }}" class="btn-action btn-view">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        @if (in_array($userRole, ['hr', 'owner']))
                                             <a href="{{ route('task.edit', $task->id) }}" class="btn-action btn-edit">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
-
+                                        @endif
+                                        @if ($userRole == 'owner')
                                             <form action="{{ route('task.destroy', $task->id) }}" method="POST"
                                                 id="deleteForm{{ $task->id }}">
                                                 @csrf
@@ -269,10 +260,9 @@
                                                     <i class="fa-solid fa-trash"></i>
                                                 </button>
                                             </form>
-
-                                        </div>
-                                    </td>
-                                @endif
+                                        @endif
+                                    </div>
+                                </td>
 
                             </tr>
                         @endforeach
