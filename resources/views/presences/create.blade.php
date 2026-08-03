@@ -55,6 +55,12 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     @endif
+                      @if (session('warning'))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ session('warning') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
                     <form action="{{ route('presence.store') }}" method="post">
                         @csrf
@@ -93,6 +99,25 @@
                                     @endforeach
                                 </select>
                                 @error('task_id')
+                                    <span class="invalid-feedback d-block">{{ $message }}</span>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label for="date" class="form-label fw-bold text-secondary">
+                                    <i class="fa-solid fa-calendar-day me-2" style="color: #bc5e6b;"></i> Shift
+                                </label>
+                                <select name="shift_id" id="shift_id"
+                                    class="form-control select2-js @error('shift_id') is-invalid @enderror">
+                                    <option value="">-- Pilih Shift --</option>
+                                    @foreach ($shifts as $shift)
+                                        <option value="{{ $shift->id }}"
+                                            {{ old('shift_id') == $shift->id ? 'selected' : '' }}>
+                                            {{ ucwords($shift->name) }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('shift_id')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
                                 @enderror
                             </div>

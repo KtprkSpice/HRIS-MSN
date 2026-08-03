@@ -117,42 +117,12 @@
                 </div>
             @endif
 
-            <div class="filter-section mb-4">
-                <div class="row g-3 align-items-end">
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-secondary small">
-                            <i class="fa-solid fa-filter me-2" style="color: #bc5e6b;"></i> Filter Status
-                        </label>
-                        <select id="filterStatus" class="form-control select2-js">
-                            <option value="">-- Semua Status --</option>
-                            <option value="Belum Selesai">Belum Selesai</option>
-                            <option value="Sedang Dikerjakan">Sedang Dikerjakan</option>
-                            <option value="Selesai">Selesai</option>
-                            <option value="Menunggu ACC HRD">Menunggu ACC HRD</option>
-                            <option value="Ditolak HRD">Ditolak HRD</option>
-                        </select>
-                    </div>
-
-                    @if (in_array($userRole, ['hr', 'owner']))
-                        <div class="col-md-4">
-                            <label class="form-label fw-bold text-secondary small">
-                                <i class="fa-solid fa-user me-2" style="color: #bc5e6b;"></i> Filter Karyawan
-                            </label>
-                            <select id="filterKaryawan" class="form-control select2-js">
-                                <option value="">-- Semua Karyawan --</option>
-                                <option value="Budi Santoso">Budi Santoso</option>
-                                <option value="Siti Aminah">Siti Aminah</option>
-                                <option value="Rudi Hartono">Rudi Hartono</option>
-                            </select>
-                        </div>
-                    @endif
-
-                    <div class="col-md-4 text-end pb-1">
-                        <span class="text-muted small">Total Data: <strong
-                                class="text-dark">{{ count($presences) }}</strong> baris</span>
-                    </div>
-                </div>
-            </div>
+            @if (session('warning'))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ session('warning') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
 
             {{-- Table Section --}}
             <div class="table-responsive">

@@ -6,12 +6,15 @@ use App\Models\Employee;
 use App\Models\Presence;
 use App\Models\QrCode;
 use App\Models\Schedule;
+use App\Models\Shift;
 use App\Models\Task;
 use App\Models\Tasklocation;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 use function Illuminate\Support\now;
+use function Laravel\Prompts\alert;
 
 class PresecesController extends Controller
 {
@@ -33,41 +36,167 @@ class PresecesController extends Controller
         $presences = Presence::all();
         $employees = Employee::all();
         $tasks = Task::all();
+        $shifts = Shift::all();
 
-        return view('presences.create', compact('presences', 'employees', 'tasks'));
+        return view('presences.create', compact('presences', 'employees', 'tasks', 'shifts'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'employee_id' => 'required',
             'date' => 'required|date',
-            'check_in' => 'required|date',
-            'check_out' => 'required|date',
+            'check_in' => 'nullable|date',
+            'check_out' => 'nullable|date',
+            'shift_id' => 'required|exists:shifts,id',
+            'task_id' => 'required',
         ]);
 
-        Presence::create($request->all());
+        $shift = Shift::findOrFail($validated['shift_id']);
+
+        $schedule = Schedule::create([
+            'employee_id' => $validated['employee_id'],
+            'shift_id' => $validated['shift_id'],
+            'task_id' => $validated['task_id'],
+            'date' => $validated['date'],
+            'source' => 'manual',
+        ]);
+
+        // Default kalau gak ada check_in sama sekali -> absent
+        $status = 'absent';
+        $lateMinutes = 0;
+        $workMinutes = 0;
+
+        if (! empty($validated['check_in'])) {
+            $checkIn = Carbon::parse($validated['check_in']);
+
+            // Jadwal seharusnya masuk jam berapa (gabungin tanggal + jam shift)
+            $scheduledStart = Carbon::parse($validated['date'] . ' ' . $shift->start_time);
+
+            // Batas toleransi telat
+            $toleranceLimit = $scheduledStart->copy()->addMinutes($shift->late_tolerance_minutes);
+
+            if ($checkIn->lessThan($scheduledStart)) {
+                return redirect()->back()
+                    ->withInput() // WAJIB: agar data form tidak hilang saat balik ke halaman form
+                    ->with('warning', 'Presensi tidak dapat dilakukan lebih awal dari jadwal shift!');
+            }
+
+            if ($checkIn->greaterThan($toleranceLimit)) {
+                $status = 'late';
+                $lateMinutes = $scheduledStart->diffInMinutes($checkIn);
+            } else {
+                $status = 'on time';
+                $lateMinutes = 0;
+            }
+
+            // Hitung work_minutes kalau check_out ada
+            if (! empty($validated['check_out'])) {
+                $checkOut = Carbon::parse($validated['check_out']);
+
+                // Handle shift cross_day (misal shift malam 22:00 - 06:00)
+                if ($shift->cross_day && $checkOut->lessThan($checkIn)) {
+                    $checkOut->addDay();
+                }
+
+                $workMinutes = $checkIn->diffInMinutes($checkOut);
+            }
+        }
+
+        Presence::create([
+            'employee_id' => $validated['employee_id'],
+            'schedule_id' => $schedule->id,
+            'shift_id' => $validated['shift_id'],
+            'task_id' => $validated['task_id'],
+            'date' => $validated['date'],
+            'check_in' => $validated['check_in'] ?? null,
+            'check_out' => $validated['check_out'] ?? null,
+            'work_minutes' => $workMinutes,
+            'late_minutes' => $lateMinutes,
+            'status' => $status,
+            'type' => 'outside',
+        ]);
 
         return redirect()->route('presence.index')->with('success', 'Data Presensi Telah Dibuat');
     }
 
     public function edit(Presence $presence)
     {
+        $presences = Presence::all();
         $employees = Employee::all();
+        $tasks = Task::all();
+        $shifts = Shift::all();
 
-        return view('presences.edit', compact('employees', 'presence'));
+        return view('presences.edit', compact('employees', 'presence', 'shifts', 'tasks'));
     }
 
     public function update(Presence $presence, Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'employee_id' => 'required',
+            'task_id' => 'required',
+            'shift_id' => 'required|exists:shifts,id',
             'date' => 'required|date',
             'check_in' => 'required|date',
-            'check_out' => 'required|date',
+            'check_out' => 'nullable|date',
         ]);
 
-        $presence->update($request->all());
+        $shift = Shift::findOrFail($validated['shift_id']);
+
+        // Update schedule yang terkait (bukan bikin baru)
+        $presence->schedule()->update([
+            'employee_id' => $validated['employee_id'],
+            'shift_id' => $validated['shift_id'],
+            'task_id' => $validated['task_id'],
+            'date' => $validated['date'],
+        ]);
+
+        // Hitung ulang status, late_minutes, work_minutes
+        $status = 'absent';
+        $lateMinutes = 0;
+        $workMinutes = 0;
+
+        if (! empty($validated['check_in'])) {
+            $checkIn = Carbon::parse($validated['check_in']);
+            $scheduledStart = Carbon::parse($validated['date'] . ' ' . $shift->start_time);
+            $toleranceLimit = $scheduledStart->copy()->addMinutes($shift->late_tolerance_minutes);
+
+            if ($checkIn->lessThan($scheduledStart)) {
+                return redirect()->back()
+                    ->withInput() // WAJIB: agar data form tidak hilang saat balik ke halaman form
+                    ->with('warning', 'Presensi tidak dapat dilakukan lebih awal dari jadwal shift!');
+            }
+
+            if ($checkIn->greaterThan($toleranceLimit)) {
+                $status = 'late';
+                $lateMinutes = $scheduledStart->diffInMinutes($checkIn);
+            } else {
+                $status = 'on time';
+            }
+
+            if (! empty($validated['check_out'])) {
+                $checkOut = Carbon::parse($validated['check_out']);
+
+                // Handle shift cross_day (misal shift Malam 22:00 - 06:00)
+                if ($shift->cross_day && $checkOut->lessThan($checkIn)) {
+                    $checkOut->addDay();
+                }
+
+                $workMinutes = $checkIn->diffInMinutes($checkOut);
+            }
+        }
+
+        $presence->update([
+            'employee_id' => $validated['employee_id'],
+            'shift_id' => $validated['shift_id'],
+            'task_id' => $validated['task_id'],
+            'date' => $validated['date'],
+            'check_in' => $validated['check_in'],
+            'check_out' => $validated['check_out'] ?? null,
+            'work_minutes' => $workMinutes,
+            'late_minutes' => $lateMinutes,
+            'status' => $status,
+        ]);
 
         return redirect()->route('presence.index')->with('success', 'Data Berhasil Diubah');
     }

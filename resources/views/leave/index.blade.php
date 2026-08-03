@@ -85,31 +85,31 @@
 
     <div class="card shadow-sm border-0 rounded-4 mb-4">
 
-    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-        <h5 class="mb-0 fw-semibold d-flex align-items-center">
-            <i class="fa-solid fa-calendar-check me-2"></i>
-            Manajemen Cuti
-        </h5>
+            <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                <i class="fa-solid fa-calendar-check me-2"></i>
+                Manajemen Cuti
+            </h5>
 
-        @if (in_array($userRole, ['hr', 'employee']))
-            <a href="{{ route('leave-request.create') }}" class="btn btn-primary rounded-pill px-4">
-    <i class="fa-solid fa-plus me-2"></i> Ajukan Cuti
-</a>
+            @if ($userRole == 'employee')
+                <a href="{{ route('leave-request.create') }}" class="btn btn-primary rounded-pill px-4">
+                    <i class="fa-solid fa-plus me-2"></i> Ajukan Cuti
+                </a>
+            @endif
+
+        </div>
+
+        @if (session('success'))
+            <div class="card-body pt-0">
+                <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+                    <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </div>
         @endif
 
     </div>
-
-    @if (session('success'))
-    <div class="card-body pt-0">
-        <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
-            <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-    @endif
-
-</div>
 
     <div class="card shadow border-0">
         <div class="card-body p-3">
@@ -194,7 +194,8 @@
                                     @if ($leave->document_file)
                                         <a class="btn btn-sm p-1 px-2 text-white shadow-sm"
                                             style="background-color: #bc5e6b;"
-                                            href="{{ asset('storage/app/public/' . $leave->document_file) }}" target="_blank">
+                                            href="{{ asset('storage/app/public/' . $leave->document_file) }}"
+                                            target="_blank">
                                             <i class="fa-solid fa-file-pdf"></i>
                                         </a>
                                     @else
@@ -203,47 +204,59 @@
                                 </td>
 
                                 @if (in_array($userRole, ['hr', 'owner']))
-                                <td>
-                                    @if ($leave->status === 'pending')
-                                        @if (($userRole === 'hr' && $leave->current_step == 1 && $leave->employee->user_id !== auth()->id()) || ($userRole === 'owner' && $leave->current_step == 2))
-                                            
-                                            {{-- Tombol Approve --}}
-                                            <form action="{{ route('leave-request.approve', $leave->id) }}" method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="submit" class="btn btn-success btn-action shadow-sm" title="Setujui">
-                                                    <i class="fa-solid fa-check"></i>
+                                    <td>
+                                        @if ($leave->status === 'pending')
+                                            @if (
+                                                ($userRole === 'hr' && $leave->current_step == 1 && $leave->employee->user_id !== auth()->id()) ||
+                                                    ($userRole === 'owner' && $leave->current_step == 2))
+                                                {{-- Tombol Approve --}}
+                                                <form action="{{ route('leave-request.approve', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-action shadow-sm"
+                                                        title="Setujui">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+                                                </form>
+
+                                                {{-- Tombol Reject (Visual) --}}
+                                                 <form action="{{ route('leave-request.rejected', $leave->id) }}"
+                                                    method="POST" class="d-inline">
+                                                    @csrf
+                                                <button type="submit" class="btn btn-warning btn-action shadow-sm ms-1"
+                                                    title="Tolak (Fungsi Belum Aktif)">
+                                                    <i class="fa-solid fa-xmark"></i>
                                                 </button>
-                                            </form>
+                                                 </form>
+                                                
 
-                                            {{-- Tombol Reject (Visual) --}}
-                                            <button type="button" class="btn btn-danger btn-action shadow-sm ms-1" title="Tolak (Fungsi Belum Aktif)">
-                                                <i class="fa-solid fa-xmark"></i>
-                                            </button>
-
-                                            {{-- Tombol Delete --}}
-                                            <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus data ini?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-secondary btn-action shadow-sm ms-1" title="Hapus">
-                                                    <i class="fa-solid fa-trash"></i>
-                                                </button>
-                                            </form>
-
+                                                {{-- Tombol Delete --}}
+                                                @if ($userRole == 'owner')
+                                                    <form action="{{ route('leave-request.destroy', $leave->id) }}"
+                                                        method="POST" id="deleteForm{{ $leave->id }}" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" onclick="confirmDelete({{ $leave->id }})"
+                                                            class="btn btn-danger btn-action btn-delete">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            @else
+                                                <span class="text-muted small">-</span>
+                                            @endif
                                         @else
-                                            <span class="text-muted small">-</span>
+                                            <i class="fa-solid fa-lock text-muted small"></i>
                                         @endif
-                                    @else
-                                        <i class="fa-solid fa-lock text-muted small"></i>
-                                    @endif
-                                </td>
-                            @endif
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                    </td>
+                                @endif
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
 
     <script src="{{ asset('js/jquery.min.js') }}"></script>

@@ -127,31 +127,6 @@
         </div>
     </div>
 
-    <div class="filter-section mb-4">
-        <div class="row g-3 align-items-end">
-            <div class="col-md-4">
-                <label class="form-label fw-bold text-secondary small">
-                    <i class="fa-solid fa-filter me-2" style="color: #bc5e6b;"></i> Filter Status
-                </label>
-                <select id="filterStatus" class="form-control select2-js">
-                    <option value="">-- Semua Status --</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-            <div class="col-md-4">
-                <label class="form-label fw-bold text-secondary small">
-                    <i class="fa-solid fa-search me-2" style="color: #bc5e6b;"></i> Cari Nama Divisi
-                </label>
-                <select id="filterKaryawan" class="form-control select2-js">
-                    <option value="">-- Ketik Nama --</option>
-                    @foreach ($divisions as $d)
-                        <option value="{{ $d->name }}">{{ ucwords($d->name) }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-    </div>
 
     <div class="card shadow-sm border-0" style="border-radius: 12px; overflow: hidden;">
         <div class="card-header card-custom-header">

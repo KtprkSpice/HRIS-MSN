@@ -87,6 +87,7 @@ class EmployeeController extends Controller
             'nik' => 'required|digits_between:1,20|unique:employees,nik',
             'position_id' => 'required',
             'address' => 'nullable|string',
+            'gender' => 'required|string',
             'email' => 'required|unique:employees,email|string',
             'phone' => 'required|unique:employees,phone|digits_between:1,20|max:20',
             'hire_date' => 'required|date',
@@ -123,6 +124,7 @@ class EmployeeController extends Controller
                 'position_id' => $validated['position_id'],
                 'division_id' => $division,
                 'address' => $validated['address'] ?? null,
+                'gender' => $validated['gender'],
                 'email' => $validated['email'],
                 'phone' => $validated['phone'],
                 'hire_date' => $validated['hire_date'],
@@ -148,9 +150,7 @@ class EmployeeController extends Controller
             $divisions = Division::where('status', 'active');
             $roles = Role::all();
             $user = User::all();
-            $positions = Position::whereHas('division', function ($q) {
-                $q->where('status', 'active');
-            })->get();
+            $positions = Position::all();
         }
 
         return view('Employees.edit', compact('divisions', 'roles', 'employee', 'user', 'positions'));
@@ -165,7 +165,9 @@ class EmployeeController extends Controller
             'fullname' => 'required|string|max:255',
             'nik' => 'required|digits_between:1,20',
             'position_id' => 'required',
+            'gender' => 'required|string',
             'address' => 'nullable|string',
+            'gender' => 'required|string',
             'email' => 'required|string',
             'phone' => 'required|digits_between:1,20|max:20',
             'hire_date' => 'required|date',
@@ -199,6 +201,7 @@ class EmployeeController extends Controller
             'position_id' => $validated['position_id'],
             'division_id' => $division,
             'address' => $validated['address'] ?? null,
+            'gender' => $validated['gender'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
             'hire_date' => $validated['hire_date'],

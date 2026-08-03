@@ -17,6 +17,7 @@ class Employee extends Model
         'division_id',
         'position_id',
         'address',
+        'gender',
         'email',
         'user_id',
         'phone',

@@ -82,6 +82,23 @@
                         @enderror
                     </div>
                 </div>
+                {{-- Gender --}}
+                 <div class="col-md-6">
+                    <label for="gender" class="form-label fw-semibold mb-2">
+                        <i class="fa-solid fa-sitemap me-2" style="color: #4f4f5a;"></i>Jenis Kelamin
+                    </label>
+                    <select id="gender"
+                        class="form-select form-control-modern @error('gender') is-invalid @enderror"
+                        name="gender" required>
+                        <option value="">Pilih Jenis Kelamin</option>
+                            <option value="laki-laki">Laki-Laki</option>
+                            <option value="perempuan">Perempuan</option>
+                    </select>
+                    @error('gender')
+                        <span class="invalid-feedback d-block mt-2"><i
+                                class="fa-solid fa-triangle-exclamation me-1"></i>{{ $message }}</span>
+                    @enderror
+                </div>
                 <div class="col-md-6">
                     <label for="position_id" class="form-label fw-semibold mb-2">
                         <i class="fa-solid fa-sitemap me-2" style="color: #4f4f5a;"></i>Posisi

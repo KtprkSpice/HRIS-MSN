@@ -163,9 +163,7 @@
                             <th>Status</th>
                             <th>Show QR</th>
                             <th>Presensi</th>
-                            @if (in_array($userRole, ['hr', 'owner']))
                                 <th>Aksi</th>
-                            @endif
                         </tr>
                     </thead>
 
@@ -240,6 +238,15 @@
                                         </button>
                                     @endif
                                 </td>
+                                  <td>
+                                        <div class="action-wrapper">
+
+                                            <a href="{{ route('task.show', $task->id) }}" class="btn-action btn-view">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+
+                                        </div>
+                                    </td>
 
                                 @if (in_array($userRole, ['hr', 'owner']))
                                     <td>
