@@ -239,6 +239,15 @@
                     showConfirmButton: false
                 });
             @endif
+
+            @if (session('error_from_controller'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Divisi Tidak Bisa Dihapus',
+                    html: `{!! session('error_from_controller') !!}`,
+                    confirmButtonText: 'Mengerti'
+                });
+            @endif
         });
 
         // Fungsi SweetAlert untuk Konfirmasi Hapus

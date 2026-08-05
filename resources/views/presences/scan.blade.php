@@ -32,26 +32,32 @@
     <script src="{{ asset('js/html5-qrcode.min.js') }}"></script>
 
     <script>
+        let isSubmitting = false;
+
         function onScanSuccess(decodedText) {
+            if (isSubmitting) {
+                return;
+            }
+
             // tampilkan hasil
             let resultBox = document.getElementById('result');
             resultBox.classList.remove('d-none');
-            resultBox.innerHTML = "QR terbaca: <strong>" + decodedText + "</strong>";
+            resultBox.className = 'alert alert-info mt-3';
+            resultBox.innerHTML = 'QR terbaca. Mengambil lokasi GPS...';
 
-            let testing = true;
-
-            if (testing) {
-                var lat = -6.301028;
-                var lng = 106.739556
-            } else {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    let lat = position.coords.latitude;
-                    let lng = position.coords.longitude;
-                })
+            if (!navigator.geolocation) {
+                resultBox.className = 'alert alert-danger mt-3';
+                resultBox.innerHTML = 'Browser ini tidak mendukung GPS.';
+                return;
             }
 
-            // Kirim ke route presensi
-            fetch("{{ route('presences.storeQr') }}", {
+            isSubmitting = true;
+
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+
+                fetch("{{ route('presences.storeQr') }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -67,18 +73,37 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === "success") {
-                        resultBox.classList.remove('alert-info');
-                        resultBox.classList.add('alert-success');
+                        resultBox.className = 'alert alert-success mt-3';
                         resultBox.innerHTML = data.message;
 
                         // Stop camera
                         html5QrcodeScanner.clear();
                     } else {
-                        resultBox.classList.remove('alert-info');
-                        resultBox.classList.add('alert-danger');
+                        resultBox.className = 'alert alert-danger mt-3';
                         resultBox.innerHTML = data.message;
+                        isSubmitting = false;
                     }
+                })
+                .catch(() => {
+                    resultBox.className = 'alert alert-danger mt-3';
+                    resultBox.innerHTML = 'Presensi gagal dikirim. Silakan coba lagi.';
+                    isSubmitting = false;
                 });
+            }, function(error) {
+                const messages = {
+                    1: 'Izin lokasi ditolak. Aktifkan izin GPS di browser.',
+                    2: 'Lokasi tidak tersedia. Pastikan GPS perangkat aktif.',
+                    3: 'Pengambilan lokasi terlalu lama. Coba lagi.',
+                };
+
+                resultBox.className = 'alert alert-danger mt-3';
+                resultBox.innerHTML = messages[error.code] || 'Lokasi GPS gagal diambil.';
+                isSubmitting = false;
+            }, {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0,
+            });
         }
 
         let html5QrcodeScanner = new Html5QrcodeScanner(

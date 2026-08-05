@@ -326,29 +326,56 @@
         }).addTo(map);
 
         let marker, circle;
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
+        const radiusInput = document.getElementById('radius');
+
+        function syncMapFromCoordinateInputs(recenter = true) {
+            const lat = Number.parseFloat(latitudeInput.value);
+            const lng = Number.parseFloat(longitudeInput.value);
+
+            if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                return false;
+            }
+
+            const location = [lat, lng];
+            const radius = Number.parseFloat(radiusInput.value) || 50;
+
+            if (marker) {
+                marker.setLatLng(location);
+            } else {
+                marker = L.marker(location).addTo(map);
+            }
+
+            if (circle) {
+                circle.setLatLng(location).setRadius(radius);
+            } else {
+                circle = L.circle(location, { radius }).addTo(map);
+            }
+
+            if (recenter) {
+                map.setView(location, Math.max(map.getZoom(), 15));
+            }
+
+            return true;
+        }
 
         map.on('click', function(e) {
             const lat = e.latlng.lat;
             const lng = e.latlng.lng;
-            const radius = document.getElementById('radius').value || 50;
 
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-
-            if (marker) map.removeLayer(marker);
-            if (circle) map.removeLayer(circle);
-
-            marker = L.marker([lat, lng]).addTo(map);
-            circle = L.circle([lat, lng], {
-                radius
-            }).addTo(map);
+            latitudeInput.value = lat.toFixed(7);
+            longitudeInput.value = lng.toFixed(7);
+            syncMapFromCoordinateInputs(false);
         });
 
-        document.getElementById('radius').addEventListener('input', function() {
-            if (circle) {
-                circle.setRadius(this.value);
-            }
+        [latitudeInput, longitudeInput].forEach(input => {
+            input.addEventListener('input', () => syncMapFromCoordinateInputs());
+            input.addEventListener('change', () => syncMapFromCoordinateInputs());
         });
+
+        radiusInput.addEventListener('input', () => syncMapFromCoordinateInputs(false));
+        syncMapFromCoordinateInputs();
 
         form.addEventListener('submit', function() {
             form.querySelectorAll('.selected-employee-hidden').forEach(input => input.remove());

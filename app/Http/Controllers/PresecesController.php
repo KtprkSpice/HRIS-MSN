@@ -325,10 +325,20 @@ class PresecesController extends Controller
                 ]);
             }
 
-            //  AMBIL PRESENCE
-            $presence = Presence::where('employee_id', $employee->id)
+            // Record untuk schedule aktif; dapat sudah dibuat oleh auto-absen.
+            $presenceForSchedule = Presence::where('employee_id', $employee->id)
                 ->where('schedule_id', $schedule->id)
                 ->whereDate('date', today())
+                ->first();
+
+            // Gunakan record yang benar-benar memiliki check-in untuk check-out.
+            // Jangan bergantung pada schedule_id saja, karena data lama dapat memiliki
+            // lebih dari satu schedule atau record absent yang dibuat otomatis.
+            $checkedInPresence = Presence::where('employee_id', $employee->id)
+                ->where('task_id', $task->id)
+                ->whereDate('date', today())
+                ->whereNotNull('check_in')
+                ->latest('check_in')
                 ->first();
 
             $now = now();
@@ -338,7 +348,7 @@ class PresecesController extends Controller
             // CHECK IN
             if ($qr->type === 'check_in') {
 
-                if ($presence && $presence->check_in) {
+                if ($checkedInPresence) {
                     return response()->json([
                         'status' => 'error',
                         'message' => 'Anda sudah melakukan check-in',
@@ -353,12 +363,12 @@ class PresecesController extends Controller
                 // }
 
                 // Presensi lebih awal
-                if ($now->lessThan($shiftStart->copy()->subMinutes(30))) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Presensi belum dibuka',
-                    ]);
-                }
+                // if ($now->lessThan($shiftStart->copy()->subMinutes(30))) {
+                //     return response()->json([
+                //         'status' => 'error',
+                //         'message' => 'Presensi belum dibuka',
+                //     ]);
+                // }
 
                 $status = 'on time';
                 $lateMinutes = 0;
@@ -369,7 +379,7 @@ class PresecesController extends Controller
                     $status = 'late';
                 }
 
-                Presence::create([
+                $presenceData = [
                     'employee_id' => $employee->id,
                     'task_id' => $task->id,
                     'schedule_id' => $schedule->id,
@@ -380,7 +390,13 @@ class PresecesController extends Controller
                     'check_in' => now(),
                     'late_minutes' => $lateMinutes,
                     'status' => $status,
-                ]);
+                ];
+
+                if ($presenceForSchedule) {
+                    $presenceForSchedule->update($presenceData);
+                } else {
+                    Presence::create($presenceData);
+                }
 
                 return response()->json([
                     'status' => 'success',
@@ -391,6 +407,7 @@ class PresecesController extends Controller
 
             // CHECK OUT
             if ($qr->type === 'check_out') {
+                $presence = $checkedInPresence;
 
                 if (! $presence || ! $presence->check_in) {
                     return response()->json([

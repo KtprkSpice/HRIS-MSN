@@ -11,6 +11,7 @@ use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class LeaveRequestController extends Controller
 {
@@ -92,8 +93,9 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($leaveType->max_days && $daysRequested > $leaveType->max_days) {
-            return back()->with('error',
-                'Maksimal pengajuan '.$leaveType->max_days.' hari.'
+            return back()->with(
+                'error',
+                'Maksimal pengajuan ' . $leaveType->max_days . ' hari.'
             );
         }
 
@@ -124,8 +126,9 @@ class LeaveRequestController extends Controller
 
                 $remaining = $leaveType->limit_days - $usedDays;
 
-                return back()->with('error',
-                    'Sisa cuti hanya '.$remaining.' hari.'
+                return back()->with(
+                    'error',
+                    'Sisa cuti hanya ' . $remaining . ' hari.'
                 );
             }
         }
@@ -142,17 +145,17 @@ class LeaveRequestController extends Controller
         ) {
 
             if ($request->file('document_file')) {
-
                 $file = $request->file('document_file');
-                $filename = time().'_'.$file->getClientOriginalName();
+                $directory = public_path('uploads/leave-documents');
 
-                $file->move(
-                    storage_path('app/public/surat_dokter'),
-                    $filename
-                );
+                if (! is_dir($directory)) {
+                    mkdir($directory, 0755, true);
+                }
 
-                $validated['document_file'] =
-                    'surat_dokter/'.$filename;
+                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                $file->move($directory, $filename);
+
+                $validated['document_file'] = 'uploads/leave-documents/' . $filename;
             }
 
             $leave = LeaveRequest::create([
@@ -236,8 +239,9 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($leaveType->max_days && $daysRequested > $leaveType->max_days) {
-            return back()->with('error',
-                'Maksimal pengajuan '.$leaveType->max_days.' hari.'
+            return back()->with(
+                'error',
+                'Maksimal pengajuan ' . $leaveType->max_days . ' hari.'
             );
         }
 
@@ -269,8 +273,9 @@ class LeaveRequestController extends Controller
 
                 $remaining = $leaveType->limit_days - $usedDays;
 
-                return back()->with('error',
-                    'Sisa cuti hanya '.$remaining.' hari.'
+                return back()->with(
+                    'error',
+                    'Sisa cuti hanya ' . $remaining . ' hari.'
                 );
             }
         }
@@ -280,20 +285,25 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($request->file('document_file')) {
+            $oldDocument = $leaveRequest->document_file
+                ? public_path($leaveRequest->document_file)
+                : null;
 
-            if (
-                $leaveRequest->document_file &&
-                file_exists(storage_path('app/public/'.$leaveRequest->document_file))
-            ) {
-                unlink(storage_path('app/public/'.$leaveRequest->document_file));
+            if ($oldDocument && file_exists($oldDocument)) {
+                unlink($oldDocument);
             }
 
             $file = $request->file('document_file');
-            $filename = time().'_'.$file->getClientOriginalName();
+            $directory = public_path('uploads/leave-documents');
 
-            $file->move(storage_path('app/public/surat_dokter'), $filename);
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
 
-            $validated['document_file'] = 'surat_dokter/'.$filename;
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $file->move($directory, $filename);
+
+            $validated['document_file'] = 'uploads/leave-documents/' . $filename;
         }
 
         // ===============================
@@ -389,7 +399,6 @@ class LeaveRequestController extends Controller
                 $leave->update([
                     'current_step' => $nextStep->approval_order,
                 ]);
-
             } else {
 
                 // Tidak ada step lagi → FINAL APPROVED

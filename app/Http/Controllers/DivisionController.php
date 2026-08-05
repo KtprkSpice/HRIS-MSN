@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Division;
+use App\Models\Employee;
 use App\Models\Position;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -175,6 +176,17 @@ class DivisionController extends Controller
         $roles = auth()->user()->role->name;
 
         if ($roles === 'owner') {
+            $employeeCount = Employee::where('division_id', $division->id)->count();
+
+            if ($employeeCount > 0) {
+                return redirect()
+                    ->route('division.index')
+                    ->with(
+                        'error_from_controller',
+                        "Divisi ini tidak dapat dihapus karena masih memiliki {$employeeCount} karyawan. Pindahkan atau hapus karyawan tersebut terlebih dahulu."
+                    );
+            }
+
             $division->delete();
 
             return redirect()->route('division.index')->with('success', "Divisi dengan nama $division->name telah dihapus");

@@ -3,11 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\QrCode;
-use App\Models\Schedule;
 use App\Models\Task;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 use function Symfony\Component\Clock\now;
@@ -92,17 +89,9 @@ class QrController extends Controller
 
     public function generate()
     {
-        $weekStart = Carbon::now()->startOfWeek();
-        $weekEnd = Carbon::now()->endOfWeek();
-
-        $scheduleExists = Schedule::whereBetween('date', [
-            $weekStart->toDateString(),
-            $weekEnd->toDateString(),
-        ])->exists();
-
-        if (! $scheduleExists) {
-            Artisan::call('app:auto-schedule');
-        }
+        // Generator jadwal bersifat idempoten: jadwal lama dilewati dan
+        // hanya jadwal yang belum ada yang dibuat.
+        Artisan::call('app:auto-schedule');
 
         Artisan::call('app:qr-generate');
 

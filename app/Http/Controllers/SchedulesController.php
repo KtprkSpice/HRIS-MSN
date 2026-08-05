@@ -164,16 +164,6 @@ class SchedulesController extends Controller
                 $weekStart = Carbon::now()->startOfWeek();
                 $weekEnd = Carbon::now()->endOfWeek();
 
-                // 0. Validasi jadwal existing
-                if (
-                    Schedule::whereBetween('date', [
-                        $weekStart->toDateString(),
-                        $weekEnd->toDateString(),
-                    ])->exists()
-                ) {
-                    throw new \Exception('Masih ada jadwal minggu ini. Hapus dulu sebelum generate ulang.');
-                }
-
                 // 1. Ambil task aktif
                 $tasks = Task::whereIn('status', ['on duty', 'pending'])->get();
 
@@ -239,9 +229,16 @@ class SchedulesController extends Controller
                             ->filter(fn ($employee) => AttendancePolicy::hasApprovedLeaveOnDate($employee->id, $date))
                             ->pluck('id');
 
+                        // Jadwal yang sudah ada tidak dibuat ulang. Hanya slot yang belum ada
+                        // untuk task dan tanggal ini yang akan diproses.
+                        $scheduledEmployeeIds = Schedule::where('task_id', $task->id)
+                            ->whereDate('date', $date)
+                            ->pluck('employee_id');
+
                         $availableEmployees = $employees
                             ->whereNotIn('id', $offEmployeeIds)
                             ->whereNotIn('id', $leaveEmployeeIds)
+                            ->whereNotIn('id', $scheduledEmployeeIds)
                             ->shuffle()
                             ->values();
 
@@ -267,13 +264,17 @@ class SchedulesController extends Controller
                                 ->take($needed);
 
                             foreach ($candidates as $employee) {
-                                Schedule::create([
-                                    'employee_id' => $employee->id,
-                                    'task_id' => $task->id,
-                                    'shift_id' => $shiftId,
-                                    'date' => $date->toDateString(),
-                                    'source' => 'system',
-                                ]);
+                                Schedule::firstOrCreate(
+                                    [
+                                        'employee_id' => $employee->id,
+                                        'task_id' => $task->id,
+                                        'date' => $date->toDateString(),
+                                    ],
+                                    [
+                                        'shift_id' => $shiftId,
+                                        'source' => 'system',
+                                    ]
+                                );
 
                                 $usedEmployeeIds->push($employee->id);
                             }

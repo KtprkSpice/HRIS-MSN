@@ -698,7 +698,7 @@
                             class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
                         Slip Gaji</a></li>
                 <li><a href="{{ route('leave-request.index') }}"
-                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        class="{{ request()->is('leave-request*') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
                         Pengajuan Cuti</a>
                 </li>
                 <li><a href="{{ route('leave-type.index') }}"
@@ -735,7 +735,7 @@
                             class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
                         Slip Gaji</a></li>
                 <li><a href="{{ route('leave-request.index') }}"
-                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
+                        class="{{ request()->is('leave-request*') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
                         Pengajuan Cuti</a>
                 </li>
                 <li><a href="{{ route('leave-type.index') }}"
@@ -763,7 +763,7 @@
                             class="fa-solid fa-money-bill" class="{{ request()->is('salary') ? 'active' : '' }}"></i>
                         Slip Gaji</a></li>
                 <li><a href="{{ route('leave-request.index') }}"
-                        class="{{ request()->is('leave-request') ? 'active' : '' }}"><i
+                        class="{{ request()->is('leave-request*') ? 'active' : '' }}"><i
                             class="fa-solid fa-plane"></i>
                         Pengajuan Cuti</a>
                 </li>

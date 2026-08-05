@@ -83,7 +83,7 @@
             @if ($leaveRequest->document_file)
                 <small class="text-muted d-block mt-2">
                     File saat ini:
-                    <a href="{{ asset('storage/' . $leaveRequest->document_file) }}" target="_blank">
+                    <a href="{{ asset($leaveRequest->document_file) }}" target="_blank">
                         Lihat Dokumen
                     </a>
                 </small>
