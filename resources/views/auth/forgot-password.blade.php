@@ -18,7 +18,7 @@
             font-family: 'Plus Jakarta Sans', sans-serif;
             /* Background selaras dengan halaman ganti password */
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                        url('{{ asset('build/assets/img/bg login.png') }}') center/cover no-repeat fixed;
+                        url('{{ asset('build/img/bg login.png') }}') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -138,7 +138,7 @@
 
             {{-- Logo --}}
             <div class="text-center">
-                <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo" class="logo-img">
+                <img src="{{ asset('build/img/logo.png') }}" alt="Logo" class="logo-img">
             </div>
 
             <div class="text-center mb-4">

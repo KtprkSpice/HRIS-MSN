@@ -19,7 +19,7 @@
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, .6), rgba(0, 0, 0, .6)),
-                url('{{ asset('build/assets/img/bg.jpg') }}') center/cover no-repeat;
+                url('{{ asset('build/img/bg.jpg') }}') center/cover no-repeat;
         }
     </style>
 </head>
@@ -31,7 +31,7 @@
 
             {{-- Logo --}}
             <div class="text-center mb-3">
-                <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo" class="img-fluid"
+                <img src="{{ asset('build/img/logo.png') }}" alt="Logo" class="img-fluid"
                     style="width: 80px;">
             </div>
 

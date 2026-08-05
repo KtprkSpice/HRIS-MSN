@@ -216,7 +216,7 @@
             <div class="col-md-4 d-flex">
                 <div class="card shadow-sm text-center flex-fill">
                     <div class="card-body">
-                        <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo" width="110"
+                        <img src="{{ asset('build/img/logo.png') }}" alt="Logo" width="110"
                             class="mb-3 d-block mx-auto">
                         <h5>Visi</h5>
                         <p>Menjadi pemimpin dalam industri Services, IT service, building management, office suppliers, dan
@@ -556,13 +556,13 @@
                             <div id="carouselIklanFull" class="carousel slide" data-bs-ride="carousel">
                                 <div class="carousel-inner">
                                     <div class="carousel-item active"><a href="#"><img
-                                                src="{{ asset('build/assets/img/struktur.png') }}"
+                                                src="{{ asset('build/img/struktur.png') }}"
                                                 class="d-block w-100 carousel-img-full" alt="Iklan 1"></a></div>
                                     <div class="carousel-item"><a href="#"><img
-                                                src="{{ asset('build/assets/img/partner.png') }}"
+                                                src="{{ asset('build/img/partner.png') }}"
                                                 class="d-block w-100 carousel-img-full" alt="Iklan 2"></a></div>
                                     <div class="carousel-item"><a href="#"><img
-                                                src="{{ asset('build/assets/img/iso.PNG') }}"
+                                                src="{{ asset('build/img/iso.PNG') }}"
                                                 class="d-block w-100 carousel-img-full" alt="Iklan 3"></a></div>
                                 </div>
                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselIklanFull"

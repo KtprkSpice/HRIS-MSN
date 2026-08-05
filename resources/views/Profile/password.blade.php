@@ -17,7 +17,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-                        url('{{ asset('build/assets/img/bg login.png') }}') center/cover no-repeat fixed;
+                        url('{{ asset('build/img/bglogin.png') }}') center/cover no-repeat fixed;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -116,7 +116,7 @@
         <div class="card-body">
 
             <div class="text-center mb-4">
-                <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo" style="width: 75px;">
+                <img src="{{ asset('build/img/logo.png') }}" alt="Logo" style="width: 75px;">
             </div>
 
             <div class="text-center mb-4">
