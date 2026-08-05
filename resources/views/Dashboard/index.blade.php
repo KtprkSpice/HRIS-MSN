@@ -225,13 +225,13 @@
                             pihak dan Good Corporate government.</p>
                         <h5>Misi</h5>
                         <ol class="text-start">
-                            <li>1. Menawarkan produk yang berkualitas, inovatif, dan state of the art pelayanan bermutu dan
+                            <li>Menawarkan produk yang berkualitas, inovatif, dan state of the art pelayanan bermutu dan
                                 bernilai tambah untuk pelanggan.</li>
-                            <li>2. Menawarkan provivilitas dan mendapatkan keuntungan atau manfaat yang baik secara optimal.
+                            <li>Menawarkan provivilitas dan mendapatkan keuntungan atau manfaat yang baik secara optimal.
                             </li>
-                            <li>3. Memaksimalkan potensi karyawan dengan memperhatikan karir dan kesejahteraan karyawan.
+                            <li>Memaksimalkan potensi karyawan dengan memperhatikan karir dan kesejahteraan karyawan.
                             </li>
-                            <li>4. Menciptakan lingkungan yang lebih baik secara langsung atau tak langsung bagi masyarakat.
+                            <li>Menciptakan lingkungan yang lebih baik secara langsung atau tak langsung bagi masyarakat.
                             </li>
                         </ol>
                     </div>
