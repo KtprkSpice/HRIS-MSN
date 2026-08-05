@@ -173,7 +173,7 @@
             <div class="d-flex justify-content-between align-items-center">
 
                 <div class="d-flex align-items-center">
-                    <img src="{{ asset('build/assets/img/logo.png') }}" style="width:70px; margin-right:15px;">
+                    <img src="{{ asset('build/img/logo.png') }}" style="width:70px; margin-right:15px;">
                     <div>
                         <h4 style="margin:0; font-weight:bold;">
                             PT. MEGAJAYA SARANA NUSANTARA
@@ -200,7 +200,7 @@
                 <div class="company-header d-flex justify-content-between align-items-center mb-4">
 
                     <div class="d-flex align-items-center gap-3">
-                        <img src="{{ asset('build/assets/img/logo.png') }}" class="logo-pt">
+                        <img src="{{ asset('build/img/logo.png') }}" class="logo-pt">
 
                         <div>
                             <div class="fw-bold">PT. Megajaya Sarana Nusantara</div>

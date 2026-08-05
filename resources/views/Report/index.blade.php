@@ -269,7 +269,7 @@
 
             <div>
                 <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
-                    <img src="{{ asset('build/assets/img/logo.png') }}" class="logo-pt" alt="Logo PT">
+                    <img src="{{ asset('build/img/logo.png') }}" class="logo-pt" alt="Logo PT">
                     Dashboard Report
                 </h4>
 
@@ -361,7 +361,7 @@
     <!-- PRINT HEADER (KHUSUS PRINT SAJA) -->
     <div class="print-header">
         <div class="header-left">
-            <img src="{{ asset('build/assets/img/logo.png') }}" alt="Logo">
+            <img src="{{ asset('build/img/logo.png') }}" alt="Logo">
             <div>
                 <h2>PT. Megajaya Sarana Nusantara</h2>
                 <p>Gedung Sarana Square Lt.3A Jl. Tebet Barat</p>
