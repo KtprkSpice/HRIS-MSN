@@ -155,15 +155,15 @@
                                         'status-inactive' => $division->status == 'inactive',
                                     ])>
 
-                                      <option value="{{ route('division.active', [$division->id, 'active']) }}" 
-                                         {{ $division->status == 'active' ? 'selected' : '' }}>
-    Active
-</option>
+                                        <option value="{{ route('division.active', [$division->id, 'active']) }}"
+                                            {{ $division->status == 'active' ? 'selected' : '' }}>
+                                            Active
+                                        </option>
 
-<option value="{{ route('division.inactive', [$division->id, 'inactive']) }}" 
-     {{ $division->status == 'inactive' ? 'selected' : '' }}>
-    Inactive
-</option>
+                                        <option value="{{ route('division.inactive', [$division->id, 'inactive']) }}"
+                                            {{ $division->status == 'inactive' ? 'selected' : '' }}>
+                                            Inactive
+                                        </option>
                                     </select>
                                 </td>
                                 </td>
@@ -248,6 +248,15 @@
                     confirmButtonText: 'Mengerti'
                 });
             @endif
+
+            @if (session('warning_from_controller'))
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Divisi Tidak Bisa Dinonaktifkan',
+                    html: `{!! session('warning_from_controller') !!}`,
+                    confirmButtonText: 'Mengerti'
+                });
+            @endif
         });
 
         // Fungsi SweetAlert untuk Konfirmasi Hapus
@@ -271,7 +280,7 @@
 
         function changeStatus(select) {
             window.location.href = select.value;
-}
+        }
     </script>
 
 @endsection

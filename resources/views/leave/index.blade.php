@@ -189,12 +189,12 @@
                                         {{ ucfirst($finalStatus ?? 'pending') }}
                                     </span>
                                 </td>
+
                                 <td>
-                                   @if ($leave->document_file)
+                                    @if ($leave->document_file)
                                         <a class="btn btn-sm p-1 px-2 text-white shadow-sm"
                                             style="background-color: #bc5e6b;"
-                                            href="{{ asset($leave->document_file) }}"
-                                            target="_blank">
+                                            href="{{ asset('public/' . $leave->document_file) }}" target="_blank">
                                             <i class="fa-solid fa-file-pdf"></i>
                                         </a>
                                     @else
@@ -205,10 +205,11 @@
                                 @if (in_array($userRole, ['hr', 'owner']))
                                     <td>
                                         @if ($leave->status === 'pending')
+                                            {{-- Approve / Reject --}}
                                             @if (
                                                 ($userRole === 'hr' && $leave->current_step == 1 && $leave->employee->user_id !== auth()->id()) ||
                                                     ($userRole === 'owner' && $leave->current_step == 2))
-                                                {{-- Tombol Approve --}}
+                                                {{-- Approve --}}
                                                 <form action="{{ route('leave-request.approve', $leave->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
@@ -218,31 +219,30 @@
                                                     </button>
                                                 </form>
 
-                                                {{-- Tombol Reject (Visual) --}}
-                                                 <form action="{{ route('leave-request.rejected', $leave->id) }}"
+                                                {{-- Reject --}}
+                                                <form action="{{ route('leave-request.rejected', $leave->id) }}"
                                                     method="POST" class="d-inline">
                                                     @csrf
-                                                <button type="submit" class="btn btn-warning btn-action shadow-sm ms-1"
-                                                    title="Tolak (Fungsi Belum Aktif)">
-                                                    <i class="fa-solid fa-xmark"></i>
-                                                </button>
-                                                 </form>
-                                                
-
-                                                {{-- Tombol Delete --}}
-                                                @if ($userRole == 'owner')
-                                                    <form action="{{ route('leave-request.destroy', $leave->id) }}"
-                                                        method="POST" id="deleteForm{{ $leave->id }}" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="button" onclick="confirmDelete({{ $leave->id }})"
-                                                            class="btn btn-danger btn-action btn-delete">
-                                                            <i class="fa-solid fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                @endif
+                                                    <button type="submit" class="btn btn-warning btn-action shadow-sm ms-1"
+                                                        title="Tolak">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </form>
                                             @else
                                                 <span class="text-muted small">-</span>
+                                            @endif
+
+                                            {{-- Delete hanya untuk Owner saat Pending --}}
+                                            @if ($userRole === 'owner' || in_array($leave->status, ['pending', 'rejected']))
+                                                <form action="{{ route('leave-request.destroy', $leave->id) }}"
+                                                    method="POST" id="deleteForm{{ $leave->id }}" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="button" onclick="confirmDelete({{ $leave->id }})"
+                                                        class="btn btn-danger btn-action btn-delete">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </form>
                                             @endif
                                         @else
                                             <i class="fa-solid fa-lock text-muted small"></i>

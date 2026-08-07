@@ -200,9 +200,10 @@ class DivisionController extends Controller
         $user = auth()->user();
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
-            $division = Division::find($id);
+        if ($roles == 'owner') {
+            $division = Division::findOrFail($id);
             $divisionName = $division->name;
+
             $division->update([
                 'status' => 'active',
             ]);
@@ -210,24 +211,35 @@ class DivisionController extends Controller
             abort(403);
         }
 
-        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Pending");
+        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Active");
     }
 
     public function inactive($id)
     {
-        $user = auth()->user();
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
-            $division = Division::find($id);
+        if ($roles == 'owner') {
+            $division = Division::findOrFail($id);
             $divisionName = $division->name;
+
+            $employeeCount = Employee::where('division_id', $division->id)->count();
+
+            if ($employeeCount > 0) {
+                return redirect()
+                    ->route('division.index')
+                    ->with(
+                        'warning_from_controller',
+                        "Divisi ini tidak dapat dinonaktifkan karena masih memiliki {$employeeCount} karyawan. Pindahkan atau hapus karyawan tersebut terlebih dahulu."
+                    );
+            }
+
             $division->update([
-                'status' => 'active',
+                'status' => 'inactive',
             ]);
         } else {
             abort(403);
         }
 
-        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Pending");
+        return redirect()->route('division.index')->with('success', "Tugas $divisionName telah diupdate menjadi Inactive");
     }
 }
