@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TaskAssignmentExport;
+use App\Imports\TaskScheduleImport;
 use App\Models\Employee;
 use App\Models\Schedule;
 use App\Models\Shift;
@@ -12,6 +14,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 use function Symfony\Component\Clock\now;
 
@@ -46,7 +49,7 @@ class TaskController extends Controller
         return view('tasks.index', compact('tasks'));
     }
 
-    public function show(Task $task)
+    public function show(Request $request, Task $task)
     {
 
         $user = auth()->user();
@@ -62,18 +65,83 @@ class TaskController extends Controller
             }
         }
 
-        $today = Carbon::now()->today();
-        $weekStart = Carbon::now()->startOfWeek();
-        $weekEnd = Carbon::now()->endOfWeek();
-        $employees = $task->employees()->with('division')->where('status', 'active')->get();
+        $validated = $request->validate([
+            'week_start' => 'nullable|date',
+        ]);
+
+        $weekStart = isset($validated['week_start'])
+            ? Carbon::parse($validated['week_start'])->startOfWeek()
+            : Carbon::now()->startOfWeek();
+        $weekEnd = $weekStart->copy()->endOfWeek();
+        $weekDates = collect();
+
+        for ($date = $weekStart->copy(); $date->lte($weekEnd); $date->addDay()) {
+            $weekDates->push($date->copy());
+        }
+
+        $employees = $task->employees()->with(['division', 'position'])->where('status', 'active')->get();
         $locations = Tasklocation::where('task_id', $task->id)->first();
         $schedules = Schedule::where('task_id', $task->id)
-            ->where('date', [$today])
+            ->whereBetween('date', [$weekStart->toDateString(), $weekEnd->toDateString()])
             ->with(['employee', 'shift'])
             ->get()
-            ->groupBy('shift_id');
+            ->groupBy(fn ($schedule) => $schedule->employee_id.'_'.Carbon::parse($schedule->date)->toDateString());
+        $shifts = $task->Shift()->orderBy('start_time')->get();
 
-        return view('tasks.show', compact('task', 'employees', 'schedules', 'locations'));
+        return view('tasks.show', compact('task', 'employees', 'schedules', 'locations', 'shifts', 'weekStart', 'weekEnd', 'weekDates'));
+    }
+
+    public function export(Request $request, Task $task)
+    {
+        $roles = auth()->user()->role->name;
+
+        if (! in_array($roles, ['hr', 'owner'])) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'week_start' => 'nullable|date',
+        ]);
+
+        $weekStart = isset($validated['week_start'])
+            ? Carbon::parse($validated['week_start'])->startOfWeek()
+            : Carbon::now()->startOfWeek();
+
+        $task->load([
+            'employees.division',
+            'employees.position',
+            'location',
+            'Shift',
+        ]);
+
+        $safeTaskName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $task->name);
+        $fileName = 'Template_Jadwal_'.$safeTaskName.'_'.$weekStart->format('d-m-Y').'.xlsx';
+
+        return Excel::download(new TaskAssignmentExport($task, $weekStart), $fileName);
+    }
+
+    public function importSchedule(Request $request, Task $task)
+    {
+        $roles = auth()->user()->role->name;
+
+        if (! in_array($roles, ['hr', 'owner'])) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'schedule_file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        $task->load([
+            'employees',
+            'Shift',
+        ]);
+
+        Excel::import(new TaskScheduleImport($task), $validated['schedule_file']);
+
+        return redirect()
+            ->route('task.show', $task->id)
+            ->with('success', 'Jadwal kerja berhasil di-import dari Excel');
     }
 
     public function create()

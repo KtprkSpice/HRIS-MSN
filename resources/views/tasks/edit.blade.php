@@ -117,7 +117,10 @@
                     <hr class="opacity-50">
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h6 class="mb-0">Jadwal Kerja</h6>
+                        <div>
+                            <h6 class="mb-0">Shift Tugas</h6>
+                            <small class="text-muted">Shift ini dipakai sebagai pilihan saat export/import jadwal mingguan.</small>
+                        </div>
 
                         <button type="button" class="btn btn-sm btn-add-position" id="add-position">
                             <i class="fa fa-plus"></i> Tambah
@@ -128,6 +131,7 @@
 
                         @foreach ($task->Shift as $shifts)
                             <div class="row g-4 position-item align-items-end">
+                                <input type="hidden" name="shift_ids[]" value="{{ $shifts->id }}">
 
                                 <div class="col-sm-2">
                                     <label class="form-label">

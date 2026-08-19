@@ -35,6 +35,8 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
 
     // Task
     Route::resource('/task', TaskController::class);
+    Route::get('/task/{task}/export', [TaskController::class, 'export'])->name('task.export');
+    Route::post('/task/{task}/import-schedule', [TaskController::class, 'importSchedule'])->name('task.importSchedule');
     Route::get('/task/{id}/done', [TaskController::class, 'done'])->name('task.done');
     Route::get('/task/{id}/pending', [TaskController::class, 'pending'])->name('task.pending');
     Route::get('/task/{id}/onduty', [TaskController::class, 'onduty'])->name('task.onduty');

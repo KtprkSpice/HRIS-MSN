@@ -260,6 +260,10 @@
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
                                         @if (in_array($userRole, ['hr', 'owner']))
+                                            <a href="{{ route('task.export', $task->id) }}" class="btn-action btn-view"
+                                                title="Export Excel Penugasan">
+                                                <i class="fa-solid fa-file-excel"></i>
+                                            </a>
                                             <a href="{{ route('task.edit', $task->id) }}" class="btn-action btn-edit">
                                                 <i class="fa-solid fa-pen"></i>
                                             </a>
