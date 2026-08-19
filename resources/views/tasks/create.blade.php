@@ -127,15 +127,15 @@
 
                         <div class="row g-4 position-item align-items-end">
 
-                            <div class="col-md-4">
+                            <div class="col-sm-2">
                                 <label class="form-label">
                                     <i class="fa-solid fa-briefcase me-2 accent-icon"></i>
                                     Nama Shift
                                 </label>
-                                <input type="text" class="form-control" name="position[]" required placeholder="Pagi">
+                                <input type="text" class="form-control" name="shift_name[]" required placeholder="Pagi">
                             </div>
 
-                            <div class="col-md-4">
+                            <div class="col-sm-2">
                                 <label class="form-label">
                                     <i class="fa-solid fa-money-bill me-2 accent-icon"></i>
                                     Jam Masuk
@@ -144,11 +144,11 @@
                                 <div class="input-group shadow-sm">
                                     <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
 
-                                    <input type="text" class="form-control money-input" name="base_salary[]" required>
+                                    <input type="time" class="form-control money-input" name="shift_start[]" required>
                                 </div>
                             </div>
 
-                            <div class="col-md-3">
+                            <div class="col-sm-2">
                                 <label class="form-label">
                                     <i class="fa-solid fa-clock me-2 accent-icon"></i>
                                     Jam Keluar
@@ -157,8 +157,22 @@
                                 <div class="input-group shadow-sm">
                                     <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
 
-                                    <input type="text" class="form-control money-input" name="deduction_per_minute[]"
-                                        required>
+                                    <input type="time" class="form-control money-input" name="shift_end[]" required>
+                                </div>
+                            </div>
+
+                            {{-- Toleransi telat --}}
+                            <div class="col-sm-2">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-clock me-2 accent-icon"></i>
+                                    Toleransi Telat (Menit)
+                                </label>
+
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                    <input type="number" min="0" class="form-control money-input"
+                                        name="shift_late_tolerance[]" required>
                                 </div>
                             </div>
 
@@ -174,7 +188,7 @@
 
                     <hr class="opacity-50">
 
-                    <div class="d-flex justify-content-end gap-2">
+                    {{-- <div class="d-flex justify-content-end gap-2">
                         <a href="{{ url()->previous() }}" class="btn btn-back shadow-sm">
                             <i class="fa-solid fa-arrow-left me-2"></i>
                             Batal
@@ -184,7 +198,7 @@
                             <i class="fa-solid fa-save me-2"></i>
                             Simpan Data
                         </button>
-                    </div>
+                    </div> --}}
 
                 </div>
             </div>
@@ -515,15 +529,15 @@
                 Swal.fire({
                     icon: 'warning',
                     title: 'Tidak Bisa Dihapus',
-                    text: 'Minimal harus ada 1 data posisi.',
+                    text: 'Minimal harus ada 1 data Shift.',
                     confirmButtonColor: '#bc5e6b'
                 });
                 return;
             }
 
             Swal.fire({
-                title: 'Hapus Posisi?',
-                text: 'Data posisi ini akan dihapus dari form.',
+                title: 'Hapus Shift?',
+                text: 'Data Shift ini akan dihapus dari form.',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
@@ -539,7 +553,7 @@
                     Swal.fire({
                         icon: 'success',
                         title: 'Berhasil',
-                        text: 'Data posisi berhasil dihapus.',
+                        text: 'Data Shift berhasil dihapus.',
                         timer: 1500,
                         showConfirmButton: false
                     });

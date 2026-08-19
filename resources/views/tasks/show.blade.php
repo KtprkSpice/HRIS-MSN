@@ -146,10 +146,9 @@
         <div class="row">
             <div class="col-12">
 
-                <div class="card border-0 shadow-sm rounded-4">
-                    <div class="card-body p-5 p-md-4">
+                <div class="card shadow-sm border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
 
-                        {{-- Header Section --}}
                         <div class="d-flex align-items-center gap-3 mb-5 pb-3 border-bottom">
                             <div class="rounded-3 d-flex align-items-center justify-content-center"
                                 style="width:48px;height:48px;
@@ -163,23 +162,22 @@
                             </div>
                         </div>
 
-                        {{-- Form Content --}}
                         <div class="row g-4">
 
                             <div class="col-12 col-md-6 col-lg-4">
-                                <label class="form-label fw-semibold">Nama Tugas</label>
-                                <input type="text" readonly
-                                    class="form-control modern-input @error('name') is-invalid @enderror"
-                                    value="{{ old('name', $task->name) }}">
+                                <label for="name" class="form-label fw-semibold">Nama Tugas</label>
+                                <input type="text" class="form-control modern-input @error('name') is-invalid @enderror"
+                                    id="name" name="name" readonly value="{{ old('name', $task->name) }}">
                                 @error('name')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="col-12 col-md-6 col-lg-4">
-                                <label class="form-label fw-semibold">Tanggal Mulai</label>
-                                <input type="date" readonly
+                                <label for="start_time" class="form-label fw-semibold">Tanggal Mulai</label>
+                                <input type="date"
                                     class="form-control modern-input @error('start_time') is-invalid @enderror"
+                                    id="start_time" name="start_time" readonly
                                     value="{{ old('start_time', $task->start_time) }}">
                                 @error('start_time')
                                     <span class="invalid-feedback">{{ $message }}</span>
@@ -187,18 +185,21 @@
                             </div>
 
                             <div class="col-12 col-md-6 col-lg-4">
-                                <label class="form-label fw-semibold">Tanggal Selesai</label>
-                                <input type="date" readonly
-                                    class="form-control modern-input @error('end_time') is-invalid @enderror"
-                                    value="{{ old('end_time', $task->end_time) }}">
+                                <label for="end_time" class="form-label fw-semibold">Tanggal Selesai</label>
+                                <input type="date"
+                                    class="form-control modern-input @error('end_time') is-invalid @enderror" id="end_time"
+                                    name="end_time" readonly value="{{ old('end_time', $task->end_time) }}">
                                 @error('end_time')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="col-12">
-                                <label class="form-label fw-semibold">Deskripsi</label>
-                                <textarea readonly rows="4" class="form-control modern-input @error('description') is-invalid @enderror">{{ old('description', $task->description) }}</textarea>
+                                <label for="description" class="form-label fw-semibold">Deskripsi</label>
+                                <input type="text"
+                                    class="form-control modern-input @error('description') is-invalid @enderror"
+                                    id="description" name="description" readonly
+                                    value="{{ old('description', $task->description) }}">
                                 @error('description')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
@@ -206,6 +207,83 @@
 
                         </div>
 
+                        <div class="col-12 mt-4">
+
+                            <hr class="opacity-50">
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">Jadwal Kerja</h6>
+
+                            </div>
+
+                            <div id="position-wrapper">
+
+                                @foreach ($task->Shift as $shifts)
+                                    <div class="row g-4 position-item align-items-end">
+
+                                        <div class="col-sm-2">
+                                            <label class="form-label">
+                                                <i class="fa-solid fa-briefcase me-2 accent-icon"></i>
+                                                Nama Shift
+                                            </label>
+                                            <input type="text" class="form-control" name="shift_name[]" readonly
+                                                placeholder="Pagi" value="{{ $shifts->name }}">
+                                        </div>
+
+                                        <div class="col-sm-2">
+                                            <label class="form-label">
+                                                <i class="fa-solid fa-money-bill me-2 accent-icon"></i>
+                                                Jam Masuk
+                                            </label>
+
+                                            <div class="input-group shadow-sm">
+                                                <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                                <input type="time" class="form-control money-input" name="shift_start[]"
+                                                    readonly value="{{ $shifts->start_time }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-sm-2">
+                                            <label class="form-label">
+                                                <i class="fa-solid fa-clock me-2 accent-icon"></i>
+                                                Jam Keluar
+                                            </label>
+
+                                            <div class="input-group shadow-sm">
+                                                <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                                <input type="time" class="form-control money-input" name="shift_end[]"
+                                                    readonly value="{{ $shifts->end_time }}">
+                                            </div>
+                                        </div>
+
+                                        {{-- Toleransi telat --}}
+                                        <div class="col-sm-2">
+                                            <label class="form-label">
+                                                <i class="fa-solid fa-clock me-2 accent-icon"></i>
+                                                Toleransi Telat (Menit)
+                                            </label>
+
+                                            <div class="input-group shadow-sm">
+                                                <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                                <input type="number" min="0" class="form-control money-input"
+                                                    name="shift_late_tolerance[]" readonly
+                                                    value="{{ $shifts->late_tolerance_minutes }}">
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                @endforeach
+
+                            </div>
+
+                            <hr class="opacity-50">
+
+
+                        </div>
                     </div>
                 </div>
 

@@ -11,6 +11,7 @@ class Shift extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'task_id',
         'name',
         'start_time',
         'end_time',

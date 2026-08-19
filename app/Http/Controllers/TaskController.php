@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Employee;
 use App\Models\Schedule;
+use App\Models\Shift;
 use App\Models\Task;
 use App\Models\Tasklocation;
+use App\Models\TaskShift;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -105,6 +107,23 @@ class TaskController extends Controller
                 'longitude' => 'required|numeric',
                 'radius' => 'required|integer|min:10',
                 'selected_employee' => 'array',
+
+                // Shift Create
+                // Shift Name
+                'shift_name' => 'required|array|min:1',
+                'shift_name.*' => 'required|string|max:100',
+
+                // Shift Start
+                'shift_start' => 'required|array|min:1',
+                'shift_start.*' => 'required|date_format:H:i',
+
+                // Shift End
+                'shift_end' => 'required|array|min:1',
+                'shift_end.*' => 'required|date_format:H:i',
+
+                // Shift Late
+                'shift_late_tolerance' => 'required|array|min:1',
+                'shift_late_tolerance.*' => 'required|integer|min:0',
             ]);
 
             DB::transaction(function () use ($request) {
@@ -114,6 +133,16 @@ class TaskController extends Controller
                     'description' => $request->description,
                     'status' => 'pending',
                 ]);
+
+                // Create Shift
+                foreach ($request->shift_name as $index => $name) {
+                    $task->Shift()->create([
+                        'name' => $request->shift_name[$index],
+                        'start_time' => $request->shift_start[$index],
+                        'end_time' => $request->shift_end[$index],
+                        'late_tolerance_minutes' => $request->shift_late_tolerance[$index],
+                    ]);
+                }
 
                 Tasklocation::create(['task_id' => $task->id,
                     'name' => 'Lokasi Utama',
@@ -168,6 +197,26 @@ class TaskController extends Controller
                 'longitude' => 'required|numeric',
                 'radius' => 'required|integer|min:10',
                 'selected_employee' => 'array',
+
+                // Shift Create
+                // Shift ID
+                'shift_ids' => 'nullable|array',
+                'shift_ids.*' => 'nullable|integer',
+                // Shift Name
+                'shift_name' => 'required|array|min:1',
+                'shift_name.*' => 'required|string|max:100',
+
+                // Shift Start
+                'shift_start' => 'required|array|min:1',
+                'shift_start.*' => 'required|date_format:H:i',
+
+                // Shift End
+                'shift_end' => 'required|array|min:1',
+                'shift_end.*' => 'required|date_format:H:i',
+
+                // Shift Late
+                'shift_late_tolerance' => 'required|array|min:1',
+                'shift_late_tolerance.*' => 'required|integer|min:0',
             ]);
 
             DB::transaction(function () use ($request, $task) {
@@ -183,8 +232,65 @@ class TaskController extends Controller
                 ]);
 
                 /* =======================
-                 * 2. UPDATE / CREATE LOCATION
+                 * 2. UPDATE / CREATE SHIFT
                  * ======================= */
+
+                $shiftIds = $request->shift_ids ?? [];
+                $processedShiftIds = [];
+
+                foreach ($request->shift_name as $index => $shiftName) {
+
+                    $shiftId = $shiftIds[$index] ?? null;
+
+                    $shift = Shift::updateOrCreate(
+                        [
+                            'id' => $shiftId,
+                            'task_id' => $task->id,
+                        ],
+                        [
+                            'name' => $shiftName,
+                            'start_time' => $request->shift_start[$index],
+                            'end_time' => $request->shift_end[$index],
+                            'late_tolerance_minutes' => $request->shift_late_tolerance[$index],
+                        ]
+                    );
+
+                    $processedShiftIds[] = $shift->id;
+                }
+
+                /* =======================
+                 * 3. CARI SHIFT YANG DIHAPUS
+                 * ======================= */
+
+                $shiftsToDelete = $task->Shift()
+                    ->whereNotIn('id', $processedShiftIds)
+                    ->get();
+
+                /* =======================
+                 * 4. CEK SEBELUM DELETE
+                 * ======================= */
+
+                foreach ($shiftsToDelete as $shiftToDelete) {
+
+                    // GANTI dengan tabel yang benar-benar
+                    // menggunakan TaskShift tersebut.
+                    $isUsed = DB::table('presences')
+                        ->where('shift_id', $shiftToDelete->id)
+                        ->exists();
+
+                    if ($isUsed) {
+                        throw new \Exception(
+                            "Jadwal '{$shiftToDelete->name}' tidak dapat dihapus karena sudah digunakan."
+                        );
+                    }
+
+                    $shiftToDelete->delete();
+                }
+
+                /* =======================
+                 * 5. UPDATE LOCATION
+                 * ======================= */
+
                 Tasklocation::updateOrCreate(
                     [
                         'task_id' => $task->id,
@@ -198,46 +304,57 @@ class TaskController extends Controller
                 );
 
                 /* =======================
-                 * 3. SYNC EMPLOYEES (SOFT DELETE AWARE)
+                 * 6. SYNC EMPLOYEES
                  * ======================= */
 
                 $selectedEmployeeIds = $request->selected_employee ?? [];
 
-                // employee AKTIF sekarang
                 $activeEmployeeIds = $task->employees()
                     ->pluck('employees.id')
                     ->toArray();
 
-                // employee SOFT DELETED
                 $trashedEmployeeIds = $task->employeesWithTrashed()
                     ->wherePivotNotNull('deleted_at')
                     ->pluck('employees.id')
                     ->toArray();
 
-                /* -------- REMOVE (soft delete) -------- */
-                $toDetach = array_diff($activeEmployeeIds, $selectedEmployeeIds);
+                // REMOVE
+                $toDetach = array_diff(
+                    $activeEmployeeIds,
+                    $selectedEmployeeIds
+                );
 
                 if (! empty($toDetach)) {
                     DB::table('employees_tasks')
                         ->where('task_id', $task->id)
                         ->whereIn('employee_id', $toDetach)
-                        ->update(['deleted_at' => now()]);
+                        ->update([
+                            'deleted_at' => now(),
+                        ]);
                 }
 
-                /* -------- RESTORE -------- */
-                $toRestore = array_intersect($trashedEmployeeIds, $selectedEmployeeIds);
+                // RESTORE
+                $toRestore = array_intersect(
+                    $trashedEmployeeIds,
+                    $selectedEmployeeIds
+                );
 
                 foreach ($toRestore as $employeeId) {
                     DB::table('employees_tasks')
                         ->where('task_id', $task->id)
                         ->where('employee_id', $employeeId)
-                        ->update(['deleted_at' => null]);
+                        ->update([
+                            'deleted_at' => null,
+                        ]);
                 }
 
-                /* -------- ATTACH BARU -------- */
+                // ATTACH BARU
                 $toAttach = array_diff(
                     $selectedEmployeeIds,
-                    array_merge($activeEmployeeIds, $trashedEmployeeIds)
+                    array_merge(
+                        $activeEmployeeIds,
+                        $trashedEmployeeIds
+                    )
                 );
 
                 foreach ($toAttach as $employeeId) {

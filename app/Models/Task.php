@@ -67,4 +67,15 @@ class Task extends Model
     {
         return $this->hasMany(TaskShiftRule::class);
     }
+
+    public function Shift()
+    {
+        return $this->hasMany(Shift::class);
+    }
+
+    // public function TaskShift()
+    // {
+    //     return $this->hasMany(TaskShift::class);
+    // }
+
 }
