@@ -110,7 +110,7 @@
         </div>
     @endif
 
-    <form class="row g-4" action="{{ route('task.update', $task->id) }}" method="post">
+    <form id="taskForm" class="row g-4" action="{{ route('task.update', $task->id) }}" method="post">
         @method('PUT')
         @csrf
 
@@ -249,7 +249,7 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        const form = document.querySelector('form');
+        const form = document.getElementById('taskForm');
         const selectAll = document.getElementById('selectAll');
         const allEmployeeIds = @json($employees->pluck('id')->map(fn($id) => (string) $id)->values());
         const selectedEmployeeIds = new Set(@json(collect(old('selected_employee', $task->employees->pluck('id')->toArray()))->map(fn($id) => (string) $id)->values()));
@@ -379,7 +379,7 @@
 
         form.addEventListener('submit', function() {
             form.querySelectorAll('.selected-employee-hidden').forEach(input => input.remove());
-            document.querySelectorAll('input[name="selected_employee[]"]').forEach(input => {
+            form.querySelectorAll('input[name="selected_employee[]"]').forEach(input => {
                 input.disabled = true;
             });
 

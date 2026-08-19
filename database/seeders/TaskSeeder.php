@@ -14,6 +14,10 @@ class TaskSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $taskName = [
+            'Menajaga ',
+        ];
         $faker = faker::create();
         $task_start = $faker->dateTimeBetween('-20 days', '-5 days')->format('Y-m-d');
         $task_end = $faker->dateTimeBetween('-10 days', '-1 days')->format('Y-m-d');

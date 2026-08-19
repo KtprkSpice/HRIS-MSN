@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\DB;
 
 class SchedulesController extends Controller
 {
+    private function scheduleIsPast(Schedule $schedule): bool
+    {
+        return Carbon::parse($schedule->date)->startOfDay()->lt(now()->startOfDay());
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -29,7 +34,6 @@ class SchedulesController extends Controller
                 ->get();
         } else {
             $schedules = Schedule::all()->except('created_at', 'updated_at', 'deleted_at');
-
         }
 
         return view('Schedules.index', compact('schedules'));
@@ -95,6 +99,8 @@ class SchedulesController extends Controller
 
         if ($role === 'employee') {
             abort(403);
+        } elseif ($this->scheduleIsPast($schedule)) {
+            abort(403, 'Jadwal yang tanggalnya sudah lewat tidak bisa diedit.');
         } else {
             $employees = Employee::select('fullname', 'id')->orderBy('fullname')->get();
             $shifts = Shift::select('id', 'name')->orderBy('id')->get();
@@ -114,6 +120,8 @@ class SchedulesController extends Controller
 
         if ($role === 'employee') {
             abort(403);
+        } elseif ($this->scheduleIsPast($schedule)) {
+            abort(403, 'Jadwal yang tanggalnya sudah lewat tidak bisa diupdate.');
         } else {
             $validated = $request->validate([
                 'employee_id' => 'required|exists:employees,id',
@@ -145,6 +153,8 @@ class SchedulesController extends Controller
 
         if ($role === 'employee') {
             abort(403);
+        } elseif ($this->scheduleIsPast($schedule)) {
+            abort(403, 'Jadwal yang tanggalnya sudah lewat tidak bisa dihapus.');
         } else {
             $schedule->delete();
         }
@@ -226,7 +236,7 @@ class SchedulesController extends Controller
                             ->pluck('employee_id');
 
                         $leaveEmployeeIds = $employees
-                            ->filter(fn ($employee) => AttendancePolicy::hasApprovedLeaveOnDate($employee->id, $date))
+                            ->filter(fn($employee) => AttendancePolicy::hasApprovedLeaveOnDate($employee->id, $date))
                             ->pluck('id');
 
                         // Jadwal yang sudah ada tidak dibuat ulang. Hanya slot yang belum ada

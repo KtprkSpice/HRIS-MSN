@@ -11,12 +11,13 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        $userId = auth()->user();
         $user = auth()->user()->role->name;
         $roleId = auth()->user()->role_id;
         $startMonth = now()->startOfMonth();
         $endMonth = now()->endOfMonth();
         $workDaysInCurrentMonth = collect(CarbonPeriod::create($startMonth, $endMonth))
-            ->filter(fn ($date) => $date->isWeekday())
+            ->filter(fn($date) => $date->isWeekday())
             ->count();
 
         $employees = Employee::where('status', 'active')
@@ -28,8 +29,8 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($employee) use ($workDaysInCurrentMonth) {
                 $attendancePercentage = $workDaysInCurrentMonth > 0
-                ? (($workDaysInCurrentMonth - $employee->absenceCount) / $workDaysInCurrentMonth) * 100
-                : 0;
+                    ? (($workDaysInCurrentMonth - $employee->absenceCount) / $workDaysInCurrentMonth) * 100
+                    : 0;
                 $employee->attendancePercentage = max(0, round($attendancePercentage, 1));
 
                 return $employee;
@@ -59,10 +60,8 @@ class DashboardController extends Controller
 
         $totalEmployee = $maleEmployee + $femaleEmployee;
 
-        $leaveCounts = LeaveRequest::where('status', 'pending')->whereHas('approvals', function ($q) use ($roleId) {
-            $q->whereColumn('approval_order', 'leave_requests.current_step')
-                ->where('role_id', $roleId)
-                ->whereNull('approved_at');
+        $leaveCounts = LeaveRequest::where('status', 'pending')->whereHas('employee', function ($q) use ($userId) {
+            $q->where('id', $userId->employee->id);
         })->count();
 
         $totalDivisions = Division::where('status', 'active')->count();

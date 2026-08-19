@@ -133,6 +133,35 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <label for="limit_type" class="form-label fw-bold text-secondary">
+                                <i class="fa-solid fa-calendar me-2" style="color: #bc5e6b;"></i> Periode Limit Cuti
+                            </label>
+                            <select class="form-select form-control @error('limit_type') is-invalid @enderror" name="limit_type" id="limit_type" required>
+                                <option value="yearly" {{ old('limit_type', $leaveType->limit_type) === 'yearly' ? 'selected' : '' }}>Tahunan</option>
+                                <option value="monthly" {{ old('limit_type', $leaveType->limit_type) === 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                            </select>
+                            @error('limit_type')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label for="limit_days" class="form-label fw-bold text-secondary">
+                                <i class="fa-solid fa-calendar-days me-2" style="color: #bc5e6b;"></i> Limit Hari Cuti
+                            </label>
+                            <div class="input-group shadow-sm">
+                                <input type="number" class="form-control @error('limit_days') is-invalid @enderror" name="limit_days"
+                                    id="limit_days" value="{{ old('limit_days', $leaveType->limit_days) }}" min="1" step="1" required>
+                                <span class="input-group-text bg-white text-muted small">Hari</span>
+                            </div>
+                            @error('limit_days')
+                                <span class="invalid-feedback d-block">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+
                     <div class="mb-4">
                         <label for="description" class="form-label fw-bold text-secondary">
                             <i class="fa-solid fa-align-left me-2" style="color: #bc5e6b;"></i> Deskripsi / Keterangan

@@ -11,9 +11,49 @@ use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class LeaveRequestController extends Controller
 {
+    private function leaveStatisticsPayload($employees, ?LeaveRequest $excludeLeaveRequest = null): array
+    {
+        $employeeIds = $employees->pluck('id');
+
+        $approvedLeaves = LeaveRequest::select('id', 'employee_id', 'leave_id', 'start_date', 'end_date')
+            ->whereIn('employee_id', $employeeIds)
+            ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
+            ->when($excludeLeaveRequest, function ($query) use ($excludeLeaveRequest) {
+                $query->where('id', '!=', $excludeLeaveRequest->id);
+            })
+            ->get()
+            ->map(function ($leave) {
+                $start = Carbon::parse($leave->start_date);
+                $end = Carbon::parse($leave->end_date);
+
+                return [
+                    'employee_id' => (string) $leave->employee_id,
+                    'leave_id' => (string) $leave->leave_id,
+                    'year' => $start->year,
+                    'month' => $start->month,
+                    'days' => $start->diffInDays($end) + 1,
+                ];
+            })
+            ->values();
+
+        return [
+            'types' => LeaveType::all()
+                ->mapWithKeys(function ($type) {
+                    return [
+                        (string) $type->id => [
+                            'limit_type' => $type->limit_type,
+                            'limit_days' => $type->limit_days,
+                        ],
+                    ];
+                }),
+            'approved_leaves' => $approvedLeaves,
+        ];
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -45,7 +85,10 @@ class LeaveRequestController extends Controller
             $employees = Employee::all();
         }
 
-        return view('leave.create', compact('employees', 'types'));
+        $leaveStats = $this->leaveStatisticsPayload($employees);
+        $defaultEmployeeId = $roles === 'employee' ? optional($employees->first())->id : null;
+
+        return view('leave.create', compact('employees', 'types', 'leaveStats', 'defaultEmployeeId'));
     }
 
     public function store(Request $request)
@@ -92,8 +135,9 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($leaveType->max_days && $daysRequested > $leaveType->max_days) {
-            return back()->with('error',
-                'Maksimal pengajuan '.$leaveType->max_days.' hari.'
+            return back()->with(
+                'error',
+                'Maksimal pengajuan ' . $leaveType->max_days . ' hari.'
             );
         }
 
@@ -124,8 +168,9 @@ class LeaveRequestController extends Controller
 
                 $remaining = $leaveType->limit_days - $usedDays;
 
-                return back()->with('error',
-                    'Sisa cuti hanya '.$remaining.' hari.'
+                return back()->with(
+                    'error',
+                    'Sisa cuti hanya ' . $remaining . ' hari.'
                 );
             }
         }
@@ -142,17 +187,17 @@ class LeaveRequestController extends Controller
         ) {
 
             if ($request->file('document_file')) {
-
                 $file = $request->file('document_file');
-                $filename = time().'_'.$file->getClientOriginalName();
+                $directory = public_path('uploads/leave-documents');
 
-                $file->move(
-                    storage_path('app/public/surat_dokter'),
-                    $filename
-                );
+                if (! is_dir($directory)) {
+                    mkdir($directory, 0755, true);
+                }
 
-                $validated['document_file'] =
-                    'surat_dokter/'.$filename;
+                $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+                $file->move($directory, $filename);
+
+                $validated['document_file'] = 'uploads/leave-documents/' . $filename;
             }
 
             $leave = LeaveRequest::create([
@@ -196,7 +241,9 @@ class LeaveRequestController extends Controller
             $types = LeaveType::all();
         }
 
-        return view('leave.edit', compact('employees', 'leaveRequest', 'types'));
+        $leaveStats = $this->leaveStatisticsPayload($employees, $leaveRequest);
+
+        return view('leave.edit', compact('employees', 'leaveRequest', 'types', 'leaveStats'));
     }
 
     public function update(Request $request, LeaveRequest $leaveRequest)
@@ -217,8 +264,8 @@ class LeaveRequestController extends Controller
 
         $leaveType = LeaveType::findOrFail($request->leave_id);
 
-        $start = Carbon::parse($request->start_date);
-        $end = Carbon::parse($request->end_date);
+        $start = \Carbon\Carbon::parse($request->start_date);
+        $end = \Carbon\Carbon::parse($request->end_date);
 
         $daysRequested = $start->diffInDays($end) + 1;
 
@@ -236,8 +283,9 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($leaveType->max_days && $daysRequested > $leaveType->max_days) {
-            return back()->with('error',
-                'Maksimal pengajuan '.$leaveType->max_days.' hari.'
+            return back()->with(
+                'error',
+                'Maksimal pengajuan ' . $leaveType->max_days . ' hari.'
             );
         }
 
@@ -269,8 +317,9 @@ class LeaveRequestController extends Controller
 
                 $remaining = $leaveType->limit_days - $usedDays;
 
-                return back()->with('error',
-                    'Sisa cuti hanya '.$remaining.' hari.'
+                return back()->with(
+                    'error',
+                    'Sisa cuti hanya ' . $remaining . ' hari.'
                 );
             }
         }
@@ -280,20 +329,25 @@ class LeaveRequestController extends Controller
         // ===============================
 
         if ($request->file('document_file')) {
+            $oldDocument = $leaveRequest->document_file
+                ? public_path($leaveRequest->document_file)
+                : null;
 
-            if (
-                $leaveRequest->document_file &&
-                file_exists(storage_path('app/public/'.$leaveRequest->document_file))
-            ) {
-                unlink(storage_path('app/public/'.$leaveRequest->document_file));
+            if ($oldDocument && file_exists($oldDocument)) {
+                unlink($oldDocument);
             }
 
             $file = $request->file('document_file');
-            $filename = time().'_'.$file->getClientOriginalName();
+            $directory = public_path('uploads/leave-documents');
 
-            $file->move(storage_path('app/public/surat_dokter'), $filename);
+            if (! is_dir($directory)) {
+                mkdir($directory, 0755, true);
+            }
 
-            $validated['document_file'] = 'surat_dokter/'.$filename;
+            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $file->move($directory, $filename);
+
+            $validated['document_file'] = 'uploads/leave-documents/' . $filename;
         }
 
         // ===============================
@@ -315,10 +369,16 @@ class LeaveRequestController extends Controller
             abort(403, 'Anda tidak memiliki akses');
         }
 
+        // Pending hanya boleh dihapus saat step owner
         if (
-            in_array($leaveRequest->status, ['pending', 'rejected']) &&
+            $leaveRequest->status === 'pending' &&
             $leaveRequest->current_step != 2
         ) {
+            abort(403, 'Data tidak dapat dihapus.');
+        }
+
+        // Selain pending dan rejected tidak boleh dihapus
+        if (!in_array($leaveRequest->status, ['pending', 'rejected'])) {
             abort(403, 'Data tidak dapat dihapus.');
         }
 
@@ -328,6 +388,8 @@ class LeaveRequestController extends Controller
             ->route('leave-request.index')
             ->with('success', 'Data telah dihapus.');
     }
+
+
 
     // Approved
     public function approve($id)
@@ -380,7 +442,6 @@ class LeaveRequestController extends Controller
                 $leave->update([
                     'current_step' => $nextStep->approval_order,
                 ]);
-
             } else {
 
                 // Tidak ada step lagi → FINAL APPROVED
@@ -409,36 +470,39 @@ class LeaveRequestController extends Controller
 
         DB::transaction(function () use ($leave, $user, $role) {
 
-            // 1. Cari approval step sesuai current_step aktif
+            // 🔹 Cari approval step sesuai current_step
             $approval = leaveApproval::where('leave_request_id', $leave->id)
                 ->where('approval_order', $leave->current_step)
                 ->first();
 
-            // Safety check jika approval step tidak ditemukan
-            if (! $approval) {
-                abort(400, 'Langkah persetujuan tidak ditemukan.');
-            }
+            // dd(
+            //     'Current Step: '.$leave->current_step,
+            //     'Approval Role ID: '.$approval?->role_id,
+            //     'Approval Role Name: '.$approval?->role?->name,
+            //     'Login Role ID: '.auth()->user()->role_id,
+            //     'Login Role Name: '.auth()->user()->role->name
+            // );
 
-            // 2. Pastikan role pengguna sesuai dengan giliran approval saat ini
+            // 🔹 Pastikan role sesuai
             if ($approval->role->name !== $role) {
-                abort(403, 'Bukan giliran Anda untuk memproses pengajuan ini.');
+                abort(403, 'Bukan giliran Anda untuk approve.');
             }
 
-            // 3. Update data pada detail step approval
+            // 🔹 Update approval step
             $approval->update([
                 'status' => 'rejected',
                 'approved_by' => $user->id,
                 'approved_at' => now(),
             ]);
 
-            // 4. LANGSUNG UPDATE STATUS UTAMA LEAVE REQUEST MENJADI REJECTED
+            // Tidak ada step lagi → FINAL APPROVED
             $leave->update([
                 'status' => 'rejected',
-                'rejected_at' => now(), // Tambahkan ini jika tabel leave_requests memiliki kolom rejected_at
+                'final_approved_at' => now(),
             ]);
         });
 
         return redirect()->route('leave-request.index')
-            ->with('success', 'Pengajuan cuti telah ditolak.');
+            ->with('success', 'Cuti telah direject.');
     }
 }

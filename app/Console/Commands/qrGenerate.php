@@ -35,13 +35,12 @@ class qrGenerate extends Command
         $workDate = today();
 
         $tasks = Task::whereIn('status', ['on duty', 'pending'])->get();
-
         foreach ($tasks as $task) {
             foreach (['check_in', 'check_out'] as $type) {
 
                 $exists = QrCode::where('task_id', $task->id)
                     ->whereDate('date', $workDate)
-                    ->where('type', $type)
+                    ->where('type', 'on duty')
                     ->exists();
 
                 if ($exists) {

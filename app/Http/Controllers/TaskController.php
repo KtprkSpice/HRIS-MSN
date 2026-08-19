@@ -63,7 +63,7 @@ class TaskController extends Controller
         $today = Carbon::now()->today();
         $weekStart = Carbon::now()->startOfWeek();
         $weekEnd = Carbon::now()->endOfWeek();
-        $employees = $task->employees()->with('division')->get();
+        $employees = $task->employees()->with('division')->where('status', 'active')->get();
         $locations = Tasklocation::where('task_id', $task->id)->first();
         $schedules = Schedule::where('task_id', $task->id)
             ->where('date', [$today])

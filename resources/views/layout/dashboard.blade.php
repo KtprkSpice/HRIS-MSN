@@ -738,9 +738,6 @@
                         class="{{ request()->is('leave-request*') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
                         Pengajuan Cuti</a>
                 </li>
-                <li><a href="{{ route('leave-type.index') }}"
-                        class="{{ request()->is('leave-type') ? 'active' : '' }}"><i class="fa-solid fa-plane"></i>
-                        Jenis Cuti</a></li>
                 <li><a href="{{ route('presence.index') }}" class="{{ request()->is('presence') ? 'active' : '' }}"><i
                             class="fa-solid fa-user-check"></i> Kehadiran</a></li>
                 <li>

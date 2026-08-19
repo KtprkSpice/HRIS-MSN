@@ -2,6 +2,51 @@
 @section('header', 'Buat Tugas')
 
 @section('content')
+
+    <style>
+        .btn-add-position {
+            background: linear-gradient(90deg, #bc5e6b 0%, #a34a57 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-position:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(188, 94, 107, 0.3);
+            color: white;
+        }
+
+        .position-item {
+            margin-bottom: 1rem;
+        }
+
+        .btn-delete-position {
+            width: 45px;
+            height: 45px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #bc5e6b 0%, #a34a57 100%);
+            color: white;
+            transition: all .3s ease;
+            box-shadow: 0 4px 12px rgba(188, 94, 107, .25);
+        }
+
+        .btn-delete-position:hover {
+            background: linear-gradient(135deg, #c96d7a 0%, #bc5e6b 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(188, 94, 107, .35);
+            color: white;
+        }
+
+        .btn-delete-position i {
+            font-size: 14px;
+        }
+    </style>
+
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -12,7 +57,7 @@
         </div>
     @endif
 
-    <form class="row g-3" action="{{ route('task.store') }}" method="post">
+    <form id="taskForm" class="row g-3" action="{{ route('task.store') }}" method="post">
         @csrf
         <div class="card shadow-sm border-0 rounded-4 mb-4">
             <div class="card-body p-4">
@@ -62,6 +107,83 @@
                         @error('description')
                             <span class="invalid-feedback">{{ $message }}</span>
                         @enderror
+                    </div>
+
+                </div>
+
+                <div class="col-12 mt-4">
+
+                    <hr class="opacity-50">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Jadwal Kerja</h6>
+
+                        <button type="button" class="btn btn-sm btn-add-position" id="add-position">
+                            <i class="fa fa-plus"></i> Tambah
+                        </button>
+                    </div>
+
+                    <div id="position-wrapper">
+
+                        <div class="row g-4 position-item align-items-end">
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-briefcase me-2 accent-icon"></i>
+                                    Nama Shift
+                                </label>
+                                <input type="text" class="form-control" name="position[]" required placeholder="Pagi">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-money-bill me-2 accent-icon"></i>
+                                    Jam Masuk
+                                </label>
+
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                    <input type="text" class="form-control money-input" name="base_salary[]" required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label class="form-label">
+                                    <i class="fa-solid fa-clock me-2 accent-icon"></i>
+                                    Jam Keluar
+                                </label>
+
+                                <div class="input-group shadow-sm">
+                                    <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+
+                                    <input type="text" class="form-control money-input" name="deduction_per_minute[]"
+                                        required>
+                                </div>
+                            </div>
+
+                            <div class="col-md-1">
+                                <button type="button" class="btn-delete-position delete-position" title="Hapus Posisi">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <hr class="opacity-50">
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ url()->previous() }}" class="btn btn-back shadow-sm">
+                            <i class="fa-solid fa-arrow-left me-2"></i>
+                            Batal
+                        </a>
+
+                        <button type="submit" class="btn btn-primary btn-save text-white shadow-sm">
+                            <i class="fa-solid fa-save me-2"></i>
+                            Simpan Data
+                        </button>
                     </div>
 
                 </div>
@@ -136,11 +258,11 @@
                 <div class="row mt-4 g-4">
                     <div class="col-md-4">
                         <label class="fw-semibold">Latitude</label>
-                        <input type="text" id="latitude" name="latitude" class="form-control modern-input" >
+                        <input type="text" id="latitude" name="latitude" class="form-control modern-input">
                     </div>
                     <div class="col-md-4">
                         <label class="fw-semibold">Longitude</label>
-                        <input type="text" id="longitude" name="longitude" class="form-control modern-input" >
+                        <input type="text" id="longitude" name="longitude" class="form-control modern-input">
                     </div>
                     <div class="col-md-4">
                         <label class="fw-semibold">Radius (meter)</label>
@@ -220,7 +342,7 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        const form = document.querySelector('form');
+        const form = document.getElementById('taskForm');
         const selectAll = document.getElementById('selectAll');
         const allEmployeeIds = @json($employees->pluck('id')->map(fn($id) => (string) $id)->values());
         const selectedEmployeeIds = new Set(@json(collect(old('selected_employee', []))->map(fn($id) => (string) $id)->values()));
@@ -321,7 +443,9 @@
             if (circle) {
                 circle.setLatLng(location).setRadius(radius);
             } else {
-                circle = L.circle(location, { radius }).addTo(map);
+                circle = L.circle(location, {
+                    radius
+                }).addTo(map);
             }
 
             if (recenter) {
@@ -350,7 +474,7 @@
 
         form.addEventListener('submit', function() {
             form.querySelectorAll('.selected-employee-hidden').forEach(input => input.remove());
-            document.querySelectorAll('input[name="selected_employee[]"]').forEach(input => {
+            form.querySelectorAll('input[name="selected_employee[]"]').forEach(input => {
                 input.disabled = true;
             });
 
@@ -362,6 +486,68 @@
                 input.className = 'selected-employee-hidden';
                 form.appendChild(input);
             });
+        });
+
+        // Scripy Jadawl kerja
+        document.getElementById('add-position').addEventListener('click', function() {
+
+            let wrapper = document.getElementById('position-wrapper');
+            let firstItem = wrapper.querySelector('.position-item');
+
+            let clone = firstItem.cloneNode(true);
+
+            clone.querySelectorAll('input').forEach(input => {
+                input.value = '';
+            });
+
+            wrapper.appendChild(clone);
+        });
+
+        document.addEventListener('click', function(e) {
+
+            let deleteButton = e.target.closest('.delete-position');
+
+            if (!deleteButton) return;
+
+            let items = document.querySelectorAll('.position-item');
+
+            if (items.length <= 1) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Bisa Dihapus',
+                    text: 'Minimal harus ada 1 data posisi.',
+                    confirmButtonColor: '#bc5e6b'
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Hapus Posisi?',
+                text: 'Data posisi ini akan dihapus dari form.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    deleteButton.closest('.position-item').remove();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil',
+                        text: 'Data posisi berhasil dihapus.',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+
+                }
+
+            });
+
         });
     </script>
 

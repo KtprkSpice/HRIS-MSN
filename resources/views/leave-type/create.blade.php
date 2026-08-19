@@ -121,12 +121,39 @@
 
                     <div class="col-md-6">
                         <label for="max_days" class="form-label fw-bold text-secondary">
-                            <i class="fa-solid fa-calendar-check me-2" style="color: #bc5e6b;"></i> Maksimal Hari
+                            <i class="fa-solid fa-calendar-check me-2" style="color: #bc5e6b;"></i> Maksimal Hari (Tahunan)
                         </label>
                         <input type="number" class="form-control @error('max_days') is-invalid @enderror" name="max_days"
                             id="max_days" value="{{ old('max_days') }}" placeholder="Contoh: 12" min="1">
                         @error('max_days')
                             <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="limit_type" class="form-label fw-bold text-secondary">
+                            <i class="fa-solid fa-calendar me-2" style="color: #bc5e6b;"></i> Periode Limit Cuti
+                        </label>
+                        <select class="form-select form-control @error('limit_type') is-invalid @enderror" name="limit_type" id="limit_type" required>
+                            <option value="yearly" {{ old('limit_type', 'yearly') === 'yearly' ? 'selected' : '' }}>Tahunan</option>
+                            <option value="monthly" {{ old('limit_type') === 'monthly' ? 'selected' : '' }}>Bulanan</option>
+                        </select>
+                        @error('limit_type')
+                            <span class="invalid-feedback">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="limit_days" class="form-label fw-bold text-secondary">
+                            <i class="fa-solid fa-calendar-days me-2" style="color: #bc5e6b;"></i> Limit Hari Cuti
+                        </label>
+                        <div class="input-group">
+                            <input type="number" class="form-control @error('limit_days') is-invalid @enderror" name="limit_days"
+                                id="limit_days" value="{{ old('limit_days') }}" placeholder="Contoh: 12" min="1" step="1" required>
+                            <span class="input-group-text bg-light">Hari</span>
+                        </div>
+                        @error('limit_days')
+                            <span class="invalid-feedback d-block">{{ $message }}</span>
                         @enderror
                     </div>
 

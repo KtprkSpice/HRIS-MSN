@@ -75,7 +75,7 @@ class SalaryController extends Controller
         if ($roles === 'employee') {
             abort(403);
         } else {
-            $employees = Employee::with('position')->get();
+            $employees = Employee::with('position')->where('status', 'active')->get();
         }
 
         return view('Salary.create', compact('employees'));

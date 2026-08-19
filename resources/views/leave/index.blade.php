@@ -193,8 +193,8 @@
                                 <td>
                                     @if ($leave->document_file)
                                         <a class="btn btn-sm p-1 px-2 text-white shadow-sm"
-                                            style="background-color: #bc5e6b;"
-                                            href="{{ asset('public/' . $leave->document_file) }}" target="_blank">
+                                            style="background-color: #bc5e6b;" href="{{ asset($leave->document_file) }}"
+                                            target="_blank">
                                             <i class="fa-solid fa-file-pdf"></i>
                                         </a>
                                     @else
@@ -231,24 +231,27 @@
                                             @else
                                                 <span class="text-muted small">-</span>
                                             @endif
+                                        @endif
 
-                                            {{-- Delete hanya untuk Owner saat Pending --}}
-                                            @if ($userRole === 'owner' || in_array($leave->status, ['pending', 'rejected']))
-                                                <form action="{{ route('leave-request.destroy', $leave->id) }}"
-                                                    method="POST" id="deleteForm{{ $leave->id }}" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" onclick="confirmDelete({{ $leave->id }})"
-                                                        class="btn btn-danger btn-action btn-delete">
-                                                        <i class="fa-solid fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
+                                        {{-- Delete hanya untuk Owner saat Pending --}}
+                                        @if (
+                                            $userRole == 'owner' &&
+                                                (($leave->status === 'pending' && $leave->current_step == 2) || $leave->status === 'rejected'))
+                                            <form action="{{ route('leave-request.destroy', $leave->id) }}" method="POST"
+                                                id="deleteForm{{ $leave->id }}" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+
+                                                <button type="button" onclick="confirmDelete({{ $leave->id }})"
+                                                    class="btn btn-danger btn-action btn-delete">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </form>
                                         @else
                                             <i class="fa-solid fa-lock text-muted small"></i>
                                         @endif
-                                    </td>
                                 @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class DivisionFactory extends Factory
 {
-    protected $model = division::class;
+    protected $model = Division::class;
+
     /**
      * Define the model's default state.
      *
@@ -18,9 +19,16 @@ class DivisionFactory extends Factory
      */
     public function definition(): array
     {
-       return [
+
+        $divisions = [
+            'Cleaning Service',
+            'Security',
+            'Building Management',
+        ];
+
+        return [
             // Contoh: "Human Resources", "Information Technology", "Marketing"
-            'name' => $this->faker->unique()->jobTitle() . ' Department', 
+            'name' => $this->faker->unique()->randomElement($divisions),
             'description' => $this->faker->sentence(),
             'status' => $this->faker->randomElement(['Active', 'Inactive']),
         ];

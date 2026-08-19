@@ -39,7 +39,7 @@ class autoSchedule extends Command
             $weekEnd = Carbon::now()->endOfWeek();
 
             // 1. Ambil task aktif
-            $tasks = Task::whereIn('status', ['on duty', 'pending'])->get();
+            $tasks = Task::where('status', 'on duty')->get();
 
             if ($tasks->isEmpty()) {
                 throw new \Exception('Tidak ada task aktif.');
@@ -50,7 +50,7 @@ class autoSchedule extends Command
                 // 2. Ambil employee task
                 $employees = Employee::whereHas('tasks', function ($q) use ($task) {
                     $q->where('task_id', $task->id);
-                })->get();
+                })->where('status', 'active')->get();
 
                 if ($employees->isEmpty()) {
                     continue;
@@ -138,17 +138,17 @@ class autoSchedule extends Command
                             ->take($needed);
 
                         foreach ($candidates as $employee) {
-                                Schedule::firstOrCreate(
-                                    [
-                                        'employee_id' => $employee->id,
-                                        'task_id' => $task->id,
-                                        'date' => $date->toDateString(),
-                                    ],
-                                    [
-                                        'shift_id' => $shiftId,
-                                        'source' => 'system',
-                                    ]
-                                );
+                            Schedule::firstOrCreate(
+                                [
+                                    'employee_id' => $employee->id,
+                                    'task_id' => $task->id,
+                                    'date' => $date->toDateString(),
+                                ],
+                                [
+                                    'shift_id' => $shiftId,
+                                    'source' => 'system',
+                                ]
+                            );
 
                             $usedEmployeeIds->push($employee->id);
                         }

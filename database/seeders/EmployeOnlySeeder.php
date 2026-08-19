@@ -37,7 +37,7 @@ class EmployeOnlySeeder extends Seeder
                 'address' => $faker->address,
                 'email' => $user->email,
                 'user_id' => $user->id,
-                'phone' => $faker->unique()->numerify('+62###########'),
+                'phone' => $faker->unique()->numerify('62###########'),
                 'hire_date' => $hireDate,
                 'born_date' => $bornDate,
                 'bpjs_kesehatan' => $faker->numerify('##########'),

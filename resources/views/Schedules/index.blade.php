@@ -45,32 +45,32 @@
     </style>
 
     <div class="card shadow-sm border-0 rounded-4 mb-4">
-    <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
 
-        <h5 class="mb-0 fw-semibold d-flex align-items-center">
-            <i class="fa-solid fa-plus-circle me-2 text-dark"></i>
-            Tambah Jadwal
-        </h5>
+            <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                <i class="fa-solid fa-plus-circle me-2 text-dark"></i>
+                Tambah Jadwal
+            </h5>
 
-        <div class="d-flex align-items-center gap-2">
-            <div class="d-grid">
-                <a href="{{ route('schedule.create') }}" class="btn btn-primary rounded-pill px-4">
-                    <i class="fa-solid fa-plus me-2"></i> Tambah
-                </a>
+            <div class="d-flex align-items-center gap-2">
+                <div class="d-grid">
+                    <a href="{{ route('schedule.create') }}" class="btn btn-primary rounded-pill px-4">
+                        <i class="fa-solid fa-plus me-2"></i> Tambah
+                    </a>
+                </div>
             </div>
+
         </div>
 
+        <div class="card-body pt-0">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+        </div>
     </div>
-
-    <div class="card-body pt-0">
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show rounded-3 mt-2" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-    </div>
-</div>
 
     <div class="card shadow">
         <div class="card-body">
@@ -84,11 +84,18 @@
                             <th>Tugas</th>
                             <th>Type</th>
                             <th>Tanggal</th>
-                            <th class="text-center">Aksi</th>
+                            @if (in_array($userRole, ['hr', 'owner']))
+                                <th class="text-center">Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($schedules as $schedule)
+                            @php
+                                $isPastSchedule = \Carbon\Carbon::parse($schedule->date)
+                                    ->startOfDay()
+                                    ->lt(now()->startOfDay());
+                            @endphp
                             <tr>
                                 <td class="fw-bold text-dark">{{ ucwords($schedule->employee->fullname) }}</td>
                                 <td><span
@@ -99,24 +106,30 @@
                                 <td data-search="{{ \Carbon\Carbon::parse($schedule->date)->translatedFormat('d F Y') }}"
                                     data-order="{{ $schedule->date }}">
                                     {{ \Carbon\Carbon::parse($schedule->date)->format('d F Y') }}</td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-2">
-                                        <a href="{{ route('schedule.edit', $schedule->id) }}"
-                                            class="btn btn-action btn-edit btn-sm" title="Edit">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
+                                @if (in_array($userRole, ['hr', 'owner']))
+                                    <td class="text-center">
+                                        @unless ($isPastSchedule)
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="{{ route('schedule.edit', $schedule->id) }}"
+                                                    class="btn btn-action btn-edit btn-sm" title="Edit">
+                                                    <i class="fa-solid fa-pen"></i>
+                                                </a>
+                                                @if ($userRole == 'owner')
+                                                    <form action="{{ route('schedule.destroy', $schedule->id) }}"
+                                                        method="POST" class="d-inline" id="deleteForm{{ $schedule->id }}">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button class="btn btn-action btn-delete btn-sm" type="button"
+                                                            onclick="confirmDelete({{ $schedule->id }})" title="Hapus">
+                                                            <i class="fa-solid fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                        @endunless
+                                    </td>
+                                @endif
 
-                                        <form action="{{ route('schedule.destroy', $schedule->id) }}" method="POST"
-                                            class="d-inline" id="deleteForm{{ $schedule->id }}">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-action btn-delete btn-sm" type="button"
-                                                onclick="confirmDelete({{ $schedule->id }})" title="Hapus">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -142,11 +155,13 @@
                         next: "Berikutnya",
                     },
                 },
-                columnDefs: [{
-                    targets: 5,
-                    orderable: false,
-                    searchable: false
-                }]
+                @if (in_array($userRole, ['hr', 'owner']))
+                    columnDefs: [{
+                        targets: 5,
+                        orderable: false,
+                        searchable: false
+                    }]
+                @endif
             });
         });
     </script>

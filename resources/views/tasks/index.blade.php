@@ -189,6 +189,7 @@
                                     {{ Carbon\Carbon::parse($task->end_time)->format('d M Y') }}
                                 </td>
 
+                                  @if (in_array($userRole, ['hr', 'owner']))
                                 <td>
                                     <select onchange="changeStatus(this)" @class([
                                         'form-select form-select-sm fw-medium text-center status-badge' => true,
@@ -214,6 +215,19 @@
 
                                     </select>
                                 </td>
+                                @else
+                                  <td>
+                                    <span onchange="changeStatus(this)" @class([
+                                        'form-select form-select-sm fw-medium text-center status-badge' => true,
+                                        'status-done' => $task->status == 'done',
+                                        'status-onduty' => $task->status == 'on duty',
+                                        'status-pending' => $task->status == 'pending',
+                                    ])>
+                                    {{ $task->status }}
+                                  </span>
+                                </td>
+                                @endif
+
                                 <!-- STATUS -->
 
 

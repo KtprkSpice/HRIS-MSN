@@ -11,27 +11,24 @@ class LeaveTypeController extends Controller
     {
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
             $leaveTypes = LeaveType::all();
-
         } else {
             abort(403, 'Anda tidak dapat mengakses halaman ini.');
         }
 
         return view('leave-type.index', compact('leaveTypes'));
-
     }
 
     public function create()
     {
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
             return view('leave-type.create');
         } else {
             abort(403, 'Anda tidak dapat mengakses halaman ini.');
         }
-
     }
 
     public function store(Request $request)
@@ -39,15 +36,15 @@ class LeaveTypeController extends Controller
 
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
             $validated = $request->validate([
                 'name' => 'string|required|max:255',
                 'is_paid' => 'boolean|required',
                 'max_days' => 'nullable|numeric|min:1',
                 'deduction' => 'nullable|numeric|min:0',
                 'document' => 'boolean|required',
-                'limit_type' => 'string|required',
-                'limit_days' => 'numeric|required',
+                'limit_type' => 'required|in:yearly,monthly',
+                'limit_days' => 'required|integer|min:1',
             ]);
 
             if ($validated['is_paid']) {
@@ -72,7 +69,7 @@ class LeaveTypeController extends Controller
     {
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
             return view('leave-type.edit', compact('leaveType'));
         } else {
             abort(403, 'Anda tidak dapat mengakses halaman ini.');
@@ -84,7 +81,7 @@ class LeaveTypeController extends Controller
 
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
 
             $validated = $request->validate([
                 'name' => 'string|required|max:255',
@@ -92,8 +89,8 @@ class LeaveTypeController extends Controller
                 'max_days' => 'nullable|numeric|min:1',
                 'deduction' => 'nullable|numeric|min:0',
                 'document' => 'boolean|required',
-                'limit_type' => 'string|required',
-                'limit_days' => 'numeric|required',
+                'limit_type' => 'required|in:yearly,monthly',
+                'limit_days' => 'required|integer|min:1',
             ]);
 
             if ($validated['is_paid']) {
@@ -119,7 +116,7 @@ class LeaveTypeController extends Controller
 
         $roles = auth()->user()->role->name;
 
-        if (in_array($roles, ['hr', 'owner'])) {
+        if ($roles === 'owner') {
             $leaveType->delete();
         } else {
             abort(403, 'Anda tidak dapat mengakses halaman ini.');

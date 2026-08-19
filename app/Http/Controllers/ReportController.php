@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EmployeeReportExport;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\Presence;
 use App\Models\Salary;
-use App\Exports\EmployeeReportExport;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ReportController extends Controller
@@ -29,7 +29,7 @@ class ReportController extends Controller
         $salaries = Salary::whereNull('deleted_at')->whereIn('date', [$startMonth, $endMonth])->sum('total');
         $employees = Employee::whereHas('user.role', function ($q) {
             $q->whereIn('name', ['employee', 'hr']);
-        })->get();
+        })->where('status', 'active')->get();
 
         $absentTotal = Presence::whereHas('employee', function ($q) {
             $q->where('status', 'active');
@@ -65,7 +65,7 @@ class ReportController extends Controller
 
         $employees = Employee::whereHas('user.role', function ($q) {
             $q->whereIn('name', ['employee', 'hr']);
-        })->get();
+        })->where('status', 'active')->get();
 
         foreach ($employees as $employee) {
             $employee->salary_total = Salary::where('employee_id', $employee->id)
@@ -86,7 +86,8 @@ class ReportController extends Controller
             $employee->absent_total = Presence::where('employee_id', $employee->id)->where('status', 'absent')->count();
         }
 
-        $fileName = 'Laporan_Karyawan_' . now()->format('d-m-Y_H-i-s') . '.xlsx';
+        $fileName = 'Laporan_Karyawan_'.now()->format('d-m-Y_H-i-s').'.xlsx';
+
         return Excel::download(new EmployeeReportExport($employees), $fileName);
     }
 }
