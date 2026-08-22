@@ -39,12 +39,11 @@ class TaskController extends Controller
     {
         $user = auth()->user();
         $roles = auth()->user()->role->name;
-        if (in_array($roles, ['hr', 'owner'])) {
-
-            $tasks = Task::all();
-        } elseif ($roles === 'employee') {
-            $tasks = $user->employee->tasks;
+        if ($roles === 'employee') {
+            abort(403, 'Anda tidak memiliki akses');
         }
+
+        $tasks = Task::all();
 
         return view('tasks.index', compact('tasks'));
     }
@@ -85,7 +84,7 @@ class TaskController extends Controller
             ->whereBetween('date', [$weekStart->toDateString(), $weekEnd->toDateString()])
             ->with(['employee', 'shift'])
             ->get()
-            ->groupBy(fn ($schedule) => $schedule->employee_id.'_'.Carbon::parse($schedule->date)->toDateString());
+            ->groupBy(fn($schedule) => $schedule->employee_id . '_' . Carbon::parse($schedule->date)->toDateString());
         $shifts = $task->Shift()->orderBy('start_time')->get();
 
         return view('tasks.show', compact('task', 'employees', 'schedules', 'locations', 'shifts', 'weekStart', 'weekEnd', 'weekDates'));
@@ -115,7 +114,7 @@ class TaskController extends Controller
         ]);
 
         $safeTaskName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $task->name);
-        $fileName = 'Template_Jadwal_'.$safeTaskName.'_'.$weekStart->format('d-m-Y').'.xlsx';
+        $fileName = 'Template_Jadwal_' . $safeTaskName . '_' . $weekStart->format('d-m-Y') . '.xlsx';
 
         return Excel::download(new TaskAssignmentExport($task, $weekStart), $fileName);
     }
@@ -195,7 +194,8 @@ class TaskController extends Controller
             ]);
 
             DB::transaction(function () use ($request) {
-                $task = Task::create(['name' => $request->name,
+                $task = Task::create([
+                    'name' => $request->name,
                     'start_time' => $request->start_time,
                     'end_time' => $request->end_time,
                     'description' => $request->description,
@@ -209,15 +209,18 @@ class TaskController extends Controller
                         'start_time' => $request->shift_start[$index],
                         'end_time' => $request->shift_end[$index],
                         'late_tolerance_minutes' => $request->shift_late_tolerance[$index],
+                        'task_id' => $request->id,
                     ]);
                 }
 
-                Tasklocation::create(['task_id' => $task->id,
+                Tasklocation::create([
+                    'task_id' => $task->id,
                     'name' => 'Lokasi Utama',
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
                     'radius' => $request->radius,
-                    'is_active' => true]);
+                    'is_active' => true
+                ]);
 
                 foreach ($request->selected_employee ?? [] as $employeeId) {
                     $task->employees()->attach($employeeId, [
@@ -448,7 +451,6 @@ class TaskController extends Controller
 
         if (in_array($roles, ['hr', 'owner'])) {
             $task->delete();
-
         } else {
             abort(403);
         }

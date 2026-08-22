@@ -91,6 +91,73 @@
         </div>
     @endif
 
+    <div class="card shadow-sm border-0 rounded-4 mb-4">
+    <div class="card-body p-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+            <h6 class="fw-semibold mb-0">
+                <i class="fa-solid fa-filter me-2"></i>
+                Filter Slip Gaji
+            </h6>
+
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+
+                {{-- BULAN --}}
+                <select id="filterMonth"
+                    class="form-select form-select-sm rounded-pill"
+                    style="width: 160px;">
+
+                    <option value="">Semua Bulan</option>
+                    <option value="01">Januari</option>
+                    <option value="02">Februari</option>
+                    <option value="03">Maret</option>
+                    <option value="04">April</option>
+                    <option value="05">Mei</option>
+                    <option value="06">Juni</option>
+                    <option value="07">Juli</option>
+                    <option value="08">Agustus</option>
+                    <option value="09">September</option>
+                    <option value="10">Oktober</option>
+                    <option value="11">November</option>
+                    <option value="12">Desember</option>
+
+                </select>
+
+
+                {{-- TAHUN --}}
+                <select id="filterYear"
+                    class="form-select form-select-sm rounded-pill"
+                    style="width: 130px;">
+
+                    <option value="">Semua Tahun</option>
+
+                    @for ($year = date('Y'); $year >= 2023; $year--)
+                        <option value="{{ $year }}">
+                            {{ $year }}
+                        </option>
+                    @endfor
+
+                </select>
+
+
+                {{-- RESET --}}
+                <button type="button"
+                    id="resetSalaryFilter"
+                    class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+
+                    <i class="fa-solid fa-rotate-left me-1"></i>
+                    Reset
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
     <div class="card shadow border-0">
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
@@ -119,7 +186,9 @@
 
                     <tbody>
                         @foreach ($salaries as $salary)
-                            <tr>
+                            <tr
+                            data-month="{{ $salary->created_at->format('m') }}"
+                            data-year="{{ $salary->created_at->format('Y') }}">
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="fw-bold text-dark">
                                     {{ ucwords($salary->employee->fullname) }}
@@ -186,29 +255,114 @@
     <script src="{{ asset('DataTables/datatables.min.js') }}"></script>
 
     <script>
-        $(document).ready(function() {
-            $('#salaryTable').DataTable({
-                "pageLength": 10,
-                "ordering": true,
-                "responsive": true,
-                language: {
-                    search: "Cari:",
-                    lengthMenu: "Tampilkan _MENU_ data",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
-                    paginate: {
-                        previous: "Sebelumnya",
-                        next: "Berikutnya",
-                    },
+    $(document).ready(function() {
+
+        // =====================================================
+        // DATATABLE
+        // =====================================================
+
+        const table = $('#salaryTable').DataTable({
+
+            pageLength: 10,
+
+            ordering: true,
+
+            responsive: true,
+
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
                 },
-                @if (in_array($userRole, ['hr', 'owner']))
-                    columnDefs: [{
-                        targets: 5,
-                        orderable: false,
-                        searchable: false
-                    }]
-                @endif
-            });
+            },
+
+            @if (in_array($userRole, ['hr', 'owner']))
+                columnDefs: [{
+                    targets: 6,
+                    orderable: false,
+                    searchable: false
+                }]
+            @else
+                columnDefs: [{
+                    targets: 6,
+                    orderable: false,
+                    searchable: false
+                }]
+            @endif
         });
-    </script>
+
+
+        // =====================================================
+        // FILTER BULAN + TAHUN
+        // =====================================================
+
+        $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+
+            // Hanya berlaku untuk salaryTable
+            if (settings.nTable.id !== 'salaryTable') {
+                return true;
+            }
+
+            const row = table.row(dataIndex).node();
+
+            if (!row) {
+                return true;
+            }
+
+            const rowMonth = row.dataset.month;
+            const rowYear = row.dataset.year;
+
+            const selectedMonth = $('#filterMonth').val();
+            const selectedYear = $('#filterYear').val();
+
+
+            // Filter bulan
+            const monthMatch =
+                selectedMonth === '' ||
+                rowMonth === selectedMonth;
+
+
+            // Filter tahun
+            const yearMatch =
+                selectedYear === '' ||
+                rowYear === selectedYear;
+
+
+            return monthMatch && yearMatch;
+
+        });
+
+
+        // =====================================================
+        // CHANGE FILTER
+        // =====================================================
+
+        $('#filterMonth, #filterYear').on('change', function() {
+
+            table.draw();
+
+        });
+
+
+        // =====================================================
+        // RESET FILTER
+        // =====================================================
+
+        $('#resetSalaryFilter').on('click', function() {
+
+            $('#filterMonth').val('');
+
+            $('#filterYear').val('');
+
+            table.draw();
+
+        });
+
+    });
+</script>
 
 @endsection

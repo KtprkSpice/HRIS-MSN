@@ -70,6 +70,113 @@
         </div>
     </div>
 
+    {{-- Filter --}}
+
+    <div class="filter-container mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-semibold mb-0">
+            <i class="fa-solid fa-filter me-2"></i>
+            Filter Karyawan
+        </h6>
+
+        <button type="button" id="resetFilter" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <i class="fa-solid fa-rotate-left me-1"></i>
+            Reset
+        </button>
+    </div>
+
+    <div class="row g-3">
+
+        {{-- STATUS --}}
+   <div class="col-md-4">
+    <div class="filter-group">
+        <label class="filter-title">Status</label>
+
+        <div class="checkbox-list">
+
+            <label class="custom-checkbox">
+                <input type="checkbox"
+                    class="filter-checkbox single-filter"
+                    data-filter="status"
+                    name="status"
+                    value="active">
+
+                <span class="checkmark"></span>
+                Aktif
+            </label>
+
+            <label class="custom-checkbox">
+                <input type="checkbox"
+                    class="filter-checkbox single-filter"
+                    data-filter="status"
+                    name="status"
+                    value="inactive">
+
+                <span class="checkmark"></span>
+                Nonaktif
+            </label>
+
+        </div>
+    </div>
+</div>
+
+        {{-- GENDER --}}
+       <div class="col-md-4">
+    <div class="filter-group">
+        <label class="filter-title">Gender</label>
+
+        <div class="checkbox-list">
+
+            <label class="custom-checkbox">
+                <input type="checkbox"
+                    class="filter-checkbox single-filter"
+                    data-filter="gender"
+                    name="gender"
+                    value="laki-laki">
+
+                <span class="checkmark"></span>
+                Laki-laki
+            </label>
+
+            <label class="custom-checkbox">
+                <input type="checkbox"
+                    class="filter-checkbox single-filter"
+                    data-filter="gender"
+                    name="gender"
+                    value="perempuan">
+
+                <span class="checkmark"></span>
+                Perempuan
+            </label>
+
+        </div>
+    </div>
+</div>
+
+        {{-- DIVISI --}}
+        <div class="col-md-4">
+            <div class="filter-group">
+                <label class="filter-title">Divisi</label>
+
+                <div class="checkbox-list">
+                    @foreach ($divisions as $division)
+                        <label class="custom-checkbox">
+                            <input type="checkbox"
+                                class="filter-checkbox"
+                                data-filter="division"
+                                value="{{ strtolower($division->name) }}">
+
+                            <span class="checkmark"></span>
+                            {{ ucwords($division->name) }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
     <!-- ===================== -->
     <!-- TABEL -->
 
@@ -96,7 +203,10 @@
 
                     <tbody>
                         @foreach ($employees as $employee)
-                            <tr>
+                            <tr class="employee-row"
+                            data-status="{{ strtolower($employee->status) }}"
+                            data-division="{{ strtolower($employee->division->name) }}"
+                            data-gender="{{ strtolower($employee->gender) }}">
 
                                 <td>
                                     <div class="d-flex align-items-center gap-3">
@@ -169,6 +279,78 @@
     <!-- STYLE -->
 
     <style>
+
+    /* Checkbox Filter Style */
+    .filter-container {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.filter-group {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+.filter-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #343a40;
+}
+
+.checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+}
+
+.custom-checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #495057;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ced4da;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    transition: all .2s ease;
+}
+
+.custom-checkbox input:checked + .checkmark {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.custom-checkbox input:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
         .status-badge {
             font-size: 13px;
             backdrop-filter: blur(6px);
@@ -435,6 +617,158 @@
                 searchable: false
             }]
         });
+
+        // Filter 
+       document.addEventListener('DOMContentLoaded', function () {
+
+
+
+    const checkboxes = document.querySelectorAll('.filter-checkbox');
+    const resetButton = document.getElementById('resetFilter');
+
+
+    // =========================
+    // SINGLE FILTER
+    // STATUS & GENDER
+    // =========================
+
+    document.querySelectorAll('.single-filter').forEach(checkbox => {
+
+        checkbox.addEventListener('change', function () {
+
+            if (this.checked) {
+
+                const filterType = this.dataset.filter;
+
+                document.querySelectorAll(
+                    `.single-filter[data-filter="${filterType}"]`
+                ).forEach(otherCheckbox => {
+
+                    if (otherCheckbox !== this) {
+                        otherCheckbox.checked = false;
+                    }
+
+                });
+
+            }
+
+            table.draw();
+
+        });
+
+    });
+
+
+    // =========================
+    // CUSTOM DATATABLE FILTER
+    // =========================
+
+    DataTable.ext.search.push(function (settings, data, dataIndex) {
+
+        if (settings.nTable.id !== 'leaveTable') {
+            return true;
+        }
+
+        const row = settings.aoData[dataIndex].nTr;
+
+        if (!row) {
+            return true;
+        }
+
+        const status = row.dataset.status;
+        const gender = row.dataset.gender;
+        const division = row.dataset.division;
+
+
+        // Ambil filter
+        const selectedStatus =
+            document.querySelector(
+                '.single-filter[data-filter="status"]:checked'
+            )?.value.toLowerCase() || null;
+
+
+        const selectedGender =
+            document.querySelector(
+                '.single-filter[data-filter="gender"]:checked'
+            )?.value.toLowerCase() || null;
+
+
+        const selectedDivisions =
+            Array.from(
+                document.querySelectorAll(
+                    '.filter-checkbox[data-filter="division"]:checked'
+                )
+            ).map(checkbox =>
+                checkbox.value.toLowerCase()
+            );
+
+
+        // =========================
+        // FILTER STATUS
+        // =========================
+
+        const statusMatch =
+            !selectedStatus ||
+            status === selectedStatus;
+
+
+        // =========================
+        // FILTER GENDER
+        // =========================
+
+        const genderMatch =
+            !selectedGender ||
+            gender === selectedGender;
+
+
+        // =========================
+        // FILTER DIVISI
+        // =========================
+
+        const divisionMatch =
+            selectedDivisions.length === 0 ||
+            selectedDivisions.includes(division);
+
+
+        return (
+            statusMatch &&
+            genderMatch &&
+            divisionMatch
+        );
+
+    });
+
+
+    // =========================
+    // DIVISION CHECKBOX
+    // =========================
+
+    document.querySelectorAll(
+        '.filter-checkbox[data-filter="division"]'
+    ).forEach(checkbox => {
+
+        checkbox.addEventListener('change', function () {
+            table.draw();
+        });
+
+    });
+
+
+    // =========================
+    // RESET
+    // =========================
+
+    resetButton.addEventListener('click', function () {
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        table.draw();
+
+    });
+
+});
     </script>
 
 @endsection

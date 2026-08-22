@@ -4,6 +4,77 @@
 @section('content')
 
     <style>
+        /* Checkbox Filter Style */
+    .filter-container {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.filter-group {
+    background: #fff;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+.filter-title {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #343a40;
+}
+
+.checkbox-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 20px;
+}
+
+.custom-checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #495057;
+}
+
+.custom-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ced4da;
+    border-radius: 5px;
+    display: inline-block;
+    position: relative;
+    transition: all .2s ease;
+}
+
+.custom-checkbox input:checked + .checkmark {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.custom-checkbox input:checked + .checkmark::after {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 1px;
+    width: 5px;
+    height: 9px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
         /* ========================= */
         /* MODERN TABLE STYLE       */
         /* ========================= */
@@ -141,6 +212,96 @@
         </div>
     @endif
 
+        {{-- Filter --}}
+
+  <div class="filter-container mb-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <h6 class="fw-semibold mb-0">
+            <i class="fa-solid fa-filter me-2"></i>
+            Filter Tugas
+        </h6>
+
+        <button
+            type="button"
+            id="resetFilter"
+            class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+
+            <i class="fa-solid fa-rotate-left me-1"></i>
+            Reset
+
+        </button>
+
+    </div>
+
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+
+            <div class="filter-group">
+
+                <label class="filter-title">
+                    Status
+                </label>
+
+                <div class="checkbox-list">
+
+                    <label class="custom-checkbox">
+
+                        <input
+                            type="checkbox"
+                            class="filter-checkbox single-filter"
+                            data-filter="status"
+                            value="pending">
+
+                        <span class="checkmark"></span>
+
+                        Pending
+
+                    </label>
+
+
+                    <label class="custom-checkbox">
+
+                        <input
+                            type="checkbox"
+                            class="filter-checkbox single-filter"
+                            data-filter="status"
+                            value="on duty">
+
+                        <span class="checkmark"></span>
+
+                        On Duty
+
+                    </label>
+
+
+                    <label class="custom-checkbox">
+
+                        <input
+                            type="checkbox"
+                            class="filter-checkbox single-filter"
+                            data-filter="status"
+                            value="done">
+
+                        <span class="checkmark"></span>
+
+                        Done
+
+                    </label>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
     <!-- TABLE -->
     <div class="card shadow-sm border-0 rounded-4">
         <div class="card-body p-6">
@@ -169,7 +330,9 @@
 
                     <tbody>
                         @foreach ($tasks as $task)
-                            <tr>
+                            <tr class="task-row"
+                            data-status = "{{ strtolower($task->status) }}"
+                            >
 
                                 <td class="fw-semibold">
                                     {{ ucwords($task->name) }}
@@ -339,6 +502,98 @@
         function changeStatus(select) {
             window.location.href = select.value;
         }
+
+       document.addEventListener('DOMContentLoaded', function () {
+
+    const checkboxes = document.querySelectorAll('.filter-checkbox');
+    const resetButton = document.getElementById('resetFilter');
+
+
+    // =====================================================
+    // STATUS - HANYA BOLEH PILIH SATU
+    // =====================================================
+
+    document.querySelectorAll('.single-filter').forEach(checkbox => {
+
+        checkbox.addEventListener('change', function () {
+
+            if (this.checked) {
+
+                document.querySelectorAll('.single-filter')
+                    .forEach(otherCheckbox => {
+
+                        if (otherCheckbox !== this) {
+                            otherCheckbox.checked = false;
+                        }
+
+                    });
+
+            }
+
+            table.draw();
+
+        });
+
+    });
+
+
+    // =====================================================
+    // CUSTOM DATATABLE FILTER
+    // =====================================================
+
+    DataTable.ext.search.push(function (settings, data, dataIndex) {
+
+        // Hanya untuk tabel tugas
+        if (settings.nTable.id !== 'tugasTable') {
+            return true;
+        }
+
+
+        const row = settings.aoData[dataIndex].nTr;
+
+        if (!row) {
+            return true;
+        }
+
+
+        // Status dari database
+        const status = row.dataset.status;
+
+
+        // Status yang dipilih
+        const selectedStatus =
+            document.querySelector(
+                '.single-filter[data-filter="status"]:checked'
+            )?.value.toLowerCase() || null;
+
+
+        // Tidak ada filter
+        if (!selectedStatus) {
+            return true;
+        }
+
+
+        // Cocokkan status
+        return status === selectedStatus;
+
+    });
+
+
+    // =====================================================
+    // RESET
+    // =====================================================
+
+    resetButton.addEventListener('click', function () {
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        table.draw();
+
+    });
+
+});
     </script>
 
 @endsection

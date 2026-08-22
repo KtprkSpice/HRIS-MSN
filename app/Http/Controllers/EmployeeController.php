@@ -18,39 +18,32 @@ class EmployeeController extends Controller
         $user = auth()->user();
         $roles = auth()->user()->role->name;
 
+        // Employee Accsess
         if ($roles === 'employee') {
-            abort(403, 'Anda tidak memiliki akses ke halaman ini');
-        } elseif ($roles === 'owner') {
-            // Owner
-            $employees = Employee::whereHas('user.role', function ($q) {
-                $q->where('name', '!=', 'owner');
-            })->get();
-            // $employeeStats = Employee::whereHas('user.role', function ($q) {
-            //     $q->where('name', 'employee');
-            // })->selectRaw('status, COUNT(*) as total')
-            //     ->groupBy('status')
-            //     ->pluck('total', 'status');
-
-            $countActiveEmployee = $employees->where('status', 'active')->count();
-            $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
-            $countTotalEmployee = $employees->count();
-        } else {
-            // Hr
-            $employees = Employee::whereHas('user.role', function ($q) {
-                $q->whereNotIn('name', ['owner', 'hr']);
-            })->get();
-            // $employeeStats = Employee::whereHas('user.role', function ($q) {
-            //     $q->where('name', 'employee');
-            // })->selectRaw('status, COUNT(*) as total')
-            //     ->groupBy('status')
-            //     ->pluck('total', 'status');
-
-            $countActiveEmployee = $employees->where('status', 'active')->count();
-            $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
-            $countTotalEmployee = $employees->count();
+            abort(403, "Anda Tidak memiliki akses");
         }
 
-        return view('Employees.index', compact('employees', 'countActiveEmployee', 'countNonActiveEmployee', 'countTotalEmployee'));
+        $excludedRole = match ($roles) {
+            'owner' => ['owner'],
+            'hr' => ['hr', 'owner'],
+            default => ['hr', 'owner'],
+        };
+
+        $employees = Employee::with(['division', 'position'])
+            ->whereHas('user.role', function ($q) use ($excludedRole) {
+                $q->WhereNotIn('name', $excludedRole);
+            })
+            ->get();
+
+        $countTotalEmployee = $employees->count();
+
+        $countActiveEmployee = $employees->where('status', 'active')->count();
+
+        $countNonActiveEmployee = $employees->where('status', 'inactive')->count();
+
+        $divisions = Division::where('status', 'active')->get();
+
+        return view('Employees.index', compact('employees', 'countActiveEmployee', 'countNonActiveEmployee', 'countTotalEmployee', 'divisions'));
     }
 
     public function show(Employee $employee)
