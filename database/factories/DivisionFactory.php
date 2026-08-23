@@ -30,7 +30,7 @@ class DivisionFactory extends Factory
             // Contoh: "Human Resources", "Information Technology", "Marketing"
             'name' => $this->faker->unique()->randomElement($divisions),
             'description' => $this->faker->sentence(),
-            'status' => $this->faker->randomElement(['Active', 'Inactive']),
+            'status' => 'active',
         ];
     }
 }

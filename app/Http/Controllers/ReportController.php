@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\EmployeeReportExport;
+use App\Models\Division;
 use App\Models\Employee;
 use App\Models\LeaveRequest;
 use App\Models\Presence;
@@ -53,9 +54,11 @@ class ReportController extends Controller
                 })->count();
 
             $employee->absent_total = Presence::where('employee_id', $employee->id)->where('status', 'absent')->count();
+
+            $divisions = Division::where('status', 'active')->get();
         }
 
-        return view('Report.index', compact('activeEmployees', 'leaveTotal', 'salaries', 'employees', 'absentTotal'));
+        return view('Report.index', compact('activeEmployees', 'leaveTotal', 'salaries', 'employees', 'absentTotal', 'divisions'));
     }
 
     public function export()

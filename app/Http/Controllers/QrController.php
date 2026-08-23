@@ -91,7 +91,7 @@ class QrController extends Controller
     {
         // Generator jadwal bersifat idempoten: jadwal lama dilewati dan
         // hanya jadwal yang belum ada yang dibuat.
-        Artisan::call('app:auto-schedule');
+        // Artisan::call('app:auto-schedule');
 
         Artisan::call('app:qr-generate');
 
