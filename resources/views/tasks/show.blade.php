@@ -188,7 +188,7 @@
                         <div class="row g-4">
 
                             <div class="col-12 col-md-6 col-lg-4">
-                                <label for="name" class="form-label fw-semibold">Nama Tugas</label>
+                                <label for="name" class="form-label fw-semibold">Nama Perusahaan</label>
                                 <input type="text" class="form-control modern-input @error('name') is-invalid @enderror"
                                     id="name" name="name" readonly value="{{ old('name', $task->name) }}">
                                 @error('name')
@@ -263,7 +263,8 @@
                                                 <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
 
                                                 <input type="time" class="form-control money-input" name="shift_start[]"
-                                                    readonly value="{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}">
+                                                    readonly
+                                                    value="{{ \Carbon\Carbon::parse($shift->start_time)->format('H:i') }}">
                                             </div>
                                         </div>
 
@@ -277,7 +278,8 @@
                                                 <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
 
                                                 <input type="time" class="form-control money-input" name="shift_end[]"
-                                                    readonly value="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}">
+                                                    readonly
+                                                    value="{{ \Carbon\Carbon::parse($shift->end_time)->format('H:i') }}">
                                             </div>
                                         </div>
 
@@ -331,8 +333,7 @@
                             @csrf
                             <div class="col-12 col-md-8">
                                 <label for="schedule_file" class="form-label fw-semibold">File Excel Jadwal</label>
-                                <input type="file"
-                                    class="form-control @error('schedule_file') is-invalid @enderror"
+                                <input type="file" class="form-control @error('schedule_file') is-invalid @enderror"
                                     id="schedule_file" name="schedule_file" accept=".xlsx,.xls,.csv" required>
                                 @error('schedule_file')
                                     <span class="invalid-feedback">{{ $message }}</span>
@@ -405,8 +406,7 @@
                             <div>
                                 <label for="schedule_week_start" class="form-label small fw-semibold mb-1">Minggu</label>
                                 <input type="date" id="schedule_week_start" name="week_start"
-                                    class="form-control form-control-sm"
-                                    value="{{ $weekStart->format('Y-m-d') }}">
+                                    class="form-control form-control-sm" value="{{ $weekStart->format('Y-m-d') }}">
                             </div>
                             <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat
@@ -432,11 +432,14 @@
                                     <tr>
                                         <td class="fw-semibold text-dark">
                                             {{ ucwords($employee->fullname) }}
-                                            <div class="small text-muted">{{ ucwords($employee->position->name ?? '-') }}</div>
+                                            <div class="small text-muted">{{ ucwords($employee->position->name ?? '-') }}
+                                            </div>
                                         </td>
                                         @foreach ($weekDates as $date)
                                             @php
-                                                $schedule = $schedules->get($employee->id . '_' . $date->toDateString())?->first();
+                                                $schedule = $schedules
+                                                    ->get($employee->id . '_' . $date->toDateString())
+                                                    ?->first();
                                             @endphp
                                             <td class="text-center">
                                                 @if ($schedule && $schedule->shift)
@@ -449,7 +452,8 @@
                                                         {{ \Carbon\Carbon::parse($schedule->shift->end_time)->format('H:i') }}
                                                     </small>
                                                 @else
-                                                    <span class="badge bg-secondary-subtle text-secondary border">Libur</span>
+                                                    <span
+                                                        class="badge bg-secondary-subtle text-secondary border">Libur</span>
                                                 @endif
                                             </td>
                                         @endforeach

@@ -555,6 +555,7 @@
                         <th>Gender</th>
                         <th>No Tlp</th>
                         <th>Email</th>
+                        <th>Penempatan</th>
                         <th>Status</th>
                         <th>Cuti</th>
                         <th>Gaji</th>
@@ -577,6 +578,13 @@
                             <td>{{ ucwords($employee->gender) }}</td>
                             <td>{{ $employee->phone }}</td>
                             <td>{{ $employee->email }}</td>
+                            <td>
+                                @forelse ($employee->tasks as $task)
+                                    <div>{{ $task->name ?? '-' }}</div>
+                                @empty
+                                    <div>-</div>
+                                @endforelse
+                            </td>
                             <td><span @class([
                                 'badge rounded-pill px-3 py-2 fw-medium status-badge' => true,
                                 'status-active' => $employee->status == 'active',

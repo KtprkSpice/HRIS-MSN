@@ -5,75 +5,75 @@
 
     <style>
         /* Checkbox Filter Style */
-    .filter-container {
-    background: #f8f9fa;
-    border-radius: 16px;
-    padding: 20px;
-}
+        .filter-container {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 20px;
+        }
 
-.filter-group {
-    background: #fff;
-    border-radius: 12px;
-    padding: 15px;
-    border: 1px solid #e9ecef;
-}
+        .filter-group {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+        }
 
-.filter-title {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: #343a40;
-}
+        .filter-title {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #343a40;
+        }
 
-.checkbox-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px 20px;
-}
+        .checkbox-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 20px;
+        }
 
-.custom-checkbox {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 14px;
-    color: #495057;
-}
+        .custom-checkbox {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #495057;
+        }
 
-.custom-checkbox input {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-}
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
 
-.checkmark {
-    width: 18px;
-    height: 18px;
-    border: 2px solid #ced4da;
-    border-radius: 5px;
-    display: inline-block;
-    position: relative;
-    transition: all .2s ease;
-}
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ced4da;
+            border-radius: 5px;
+            display: inline-block;
+            position: relative;
+            transition: all .2s ease;
+        }
 
-.custom-checkbox input:checked + .checkmark {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
+        .custom-checkbox input:checked+.checkmark {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
 
-.custom-checkbox input:checked + .checkmark::after {
-    content: '';
-    position: absolute;
-    left: 4px;
-    top: 1px;
-    width: 5px;
-    height: 9px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
+        .custom-checkbox input:checked+.checkmark::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
 
         /* ========================= */
         /* MODERN TABLE STYLE       */
@@ -212,85 +212,75 @@
         </div>
     @endif
 
-        {{-- Filter --}}
+    {{-- Filter --}}
 
-  <div class="filter-container mb-4">
+    <div class="filter-container mb-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3">
 
-        <h6 class="fw-semibold mb-0">
-            <i class="fa-solid fa-filter me-2"></i>
-            Filter Tugas
-        </h6>
+            <h6 class="fw-semibold mb-0">
+                <i class="fa-solid fa-filter me-2"></i>
+                Filter Tugas
+            </h6>
 
-        <button
-            type="button"
-            id="resetFilter"
-            class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+            <button type="button" id="resetFilter" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
 
-            <i class="fa-solid fa-rotate-left me-1"></i>
-            Reset
+                <i class="fa-solid fa-rotate-left me-1"></i>
+                Reset
 
-        </button>
+            </button>
 
-    </div>
+        </div>
 
 
-    <div class="row g-3">
+        <div class="row g-3">
 
-        <div class="col-md-4">
+            <div class="col-md-4">
 
-            <div class="filter-group">
+                <div class="filter-group">
 
-                <label class="filter-title">
-                    Status
-                </label>
-
-                <div class="checkbox-list">
-
-                    <label class="custom-checkbox">
-
-                        <input
-                            type="checkbox"
-                            class="filter-checkbox single-filter"
-                            data-filter="status"
-                            value="pending">
-
-                        <span class="checkmark"></span>
-
-                        Pending
-
+                    <label class="filter-title">
+                        Status
                     </label>
 
+                    <div class="checkbox-list">
 
-                    <label class="custom-checkbox">
+                        <label class="custom-checkbox">
 
-                        <input
-                            type="checkbox"
-                            class="filter-checkbox single-filter"
-                            data-filter="status"
-                            value="on duty">
+                            <input type="checkbox" class="filter-checkbox single-filter" data-filter="status"
+                                value="pending">
 
-                        <span class="checkmark"></span>
+                            <span class="checkmark"></span>
 
-                        On Duty
+                            Pending
 
-                    </label>
+                        </label>
 
 
-                    <label class="custom-checkbox">
+                        <label class="custom-checkbox">
 
-                        <input
-                            type="checkbox"
-                            class="filter-checkbox single-filter"
-                            data-filter="status"
-                            value="done">
+                            <input type="checkbox" class="filter-checkbox single-filter" data-filter="status"
+                                value="on duty">
 
-                        <span class="checkmark"></span>
+                            <span class="checkmark"></span>
 
-                        Done
+                            On Duty
 
-                    </label>
+                        </label>
+
+
+                        <label class="custom-checkbox">
+
+                            <input type="checkbox" class="filter-checkbox single-filter" data-filter="status"
+                                value="done">
+
+                            <span class="checkmark"></span>
+
+                            Done
+
+                        </label>
+
+                    </div>
 
                 </div>
 
@@ -299,8 +289,6 @@
         </div>
 
     </div>
-
-</div>
 
     <!-- TABLE -->
     <div class="card shadow-sm border-0 rounded-4">
@@ -317,7 +305,7 @@
                 <table id="tugasTable" class="table align-middle mb-0">
                     <thead class="bg-light">
                         <tr>
-                            <th>Nama Tugas</th>
+                            <th>Nama Perusahaan</th>
                             <th>Deskripsi</th>
                             <th>Tanggal Mulai</th>
                             <th>Tanggal Selesai</th>
@@ -330,9 +318,7 @@
 
                     <tbody>
                         @foreach ($tasks as $task)
-                            <tr class="task-row"
-                            data-status = "{{ strtolower($task->status) }}"
-                            >
+                            <tr class="task-row" data-status = "{{ strtolower($task->status) }}">
 
                                 <td class="fw-semibold">
                                     {{ ucwords($task->name) }}
@@ -352,43 +338,43 @@
                                     {{ Carbon\Carbon::parse($task->end_time)->format('d M Y') }}
                                 </td>
 
-                                  @if (in_array($userRole, ['hr', 'owner']))
-                                <td>
-                                    <select onchange="changeStatus(this)" @class([
-                                        'form-select form-select-sm fw-medium text-center status-badge' => true,
-                                        'status-done' => $task->status == 'done',
-                                        'status-onduty' => $task->status == 'on duty',
-                                        'status-pending' => $task->status == 'pending',
-                                    ])>
+                                @if (in_array($userRole, ['hr', 'owner']))
+                                    <td>
+                                        <select onchange="changeStatus(this)" @class([
+                                            'form-select form-select-sm fw-medium text-center status-badge' => true,
+                                            'status-done' => $task->status == 'done',
+                                            'status-onduty' => $task->status == 'on duty',
+                                            'status-pending' => $task->status == 'pending',
+                                        ])>
 
-                                        <option value="{{ route('task.pending', $task->id) }}"
-                                            {{ $task->status == 'pending' ? 'selected' : '' }}>
-                                            Pending
-                                        </option>
+                                            <option value="{{ route('task.pending', $task->id) }}"
+                                                {{ $task->status == 'pending' ? 'selected' : '' }}>
+                                                Pending
+                                            </option>
 
-                                        <option value="{{ route('task.onduty', $task->id) }}"
-                                            {{ $task->status == 'on duty' ? 'selected' : '' }}>
-                                            On Duty
-                                        </option>
+                                            <option value="{{ route('task.onduty', $task->id) }}"
+                                                {{ $task->status == 'on duty' ? 'selected' : '' }}>
+                                                On Duty
+                                            </option>
 
-                                        <option value="{{ route('task.done', $task->id) }}"
-                                            {{ $task->status == 'done' ? 'selected' : '' }}>
-                                            Done
-                                        </option>
+                                            <option value="{{ route('task.done', $task->id) }}"
+                                                {{ $task->status == 'done' ? 'selected' : '' }}>
+                                                Done
+                                            </option>
 
-                                    </select>
-                                </td>
+                                        </select>
+                                    </td>
                                 @else
-                                  <td>
-                                    <span onchange="changeStatus(this)" @class([
-                                        'form-select form-select-sm fw-medium text-center status-badge' => true,
-                                        'status-done' => $task->status == 'done',
-                                        'status-onduty' => $task->status == 'on duty',
-                                        'status-pending' => $task->status == 'pending',
-                                    ])>
-                                    {{ $task->status }}
-                                  </span>
-                                </td>
+                                    <td>
+                                        <span onchange="changeStatus(this)" @class([
+                                            'form-select form-select-sm fw-medium text-center status-badge' => true,
+                                            'status-done' => $task->status == 'done',
+                                            'status-onduty' => $task->status == 'on duty',
+                                            'status-pending' => $task->status == 'pending',
+                                        ])>
+                                            {{ $task->status }}
+                                        </span>
+                                    </td>
                                 @endif
 
                                 <!-- STATUS -->
@@ -503,97 +489,97 @@
             window.location.href = select.value;
         }
 
-       document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
 
-    const checkboxes = document.querySelectorAll('.filter-checkbox');
-    const resetButton = document.getElementById('resetFilter');
+            const checkboxes = document.querySelectorAll('.filter-checkbox');
+            const resetButton = document.getElementById('resetFilter');
 
 
-    // =====================================================
-    // STATUS - HANYA BOLEH PILIH SATU
-    // =====================================================
+            // =====================================================
+            // STATUS - HANYA BOLEH PILIH SATU
+            // =====================================================
 
-    document.querySelectorAll('.single-filter').forEach(checkbox => {
+            document.querySelectorAll('.single-filter').forEach(checkbox => {
 
-        checkbox.addEventListener('change', function () {
+                checkbox.addEventListener('change', function() {
 
-            if (this.checked) {
+                    if (this.checked) {
 
-                document.querySelectorAll('.single-filter')
-                    .forEach(otherCheckbox => {
+                        document.querySelectorAll('.single-filter')
+                            .forEach(otherCheckbox => {
 
-                        if (otherCheckbox !== this) {
-                            otherCheckbox.checked = false;
-                        }
+                                if (otherCheckbox !== this) {
+                                    otherCheckbox.checked = false;
+                                }
 
-                    });
+                            });
 
-            }
+                    }
 
-            table.draw();
+                    table.draw();
+
+                });
+
+            });
+
+
+            // =====================================================
+            // CUSTOM DATATABLE FILTER
+            // =====================================================
+
+            DataTable.ext.search.push(function(settings, data, dataIndex) {
+
+                // Hanya untuk tabel tugas
+                if (settings.nTable.id !== 'tugasTable') {
+                    return true;
+                }
+
+
+                const row = settings.aoData[dataIndex].nTr;
+
+                if (!row) {
+                    return true;
+                }
+
+
+                // Status dari database
+                const status = row.dataset.status;
+
+
+                // Status yang dipilih
+                const selectedStatus =
+                    document.querySelector(
+                        '.single-filter[data-filter="status"]:checked'
+                    )?.value.toLowerCase() || null;
+
+
+                // Tidak ada filter
+                if (!selectedStatus) {
+                    return true;
+                }
+
+
+                // Cocokkan status
+                return status === selectedStatus;
+
+            });
+
+
+            // =====================================================
+            // RESET
+            // =====================================================
+
+            resetButton.addEventListener('click', function() {
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                table.draw();
+
+            });
 
         });
-
-    });
-
-
-    // =====================================================
-    // CUSTOM DATATABLE FILTER
-    // =====================================================
-
-    DataTable.ext.search.push(function (settings, data, dataIndex) {
-
-        // Hanya untuk tabel tugas
-        if (settings.nTable.id !== 'tugasTable') {
-            return true;
-        }
-
-
-        const row = settings.aoData[dataIndex].nTr;
-
-        if (!row) {
-            return true;
-        }
-
-
-        // Status dari database
-        const status = row.dataset.status;
-
-
-        // Status yang dipilih
-        const selectedStatus =
-            document.querySelector(
-                '.single-filter[data-filter="status"]:checked'
-            )?.value.toLowerCase() || null;
-
-
-        // Tidak ada filter
-        if (!selectedStatus) {
-            return true;
-        }
-
-
-        // Cocokkan status
-        return status === selectedStatus;
-
-    });
-
-
-    // =====================================================
-    // RESET
-    // =====================================================
-
-    resetButton.addEventListener('click', function () {
-
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-
-        table.draw();
-
-    });
-
-});
     </script>
 
 @endsection

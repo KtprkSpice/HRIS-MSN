@@ -74,7 +74,7 @@
                 <div class="row g-4">
 
                     <div class="col-12 col-md-6 col-lg-4">
-                        <label for="name" class="form-label fw-semibold">Nama Tugas</label>
+                        <label for="name" class="form-label fw-semibold">Nama Perusahaan</label>
                         <input type="text" class="form-control modern-input @error('name') is-invalid @enderror"
                             id="name" name="name" required value="{{ old('name') }}">
                         @error('name')
@@ -118,7 +118,8 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div>
                             <h6 class="mb-0">Shift Tugas</h6>
-                            <small class="text-muted">Shift ini dipakai sebagai pilihan saat export/import jadwal mingguan.</small>
+                            <small class="text-muted">Shift ini dipakai sebagai pilihan saat export/import jadwal
+                                mingguan.</small>
                         </div>
 
                         <button type="button" class="btn btn-sm btn-add-position" id="add-position">
