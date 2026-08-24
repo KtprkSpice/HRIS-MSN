@@ -340,6 +340,23 @@
 
 
     <!-- HEADER -->
+    @php
+        $reportMonths = [
+            '01' => 'Januari',
+            '02' => 'Februari',
+            '03' => 'Maret',
+            '04' => 'April',
+            '05' => 'Mei',
+            '06' => 'Juni',
+            '07' => 'Juli',
+            '08' => 'Agustus',
+            '09' => 'September',
+            '10' => 'Oktober',
+            '11' => 'November',
+            '12' => 'Desember',
+        ];
+    @endphp
+
     <div class="card border-0 shadow-sm rounded-4 mb-4 header-card">
         <div class="card-body p-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
 
@@ -356,7 +373,7 @@
                 <div class="mt-2">
                     <span class="badge bg-light text-dark me-2">
                         <i class="fa-solid fa-calendar me-1"></i>
-                        Periode: <span id="periode"></span>
+                        Periode: {{ $reportMonths[$selectedMonth] }} {{ $selectedYear }}
                     </span>
 
                     <span class="badge bg-light text-dark">
@@ -465,6 +482,35 @@
         </div>
 
         <div class="row g-3">
+
+            {{-- PERIODE --}}
+            <div class="col-md-4">
+                <div class="filter-group">
+                    <label class="filter-title">Periode Laporan</label>
+
+                    <form method="GET" action="{{ route('report.index') }}" class="d-flex gap-2">
+                        <select name="month" class="form-select form-select-sm rounded-pill">
+                            @foreach ($reportMonths as $monthValue => $monthName)
+                                <option value="{{ $monthValue }}" @selected($selectedMonth === $monthValue)>
+                                    {{ $monthName }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select name="year" class="form-select form-select-sm rounded-pill">
+                            @for ($year = now()->year + 1; $year >= 2023; $year--)
+                                <option value="{{ $year }}" @selected($selectedYear === (string) $year)>
+                                    {{ $year }}
+                                </option>
+                            @endfor
+                        </select>
+
+                        <button class="btn btn-sm btn-primary rounded-pill px-3" type="submit">
+                            Terapkan
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             {{-- STATUS --}}
             <div class="col-md-4">
@@ -608,7 +654,7 @@
     <!-- PRINT BUTTON (BOTTOM ONLY) -->
     <div class="d-flex justify-content-end mt-5 mb-2 no-print gap-3">
 
-        <a href="{{ route('report.export') }}" class="btn btn-success" id="btnExcel">
+        <a href="{{ route('report.export', ['month' => $selectedMonth, 'year' => $selectedYear]) }}" class="btn btn-success" id="btnExcel">
             <i class="fa fa-file-excel me-1"></i> Export Excel
         </a>
 
@@ -657,11 +703,6 @@
             ];
 
             const now = new Date();
-
-            const periodeElement = document.getElementById("periode");
-            if (periodeElement) {
-                periodeElement.innerText = bulan[now.getMonth()] + " " + now.getFullYear();
-            }
 
             const lastUpdateElement = document.getElementById("lastUpdate");
             if (lastUpdateElement) {
@@ -839,6 +880,8 @@
         // =========================
         // RESET
         // =========================
+        const checkboxes = document.querySelectorAll('.filter-checkbox');
+        const resetButton = document.getElementById('resetFilter');
 
         resetButton.addEventListener('click', function() {
 

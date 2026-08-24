@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Models\Schedule;
 use App\Models\Shift;
 use App\Models\Task;
+use App\Models\Presence;
 use App\Support\AttendancePolicy;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
@@ -63,10 +64,24 @@ class TaskScheduleImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                     continue;
                 }
 
+                if ($this->dateOutsideTaskPeriod($date)) {
+                    $this->errors[] =
+                        "Baris {$excelRow}: tanggal di luar periode tugas.";
+
+                    continue;
+                }
+
                 /*
                  * 1. LIBUR
                  */
                 if ($this->isOffDay($row)) {
+                    if ($this->hasPresence($employeeId, $date)) {
+                        $this->errors[] =
+                            "Baris {$excelRow}: jadwal sudah memiliki presensi dan tidak bisa diubah menjadi libur.";
+
+                        continue;
+                    }
+
                     Schedule::where('task_id', $this->task->id)
                         ->where('employee_id', $employeeId)
                         ->whereDate('date', $date)
@@ -79,6 +94,13 @@ class TaskScheduleImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                  * 2. CUTI APPROVED
                  */
                 if (AttendancePolicy::hasApprovedLeaveOnDate($employeeId, $date)) {
+                    if ($this->hasPresence($employeeId, $date)) {
+                        $this->errors[] =
+                            "Baris {$excelRow}: jadwal sudah memiliki presensi dan tidak bisa diubah menjadi cuti.";
+
+                        continue;
+                    }
+
                     Schedule::where('task_id', $this->task->id)
                         ->where('employee_id', $employeeId)
                         ->whereDate('date', $date)
@@ -96,6 +118,13 @@ class TaskScheduleImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
                 if (! $shift) {
                     $this->errors[] =
                         "Baris {$excelRow}: isi Shift ID atau Nama Shift.";
+
+                    continue;
+                }
+
+                if ($this->hasPresence($employeeId, $date)) {
+                    $this->errors[] =
+                        "Baris {$excelRow}: jadwal sudah memiliki presensi dan tidak bisa diubah.";
 
                     continue;
                 }
@@ -181,5 +210,21 @@ class TaskScheduleImport implements SkipsEmptyRows, ToCollection, WithHeadingRow
         $shiftName = strtoupper(trim((string) ($row['nama_shift'] ?? '')));
 
         return $shiftId === 'LIBUR' || $shiftName === 'LIBUR';
+    }
+
+    private function hasPresence(int $employeeId, string $date): bool
+    {
+        return Presence::where('employee_id', $employeeId)
+            ->where('task_id', $this->task->id)
+            ->whereDate('date', $date)
+            ->exists();
+    }
+
+    private function dateOutsideTaskPeriod(string $date): bool
+    {
+        $scheduleDate = Carbon::parse($date);
+
+        return $scheduleDate->lt(Carbon::parse($this->task->start_time)->startOfDay())
+            || $scheduleDate->gt(Carbon::parse($this->task->end_time)->startOfDay());
     }
 }

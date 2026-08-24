@@ -21,7 +21,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class TaskAssignmentExport implements FromCollection, WithHeadings, WithStyles, ShouldAutoSize, WithEvents
 {
-    public function __construct(protected Task $task, protected Carbon $weekStart)
+    public function __construct(protected Task $task, protected Carbon $weekStart, protected Carbon $weekEnd)
     {
     }
 
@@ -35,7 +35,7 @@ class TaskAssignmentExport implements FromCollection, WithHeadings, WithStyles, 
         $rowNumber = 1;
 
         foreach ($this->task->employees as $employee) {
-            for ($date = $this->weekStart->copy(); $date->lte($this->weekStart->copy()->addDays(6)); $date->addDay()) {
+            for ($date = $this->weekStart->copy(); $date->lte($this->weekEnd); $date->addDay()) {
                 $isOnLeave = in_array(
                     $date->toDateString(),
                     $leaveDates[$employee->id] ?? [],
@@ -131,19 +131,18 @@ class TaskAssignmentExport implements FromCollection, WithHeadings, WithStyles, 
 
     private function leaveDatesByEmployee(): array
     {
-        $weekEnd = $this->weekStart->copy()->addDays(6);
         $employeeIds = $this->task->employees->pluck('id');
         $leaveDates = [];
 
         $leaves = LeaveRequest::whereIn('employee_id', $employeeIds)
             ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
-            ->whereDate('start_date', '<=', $weekEnd->toDateString())
+            ->whereDate('start_date', '<=', $this->weekEnd->toDateString())
             ->whereDate('end_date', '>=', $this->weekStart->toDateString())
             ->get();
 
         foreach ($leaves as $leave) {
             $start = Carbon::parse($leave->start_date)->max($this->weekStart);
-            $end = Carbon::parse($leave->end_date)->min($weekEnd);
+            $end = Carbon::parse($leave->end_date)->min($this->weekEnd);
 
             for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
                 $leaveDates[$leave->employee_id][] = $date->toDateString();
@@ -197,13 +196,12 @@ class TaskAssignmentExport implements FromCollection, WithHeadings, WithStyles, 
 
                 $sheet->insertNewRowBefore(1, 7);
                 $lastColumn = 'T';
-                $weekEnd = $this->weekStart->copy()->addDays(6);
 
                 $sheet->setCellValue('A1', 'PT. MEGAJAYA SARANA NUSANTARA');
                 $sheet->setCellValue('A2', 'Gedung Sarana Square Lt.3A Jl. Tebet Barat, Jakarta');
                 $sheet->setCellValue('A3', 'Email: megajayasarananusantara@gmail.com | Telp: 0811227337');
                 $sheet->setCellValue('A5', 'TEMPLATE JADWAL KERJA MINGGUAN');
-                $sheet->setCellValue('A6', 'Tugas: '.ucwords($this->task->name).' | Periode: '.$this->weekStart->format('d-m-Y').' s/d '.$weekEnd->format('d-m-Y').' | Dicetak: '.now()->format('d-m-Y H:i:s'));
+                $sheet->setCellValue('A6', 'Tugas: '.ucwords($this->task->name).' | Periode: '.$this->weekStart->format('d-m-Y').' s/d '.$this->weekEnd->format('d-m-Y').' | Dicetak: '.now()->format('d-m-Y H:i:s'));
                 $sheet->setCellValue('A7', 'Isi kolom Nama Shift untuk setiap karyawan dan tanggal. Shift ID, Jam Masuk, dan Jam Keluar akan terisi otomatis. Referensi shift: '.$this->shiftReferenceText());
 
                 foreach ([1, 2, 3, 5, 6, 7] as $row) {
@@ -247,7 +245,8 @@ class TaskAssignmentExport implements FromCollection, WithHeadings, WithStyles, 
                     ],
                 ]);
 
-                $dataRowCount = max(1, $this->task->employees->count() * 7);
+                $dateCount = $this->weekStart->diffInDays($this->weekEnd) + 1;
+                $dataRowCount = max(1, $this->task->employees->count() * $dateCount);
                 $dataEndRow = 8 + $dataRowCount;
                 $sheet->getStyle("A8:{$lastColumn}{$dataEndRow}")->applyFromArray([
                     'alignment' => [

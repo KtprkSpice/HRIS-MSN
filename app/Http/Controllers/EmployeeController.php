@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
@@ -61,7 +62,9 @@ class EmployeeController extends Controller
         } else {
             $divisions = Division::where('status', 'active');
             $positions = Position::all();
-            $roles = Role::all();
+            $roles = $roles === 'hr'
+                ? Role::where('name', 'employee')->get()
+                : Role::all();
         }
 
         return view('Employees.create', compact('divisions', 'roles', 'positions'));
@@ -100,6 +103,8 @@ class EmployeeController extends Controller
             if (! ($employeeRole)) {
                 return redirect()->back()->withErrors(['error' => 'Role Employee tidak ada']);
             }
+
+            $validated['role_id'] = $employeeRole->id;
         }
 
         // Owner else ($roles === 'owner') {
@@ -122,8 +127,8 @@ class EmployeeController extends Controller
                 'phone' => $validated['phone'],
                 'hire_date' => $validated['hire_date'],
                 'born_date' => $validated['born_date'],
-                'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
-                'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'],
+                'bpjs_kesehatan' => $validated['bpjs_kesehatan'] ?? null,
+                'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'] ?? null,
                 'npwp' => $validated['npwp'],
                 'status' => 'active',
                 'user_id' => $user->id,
@@ -141,7 +146,9 @@ class EmployeeController extends Controller
             abort(403);
         } else {
             $divisions = Division::where('status', 'active');
-            $roles = Role::all();
+            $roles = $roles === 'hr'
+                ? Role::where('name', 'employee')->get()
+                : Role::all();
             $user = User::all();
             $positions = Position::all();
         }
@@ -156,18 +163,18 @@ class EmployeeController extends Controller
 
         $validated = $request->validate([
             'fullname' => 'required|string|max:255',
-            'nik' => 'required|digits_between:1,20',
+            'nik' => ['required', 'digits_between:1,20', Rule::unique('employees', 'nik')->ignore($employee->id)],
             'position_id' => 'required',
             'gender' => 'required|string',
             'address' => 'nullable|string',
             'gender' => 'required|string',
-            'email' => 'required|string',
-            'phone' => 'required|digits_between:1,20|max:20',
+            'email' => ['required', 'string', Rule::unique('employees', 'email')->ignore($employee->id)],
+            'phone' => ['required', 'digits_between:1,20', 'max:20', Rule::unique('employees', 'phone')->ignore($employee->id)],
             'hire_date' => 'required|date',
             'born_date' => 'required|date',
-            'bpjs_kesehatan' => 'nullable|digits_between:1,20|max:20',
-            'bpjs_ketenagakerjaan' => 'nullable|digits_between:1,20|max:20',
-            'npwp' => 'required|max:30',
+            'bpjs_kesehatan' => ['nullable', 'digits_between:1,20', 'max:20', Rule::unique('employees', 'bpjs_kesehatan')->ignore($employee->id)],
+            'bpjs_ketenagakerjaan' => ['nullable', 'digits_between:1,20', 'max:20', Rule::unique('employees', 'bpjs_ketenagakerjaan')->ignore($employee->id)],
+            'npwp' => ['required', 'max:30', Rule::unique('employees', 'npwp')->ignore($employee->id)],
             'role_id' => 'required|exists:roles,id',
             'status' => 'required|string|max:255',
 
@@ -186,6 +193,8 @@ class EmployeeController extends Controller
             if (! ($employeeRole)) {
                 return redirect()->back()->withErrors(['error' => 'Role Employee tidak ada']);
             }
+
+            $validated['role_id'] = $employeeRole->id;
         }
 
         $employee->update([
@@ -199,8 +208,8 @@ class EmployeeController extends Controller
             'phone' => $validated['phone'],
             'hire_date' => $validated['hire_date'],
             'born_date' => $validated['born_date'],
-            'bpjs_kesehatan' => $validated['bpjs_kesehatan'],
-            'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'],
+            'bpjs_kesehatan' => $validated['bpjs_kesehatan'] ?? null,
+            'bpjs_ketenagakerjaan' => $validated['bpjs_ketenagakerjaan'] ?? null,
             'npwp' => $validated['npwp'],
             'status' => $validated['status'],
         ]);

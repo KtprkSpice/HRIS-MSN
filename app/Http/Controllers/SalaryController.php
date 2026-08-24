@@ -21,9 +21,11 @@ class SalaryController extends Controller
         $roles = auth()->user()->role->name;
 
         if ($roles === 'employee') {
-            $salaries = Salary::where('employee_id', $user->employee->id)->get();
+            $salaries = Salary::where('employee_id', $user->employee->id)
+                ->orderByDesc('date')
+                ->get();
         } else {
-            $salaries = Salary::all();
+            $salaries = Salary::orderByDesc('date')->get();
         }
 
         return view('Salary.index', compact('salaries'));
@@ -33,6 +35,7 @@ class SalaryController extends Controller
     {
         $period = Carbon::parse($salary->date);
         $start = $period->copy()->startOfMonth();
+        // Tanggal 29 adalah hari generate/gajian, jadi absensi dihitung sampai tanggal 28.
         $end = $period->copy()->day(28);
 
         $employee = Employee::with('position')->find($salary->employee_id);
@@ -83,10 +86,6 @@ class SalaryController extends Controller
 
     public function store(Request $request)
     {
-        $today = today();
-        $start = $today->copy()->startOfMonth();
-        $end = $today->copy()->day(28);
-
         $roles = auth()->user()->role->name;
 
         if ($roles === 'employee') {
@@ -103,6 +102,19 @@ class SalaryController extends Controller
                 'late_cuts' => 'nullable',
             ]);
 
+            $period = $request->filled('date')
+                ? Carbon::parse($request->date)
+                : today();
+            $start = $period->copy()->startOfMonth();
+            // Tanggal 29 adalah hari generate/gajian, jadi absensi dihitung sampai tanggal 28.
+            $end = $period->copy()->day(28);
+
+            if (Salary::where('employee_id', $request->employee_id)->whereDate('date', $start)->exists()) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['date' => 'Slip gaji karyawan untuk periode ini sudah ada.']);
+            }
+
             // Leave auto Cuts
             $leaveCuts = 0;
 
@@ -110,8 +122,8 @@ class SalaryController extends Controller
                 ->where('employee_id', $request->employee_id)
                 ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
                 ->where(function ($q) use ($start, $end) {
-                    $q->whereBetween('start_date', [$start, $end])
-                        ->orWhereBetween('end_date', [$start, $end]);
+                    $q->whereDate('start_date', '<=', $end)
+                        ->whereDate('end_date', '>=', $start);
                 })
                 ->get();
 
@@ -135,8 +147,17 @@ class SalaryController extends Controller
             $bpjsKesehatanCuts = (int) str_replace('.', '', $request->bpjs_kesehatan_cuts);
             $bpjsKetenagakerjaanCuts = (int) str_replace('.', '', $request->bpjs_ketenagakerjaan_cuts);
 
-            $absentCuts = (int) str_replace('.', '', $request->absent_cuts);
-            $lateCuts = (int) str_replace('.', '', $request->late_cuts);
+            $absentCuts = AttendancePolicy::payableAbsenceQuery(
+                $request->employee_id,
+                $start,
+                $end,
+            )->count() * 50000;
+
+            $lateCuts = Presence::where('employee_id', $request->employee_id)
+                ->whereBetween('date', [$start, $end])
+                ->whereHas('schedule')
+                ->where('late_minutes', '>', 0)
+                ->count() * 15000;
 
             $totalCuts = $bpjsKesehatanCuts +
                 $bpjsKetenagakerjaanCuts +
@@ -160,9 +181,10 @@ class SalaryController extends Controller
                 'cuts' => $totalCuts + $tax,
                 'pph_cuts' => $tax,
                 'total' => $total,
+                'date' => $start->toDateString(),
             ]);
 
-            Salary::create($request->all());
+            Salary::create($request->only((new Salary())->getFillable()));
         }
 
         return redirect()->route('salary.index')->with('success', 'Data Berhasil ditambahkan');
@@ -189,10 +211,6 @@ class SalaryController extends Controller
         if ($roles === 'employee') {
             abort(403);
         } else {
-            $today = today();
-            $start = $today->copy()->startOfMonth();
-            $end = $today->copy()->day(28);
-
             $request->validate([
                 'employee_id' => 'required',
                 'net_salary' => 'required',
@@ -205,14 +223,32 @@ class SalaryController extends Controller
 
             ]);
 
+            $period = $request->filled('date')
+                ? Carbon::parse($request->date)
+                : Carbon::parse($salary->date);
+            $start = $period->copy()->startOfMonth();
+            // Tanggal 29 adalah hari generate/gajian, jadi absensi dihitung sampai tanggal 28.
+            $end = $period->copy()->day(28);
+
+            if (
+                Salary::where('employee_id', $request->employee_id)
+                    ->whereDate('date', $start)
+                    ->where('id', '!=', $salary->id)
+                    ->exists()
+            ) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['date' => 'Slip gaji karyawan untuk periode ini sudah ada.']);
+            }
+
             $leaveCuts = 0;
 
             $leaves = LeaveRequest::with('types')
                 ->where('employee_id', $request->employee_id)
                 ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
                 ->where(function ($q) use ($start, $end) {
-                    $q->whereBetween('start_date', [$start, $end])
-                        ->orWhereBetween('end_date', [$start, $end]);
+                    $q->whereDate('start_date', '<=', $end)
+                        ->whereDate('end_date', '>=', $start);
                 })
                 ->get();
 
@@ -239,8 +275,17 @@ class SalaryController extends Controller
             $bpjsKesehatanCuts = (int) str_replace('.', '', $request->bpjs_kesehatan_cuts);
             $bpjsKetenagakerjaanCuts = (int) str_replace('.', '', $request->bpjs_ketenagakerjaan_cuts);
 
-            $absentCuts = (int) str_replace('.', '', $request->absent_cuts);
-            $lateCuts = (int) str_replace('.', '', $request->late_cuts);
+            $absentCuts = AttendancePolicy::payableAbsenceQuery(
+                $request->employee_id,
+                $start,
+                $end,
+            )->count() * 50000;
+
+            $lateCuts = Presence::where('employee_id', $request->employee_id)
+                ->whereBetween('date', [$start, $end])
+                ->whereHas('schedule')
+                ->where('late_minutes', '>', 0)
+                ->count() * 15000;
 
             $totalCuts = $bpjsKesehatanCuts + $bpjsKetenagakerjaanCuts + $absentCuts + $lateCuts + $leaveCuts;
 
@@ -260,9 +305,10 @@ class SalaryController extends Controller
                 'cuts' => $totalCuts + $tax,
                 'pph_cuts' => $tax,
                 'total' => $total,
+                'date' => $start->toDateString(),
             ]);
 
-            $salary->update($request->all());
+            $salary->update($request->only($salary->getFillable()));
         }
 
         return redirect()->route('salary.index')->with('success', 'Data Telah diubah');
@@ -292,7 +338,14 @@ class SalaryController extends Controller
 
         Log::info('Generate Salary Requested');
 
-        Artisan::call('app:generate-salary');
+        $exitCode = Artisan::call('app:generate-salary');
+
+        if ($exitCode !== 0) {
+            return back()->with(
+                'error',
+                'Slip gaji hanya bisa digenerate pada tanggal 29.'
+            );
+        }
 
         return back()->with(
             'success',

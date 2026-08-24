@@ -88,6 +88,15 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="card-body pt-0">
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 mt-2" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </div>
+            @endif
+
         </div>
     @endif
 
@@ -187,8 +196,8 @@
                     <tbody>
                         @foreach ($salaries as $salary)
                             <tr
-                            data-month="{{ $salary->created_at->format('m') }}"
-                            data-year="{{ $salary->created_at->format('Y') }}">
+                            data-month="{{ \Carbon\Carbon::parse($salary->date)->format('m') }}"
+                            data-year="{{ \Carbon\Carbon::parse($salary->date)->format('Y') }}">
                                 <td>{{ $loop->iteration }}</td>
                                 <td class="fw-bold text-dark">
                                     {{ ucwords($salary->employee->fullname) }}

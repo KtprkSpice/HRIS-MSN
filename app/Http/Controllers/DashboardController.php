@@ -21,16 +21,22 @@ class DashboardController extends Controller
             ->count();
 
         $employees = Employee::where('status', 'active')
+            ->whereHas('user.role', function ($q) {
+                $q->where('name', 'employee');
+            })
             ->with('division')
-            ->withCount(['presence as absencesCount' => function ($q) use ($startMonth, $endMonth) {
+            ->withCount(['presence as absence_count' => function ($q) use ($startMonth, $endMonth) {
                 $q->whereBetween('date', [$startMonth, $endMonth])
                     ->where('status', 'absent');
             }])
+            ->withCount(['schedules as schedule_count' => function ($q) use ($startMonth, $endMonth) {
+                $q->whereBetween('date', [$startMonth, $endMonth]);
+            }])
             ->get()
-            ->map(function ($employee) use ($workDaysInCurrentMonth) {
-                $attendancePercentage = $workDaysInCurrentMonth > 0
-                    ? (($workDaysInCurrentMonth - $employee->absenceCount) / $workDaysInCurrentMonth) * 100
-                    : 0;
+            ->map(function ($employee) {
+                $attendancePercentage = $employee->schedule_count > 0
+                    ? (($employee->schedule_count - $employee->absence_count) / $employee->schedule_count) * 100
+                    : 100;
                 $employee->attendancePercentage = max(0, round($attendancePercentage, 1));
 
                 return $employee;
@@ -40,7 +46,7 @@ class DashboardController extends Controller
             })
             ->sortBy([
                 ['attendancePercentage', 'asc'],
-                ['absenceCount', 'desc'],
+                ['absence_count', 'desc'],
             ])
             ->take(10)
             ->values();
@@ -60,12 +66,41 @@ class DashboardController extends Controller
 
         $totalEmployee = $maleEmployee + $femaleEmployee;
 
-        $leaveCounts = LeaveRequest::where('status', 'pending')->whereHas('employee', function ($q) use ($userId) {
-            $q->where('id', $userId->employee->id);
-        })->count();
+        $leaveCounts = LeaveRequest::where('status', 'pending')
+            ->when($user === 'employee', function ($q) use ($userId) {
+                $q->whereHas('employee', function ($employeeQuery) use ($userId) {
+                    $employeeQuery->where('id', $userId->employee->id);
+                });
+            })
+            ->count();
+
+        $employeeAttendancePercentage = 100;
+        if ($user === 'employee' && $userId->employee) {
+            $employeeAbsences = $userId->employee->presence()
+                ->whereBetween('date', [$startMonth, $endMonth])
+                ->where('status', 'absent')
+                ->count();
+
+            $employeeScheduleCount = $userId->employee->schedules()
+                ->whereBetween('date', [$startMonth, $endMonth])
+                ->count();
+
+            $employeeAttendancePercentage = $employeeScheduleCount > 0
+                ? max(0, round((($employeeScheduleCount - $employeeAbsences) / $employeeScheduleCount) * 100, 1))
+                : 100;
+        }
 
         $totalDivisions = Division::where('status', 'active')->count();
 
-        return view('Dashboard.index', compact('employees', 'maleEmployee', 'femaleEmployee', 'totalEmployee', 'leaveCounts', 'totalDivisions', 'workDaysInCurrentMonth'));
+        return view('Dashboard.index', compact(
+            'employees',
+            'maleEmployee',
+            'femaleEmployee',
+            'totalEmployee',
+            'leaveCounts',
+            'totalDivisions',
+            'workDaysInCurrentMonth',
+            'employeeAttendancePercentage'
+        ));
     }
 }

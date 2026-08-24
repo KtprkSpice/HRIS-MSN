@@ -176,6 +176,7 @@
                                             <input type="date" id="week_start" name="week_start"
                                                 class="form-control form-control-sm"
                                                 value="{{ $weekStart->format('Y-m-d') }}">
+                                            <small class="text-muted">Otomatis mengikuti tanggal mulai tugas.</small>
                                         </div>
                                         <button type="submit" class="btn btn-success rounded-pill px-4">
                                             <i class="fa-solid fa-file-excel me-2"></i> Export Template
@@ -407,6 +408,7 @@
                                 <label for="schedule_week_start" class="form-label small fw-semibold mb-1">Minggu</label>
                                 <input type="date" id="schedule_week_start" name="week_start"
                                     class="form-control form-control-sm" value="{{ $weekStart->format('Y-m-d') }}">
+                                <small class="text-muted">Disesuaikan dengan periode tugas.</small>
                             </div>
                             <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">
                                 <i class="fa-solid fa-eye me-1"></i> Lihat

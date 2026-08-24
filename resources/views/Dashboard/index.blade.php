@@ -113,7 +113,7 @@
 
             @if ($userRole === 'employee')
                 <!-- KHUSUS PEGAWAI: CUTI PENDING (WIDE & COMPACT) -->
-                <div class="col-12 d-flex">
+                <div class="col-md-6 d-flex">
                     <div class="card shadow-sm border-0 rounded-4 flex-fill overflow-hidden w-100">
 
                         <!-- HEADER -->
@@ -167,9 +167,51 @@
 
                     </div>
                 </div>
+
+                <div class="col-md-6 d-flex">
+                    <div class="card shadow-sm border-0 rounded-4 flex-fill overflow-hidden w-100">
+                        <div class="card-header text-white d-flex align-items-center justify-content-between py-2"
+                            style="background: linear-gradient(135deg, #aa2c36, #c73a44); border: none;">
+                            <div class="fw-semibold">
+                                Kehadiran
+                            </div>
+
+                            <div class="fs-4">
+                                <i class="fa-solid fa-user-check"></i>
+                            </div>
+                        </div>
+
+                        <div class="card-body d-flex align-items-center justify-content-between py-3 px-4">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="fs-2 text-warning">
+                                    <i class="fa-solid fa-user-check"></i>
+                                </div>
+
+                                <div>
+                                    <div class="fw-semibold">
+                                        Bulan Ini
+                                    </div>
+                                    <div class="text-muted small">
+                                        Persentase kehadiran pegawai
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end">
+                                <h3 class="fw-bold text-warning mb-0">
+                                    {{ $employeeAttendancePercentage }}%
+                                </h3>
+
+                                <div class="text-muted small">
+                                    Kehadiran
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @else
                 <!-- OWNER / HR: SEMUA CARD TETAP -->
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="fs-2 text-primary"><i class="fa-solid fa-users"></i></div>
@@ -179,7 +221,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="fs-2 text-success"><i class="fa-solid fa-building"></i></div>
@@ -189,22 +231,12 @@
                     </div>
                 </div>
 
-                <div class="col-md-3">
+                <div class="col-md-4">
                     <div class="card shadow-sm">
                         <div class="card-body">
                             <div class="fs-2 text-danger"><i class="fa-solid fa-calendar-xmark"></i></div>
                             <h5 class="card-title">Cuti Pending</h5>
                             <p class="card-text">{{ $leaveCounts }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="fs-2 text-warning"><i class="fa-solid fa-user-check"></i></div>
-                            <h5 class="card-title">Kehadiran</h5>
-                            <p class="card-text">100%</p>
                         </div>
                     </div>
                 </div>
@@ -278,7 +310,7 @@
                                             <tr>
                                                 <td>{{ ucwords($employee->fullname) }}</td>
                                                 <td>{{ ucwords($employee->division->name ?? '-') }}</td>
-                                                <td>{{ $employee->absenceCount }} kali</td>
+                                                <td>{{ $employee->absence_count }} kali</td>
                                                 <td data-order="{{ $h }}">
                                                     <span
                                                         class="badge {{ $h < 50 ? 'bg-danger' : ($h <= 70 ? 'bg-warning text-dark' : 'bg-success') }}">

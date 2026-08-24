@@ -6,7 +6,6 @@ use App\Models\Employee;
 use App\Models\Presence;
 use App\Models\QrCode;
 use App\Models\Schedule;
-use App\Models\Shift;
 use App\Models\Task;
 use App\Models\Tasklocation;
 use Carbon\Carbon;
@@ -33,16 +32,22 @@ class PresecesController extends Controller
 
     public function create()
     {
-        $presences = Presence::all();
-        $employees = Employee::all();
-        $tasks = Task::all();
-        $shifts = Shift::all();
+        if (auth()->user()->role->name === 'employee') {
+            abort(403);
+        }
 
-        return view('presences.create', compact('presences', 'employees', 'tasks', 'shifts'));
+        $employees = Employee::where('status', 'active')->get();
+        $scheduleOptions = $this->manualPresenceScheduleOptions();
+
+        return view('presences.create', compact('employees', 'scheduleOptions'));
     }
 
     public function store(Request $request)
     {
+        if (auth()->user()->role->name === 'employee') {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required',
             'date' => 'required|date',
@@ -52,15 +57,17 @@ class PresecesController extends Controller
             'task_id' => 'required',
         ]);
 
-        $shift = Shift::findOrFail($validated['shift_id']);
+        $schedule = $this->findManualPresenceSchedule($validated);
 
-        $schedule = Schedule::create([
-            'employee_id' => $validated['employee_id'],
-            'shift_id' => $validated['shift_id'],
-            'task_id' => $validated['task_id'],
-            'date' => $validated['date'],
-            'source' => 'manual',
-        ]);
+        if (! $schedule) {
+            return back()->withInput()->with('warning', 'Kehadiran manual harus mengikuti jadwal yang sudah diimport/dibuat. Pilih karyawan dan tanggal yang memiliki jadwal aktif.');
+        }
+
+        if (Presence::where('schedule_id', $schedule->id)->exists()) {
+            return back()->withInput()->with('warning', 'Presensi untuk jadwal ini sudah ada.');
+        }
+
+        $shift = $schedule->shift;
 
         // Default kalau gak ada check_in sama sekali -> absent
         $status = 'absent';
@@ -69,9 +76,16 @@ class PresecesController extends Controller
 
         if (! empty($validated['check_in'])) {
             $checkIn = Carbon::parse($validated['check_in']);
+            $scheduleDate = Carbon::parse($schedule->date)->toDateString();
+
+            if ($checkIn->toDateString() !== $scheduleDate) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('warning', 'Jam masuk harus berada di tanggal jadwal yang dipilih.');
+            }
 
             // Jadwal seharusnya masuk jam berapa (gabungin tanggal + jam shift)
-            $scheduledStart = Carbon::parse($validated['date'] . ' ' . $shift->start_time);
+            $scheduledStart = Carbon::parse($scheduleDate . ' ' . $shift->start_time);
 
             // Batas toleransi telat
             $toleranceLimit = $scheduledStart->copy()->addMinutes($shift->late_tolerance_minutes);
@@ -99,6 +113,12 @@ class PresecesController extends Controller
                     $checkOut->addDay();
                 }
 
+                if (! $shift->cross_day && $checkOut->lessThan($checkIn)) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('warning', 'Jam keluar tidak boleh lebih awal dari jam masuk.');
+                }
+
                 $workMinutes = $checkIn->diffInMinutes($checkOut);
             }
         }
@@ -106,9 +126,9 @@ class PresecesController extends Controller
         Presence::create([
             'employee_id' => $validated['employee_id'],
             'schedule_id' => $schedule->id,
-            'shift_id' => $validated['shift_id'],
-            'task_id' => $validated['task_id'],
-            'date' => $validated['date'],
+            'shift_id' => $schedule->shift_id,
+            'task_id' => $schedule->task_id,
+            'date' => $schedule->date,
             'check_in' => $validated['check_in'] ?? null,
             'check_out' => $validated['check_out'] ?? null,
             'work_minutes' => $workMinutes,
@@ -122,16 +142,22 @@ class PresecesController extends Controller
 
     public function edit(Presence $presence)
     {
-        $presences = Presence::all();
-        $employees = Employee::all();
-        $tasks = Task::all();
-        $shifts = Shift::all();
+        if (auth()->user()->role->name === 'employee') {
+            abort(403);
+        }
 
-        return view('presences.edit', compact('employees', 'presence', 'shifts', 'tasks'));
+        $employees = Employee::where('status', 'active')->get();
+        $scheduleOptions = $this->manualPresenceScheduleOptions($presence);
+
+        return view('presences.edit', compact('employees', 'presence', 'scheduleOptions'));
     }
 
     public function update(Presence $presence, Request $request)
     {
+        if (auth()->user()->role->name === 'employee') {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'employee_id' => 'required',
             'task_id' => 'required',
@@ -141,15 +167,21 @@ class PresecesController extends Controller
             'check_out' => 'nullable|date',
         ]);
 
-        $shift = Shift::findOrFail($validated['shift_id']);
+        $schedule = $this->findManualPresenceSchedule($validated);
 
-        // Update schedule yang terkait (bukan bikin baru)
-        $presence->schedule()->update([
-            'employee_id' => $validated['employee_id'],
-            'shift_id' => $validated['shift_id'],
-            'task_id' => $validated['task_id'],
-            'date' => $validated['date'],
-        ]);
+        if (! $schedule) {
+            return back()->withInput()->with('warning', 'Kehadiran manual harus mengikuti jadwal yang sudah diimport/dibuat. Pilih karyawan dan tanggal yang memiliki jadwal aktif.');
+        }
+
+        $hasOtherPresence = Presence::where('schedule_id', $schedule->id)
+            ->where('id', '!=', $presence->id)
+            ->exists();
+
+        if ($hasOtherPresence) {
+            return back()->withInput()->with('warning', 'Presensi untuk jadwal ini sudah ada.');
+        }
+
+        $shift = $schedule->shift;
 
         // Hitung ulang status, late_minutes, work_minutes
         $status = 'absent';
@@ -158,7 +190,15 @@ class PresecesController extends Controller
 
         if (! empty($validated['check_in'])) {
             $checkIn = Carbon::parse($validated['check_in']);
-            $scheduledStart = Carbon::parse($validated['date'] . ' ' . $shift->start_time);
+            $scheduleDate = Carbon::parse($schedule->date)->toDateString();
+
+            if ($checkIn->toDateString() !== $scheduleDate) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('warning', 'Jam masuk harus berada di tanggal jadwal yang dipilih.');
+            }
+
+            $scheduledStart = Carbon::parse($scheduleDate . ' ' . $shift->start_time);
             $toleranceLimit = $scheduledStart->copy()->addMinutes($shift->late_tolerance_minutes);
 
             if ($checkIn->lessThan($scheduledStart)) {
@@ -182,15 +222,22 @@ class PresecesController extends Controller
                     $checkOut->addDay();
                 }
 
+                if (! $shift->cross_day && $checkOut->lessThan($checkIn)) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('warning', 'Jam keluar tidak boleh lebih awal dari jam masuk.');
+                }
+
                 $workMinutes = $checkIn->diffInMinutes($checkOut);
             }
         }
 
         $presence->update([
             'employee_id' => $validated['employee_id'],
-            'shift_id' => $validated['shift_id'],
-            'task_id' => $validated['task_id'],
-            'date' => $validated['date'],
+            'schedule_id' => $schedule->id,
+            'shift_id' => $schedule->shift_id,
+            'task_id' => $schedule->task_id,
+            'date' => $schedule->date,
             'check_in' => $validated['check_in'],
             'check_out' => $validated['check_out'] ?? null,
             'work_minutes' => $workMinutes,
@@ -201,8 +248,64 @@ class PresecesController extends Controller
         return redirect()->route('presence.index')->with('success', 'Data Berhasil Diubah');
     }
 
+    private function manualPresenceScheduleOptions(?Presence $presence = null)
+    {
+        $currentScheduleId = $presence?->schedule_id;
+
+        return Schedule::with(['task', 'shift'])
+            ->whereHas('employee', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->where(function ($query) use ($currentScheduleId) {
+                $query->whereHas('task', function ($taskQuery) {
+                    $taskQuery->whereIn('status', ['pending', 'on duty']);
+                });
+
+                if ($currentScheduleId) {
+                    $query->orWhere('id', $currentScheduleId);
+                }
+            })
+            ->get()
+            ->filter(fn ($schedule) => $schedule->task && $schedule->shift)
+            ->map(function ($schedule) {
+                $startTime = Carbon::parse($schedule->shift->start_time)->format('H:i');
+                $endTime = Carbon::parse($schedule->shift->end_time)->format('H:i');
+
+                return [
+                    'schedule_id' => (string) $schedule->id,
+                    'employee_id' => (string) $schedule->employee_id,
+                    'date' => Carbon::parse($schedule->date)->toDateString(),
+                    'task_id' => (string) $schedule->task_id,
+                    'task_name' => $schedule->task->name,
+                    'shift_id' => (string) $schedule->shift_id,
+                    'shift_name' => "{$schedule->shift->name} ({$startTime} - {$endTime})",
+                ];
+            })
+            ->values();
+    }
+
+    private function findManualPresenceSchedule(array $validated): ?Schedule
+    {
+        return Schedule::with(['task', 'shift'])
+            ->where('employee_id', $validated['employee_id'])
+            ->where('task_id', $validated['task_id'])
+            ->where('shift_id', $validated['shift_id'])
+            ->whereDate('date', $validated['date'])
+            ->whereHas('employee', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->whereHas('task', function ($query) {
+                $query->whereIn('status', ['pending', 'on duty']);
+            })
+            ->first();
+    }
+
     public function destroy(Presence $presence)
     {
+        if (auth()->user()->role->name === 'employee') {
+            abort(403);
+        }
+
         $presence->delete();
 
         return redirect()->route('presence.index')->with('success', 'Data Telah dihapus');
@@ -304,19 +407,37 @@ class PresecesController extends Controller
                 ->where('is_active', true)
                 ->first();
 
-            if (! $qr) {
+            if (! $qr || Carbon::parse($qr->expires_at)->lt(now())) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'QR tidak valid atau tidak aktif',
+                    'message' => 'QR tidak valid, tidak aktif, atau sudah expired',
                 ]);
             }
 
-            //  AMBIL SCHEDULE HARI INI
-            $schedule = Schedule::with('shift')
+            // Gunakan record yang benar-benar memiliki check-in untuk check-out.
+            // Jangan bergantung pada schedule_id saja, karena data lama dapat memiliki
+            // lebih dari satu schedule atau record absent yang dibuat otomatis.
+            $checkedInPresence = Presence::with('schedule.shift')
                 ->where('employee_id', $employee->id)
                 ->where('task_id', $task->id)
-                ->whereDate('date', today())
+                ->whereBetween('date', [
+                    today()->copy()->subDay()->toDateString(),
+                    today()->toDateString(),
+                ])
+                ->whereNotNull('check_in')
+                ->whereNull('check_out')
+                ->latest('check_in')
                 ->first();
+
+            if ($qr->type === 'check_out' && $checkedInPresence?->schedule) {
+                $schedule = $checkedInPresence->schedule;
+            } else {
+                $schedule = Schedule::with('shift')
+                    ->where('employee_id', $employee->id)
+                    ->where('task_id', $task->id)
+                    ->whereDate('date', today())
+                    ->first();
+            }
 
             if (! $schedule) {
                 return response()->json([
@@ -328,22 +449,11 @@ class PresecesController extends Controller
             // Record untuk schedule aktif; dapat sudah dibuat oleh auto-absen.
             $presenceForSchedule = Presence::where('employee_id', $employee->id)
                 ->where('schedule_id', $schedule->id)
-                ->whereDate('date', today())
-                ->first();
-
-            // Gunakan record yang benar-benar memiliki check-in untuk check-out.
-            // Jangan bergantung pada schedule_id saja, karena data lama dapat memiliki
-            // lebih dari satu schedule atau record absent yang dibuat otomatis.
-            $checkedInPresence = Presence::where('employee_id', $employee->id)
-                ->where('task_id', $task->id)
-                ->whereDate('date', today())
-                ->whereNotNull('check_in')
-                ->latest('check_in')
+                ->whereDate('date', $schedule->date)
                 ->first();
 
             $now = now();
-            $shiftStart = today()->setTimeFromTimeString($schedule->shift->start_time);
-            $shiftEnd = today()->setTimeFromTimeString($schedule->shift->end_time);
+            $shiftStart = Carbon::parse($schedule->date)->setTimeFromTimeString($schedule->shift->start_time);
 
             // CHECK IN
             if ($qr->type === 'check_in') {
@@ -373,7 +483,9 @@ class PresecesController extends Controller
                 $status = 'on time';
                 $lateMinutes = 0;
 
-                if ($now->greaterThan($shiftStart)) {
+                $toleranceLimit = $shiftStart->copy()->addMinutes($schedule->shift->late_tolerance_minutes);
+
+                if ($now->greaterThan($toleranceLimit)) {
                     $lateRaw = $shiftStart->diffInMinutes($now);
                     $lateMinutes = (int) ceil($lateRaw / 5) * 5;
                     $status = 'late';
@@ -386,7 +498,7 @@ class PresecesController extends Controller
                     'shift_id' => $schedule->shift_id,
                     'latitude' => $request->latitude,
                     'longitude' => $request->longitude,
-                    'date' => today(),
+                    'date' => $schedule->date,
                     'check_in' => now(),
                     'late_minutes' => $lateMinutes,
                     'status' => $status,

@@ -100,12 +100,6 @@
                                 <select name="task_id" id="task_id"
                                     class="form-control select2-js @error('task_id') is-invalid @enderror">
                                     <option value="">-- Pilih Tugas --</option>
-                                    @foreach ($tasks as $task)
-                                        <option value="{{ $task->id }}"
-                                            {{ old('task_id', $presence->task_id) == $task->id ? 'selected' : '' }}>
-                                            {{ ucwords($task->name) }}
-                                        </option>
-                                    @endforeach
                                 </select>
                                 @error('task_id')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
@@ -119,12 +113,6 @@
                                 <select name="shift_id" id="shift_id"
                                     class="form-control select2-js @error('shift_id') is-invalid @enderror">
                                     <option value="">-- Pilih Shift --</option>
-                                    @foreach ($shifts as $shift)
-                                        <option value="{{ $shift->id }}"
-                                            {{ old('shift_id', $presence->shift_id) == $shift->id ? 'selected' : '' }}>
-                                            {{ ucwords($shift->name) }}
-                                        </option>
-                                    @endforeach
                                 </select>
                                 @error('shift_id')
                                     <span class="invalid-feedback d-block">{{ $message }}</span>
@@ -198,6 +186,79 @@
             $('.select2-js').select2({
                 width: '100%'
             });
+
+            const scheduleOptions = @json($scheduleOptions);
+            const initialTaskId = @json((string) old('task_id', $presence->task_id));
+            const initialShiftId = @json((string) old('shift_id', $presence->shift_id));
+
+            function matchingSchedules() {
+                const employeeId = $('#employee_id').val();
+                const date = $('#date').val();
+
+                return scheduleOptions.filter((schedule) => {
+                    return schedule.employee_id === employeeId && schedule.date === date;
+                });
+            }
+
+            function resetSelect(selector, placeholder) {
+                $(selector).empty().append(new Option(placeholder, ''));
+            }
+
+            function refreshTasks() {
+                const schedules = matchingSchedules();
+                const selectedTask = $('#task_id').val() || initialTaskId;
+                const tasks = new Map();
+
+                resetSelect('#task_id', schedules.length ? '-- Pilih Tugas --' : '-- Tidak ada jadwal --');
+
+                schedules.forEach((schedule) => {
+                    if (!tasks.has(schedule.task_id)) {
+                        tasks.set(schedule.task_id, schedule.task_name);
+                    }
+                });
+
+                tasks.forEach((taskName, taskId) => {
+                    $('#task_id').append(new Option(taskName, taskId));
+                });
+
+                if (tasks.has(selectedTask)) {
+                    $('#task_id').val(selectedTask);
+                } else if (tasks.size === 1) {
+                    $('#task_id').val([...tasks.keys()][0]);
+                } else {
+                    $('#task_id').val('');
+                }
+
+                $('#task_id').trigger('change.select2');
+                refreshShifts();
+            }
+
+            function refreshShifts() {
+                const schedules = matchingSchedules();
+                const taskId = $('#task_id').val();
+                const selectedShift = $('#shift_id').val() || initialShiftId;
+                const shifts = schedules.filter((schedule) => schedule.task_id === taskId);
+
+                resetSelect('#shift_id', shifts.length ? '-- Pilih Shift --' : '-- Tidak ada shift --');
+
+                shifts.forEach((schedule) => {
+                    $('#shift_id').append(new Option(schedule.shift_name, schedule.shift_id));
+                });
+
+                if (shifts.some((schedule) => schedule.shift_id === selectedShift)) {
+                    $('#shift_id').val(selectedShift);
+                } else if (shifts.length === 1) {
+                    $('#shift_id').val(shifts[0].shift_id);
+                } else {
+                    $('#shift_id').val('');
+                }
+
+                $('#shift_id').trigger('change.select2');
+            }
+
+            $('#employee_id, #date').on('change', refreshTasks);
+            $('#task_id').on('change', refreshShifts);
+            refreshTasks();
         });
     </script>
 @endsection

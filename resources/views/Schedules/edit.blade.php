@@ -82,9 +82,9 @@
                         </label>
                         <select name="shift_id" id="shift_id" class="form-control select2-js">
                             @foreach ($shifts as $shift)
-                                <option value="{{ $shift->id }}"
+                                <option value="{{ $shift->id }}" data-task-id="{{ $shift->task_id }}"
                                     {{ old('shift_id', $schedule->shift_id) == $shift->id ? 'selected' : '' }}>
-                                    {{ ucwords($shift->name) }}
+                                    {{ ucwords($shift->name) }} - {{ ucwords($shift->task->name ?? '-') }}
                                 </option>
                             @endforeach
                         </select>
@@ -138,6 +138,20 @@
             theme: "default",
             width: '100%'
         });
+
+        $('#task_id').on('change', function() {
+            const taskId = $(this).val();
+            $('#shift_id option').each(function() {
+                const optionTaskId = $(this).data('task-id')?.toString();
+                $(this).prop('disabled', taskId && optionTaskId && optionTaskId !== taskId);
+            });
+
+            if ($('#shift_id option:selected').prop('disabled')) {
+                $('#shift_id').val('').trigger('change');
+            }
+
+            $('#shift_id').trigger('change.select2');
+        }).trigger('change');
     });
 </script>
 @endsection

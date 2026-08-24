@@ -37,44 +37,73 @@ class generateSalary extends Command
         Log::info('Salary generation started');
 
         $today = today();
+        // nyalain kalo production
+        // if (! $today->isSameDay($today->copy()->day(29))) {
+        //     Log::warning('Generate Salary Failed - invalid payroll date', [
+        //         'date' => $today->toDateString(),
+        //     ]);
+
+        //     $this->error('Slip gaji hanya bisa digenerate pada tanggal 29.');
+
+        //     return Command::FAILURE;
+        // }
+
         $start = $today->copy()->startOfMonth();
-        $end = $today->copy()->day(28);
-
-        // Duplication check
-        if (Salary::whereDate('date', $start)->exists()) {
-            Log::warning('Generate Salary Failed - already generated', [
-                'period' => $start->format('Y-m'),
-            ]);
-
-            return;
-        }
+        $payrollDate = $today->copy()->day(29);
+        $attendanceCutoff = $payrollDate->copy()->subDay();
 
         $employees = Employee::whereHas('user.role', function ($q) {
             $q->whereIn('name', ['hr', 'employee']);
         })
             ->where('status', 'active')
+            ->whereDate('hire_date', '<=', $payrollDate)
             ->get();
 
         // Allowance
         $bpjsKesehatan = Allowance::where('allowance_type', 'BPJS Kesehatan')->first();
         $bpjsKetenagakerjaan = Allowance::where('allowance_type', 'BPJS Ketenagakerjaan')->first();
 
+        $generated = 0;
+        $restored = 0;
+        $skipped = 0;
+
         foreach ($employees as $employee) {
 
             try {
+                $activeSalary = Salary::where('employee_id', $employee->id)
+                    ->whereDate('date', $start)
+                    ->first();
+
+                if ($activeSalary) {
+                    $skipped++;
+
+                    Log::info('Salary skipped - already exists', [
+                        'employee_id' => $employee->id,
+                        'period' => $start->format('Y-m'),
+                    ]);
+
+                    continue;
+                }
+
+                $deletedSalary = Salary::onlyTrashed()
+                    ->where('employee_id', $employee->id)
+                    ->whereDate('date', $start)
+                    ->latest('deleted_at')
+                    ->first();
+
                 $preseces = Presence::where('employee_id', $employee->id)
-                    ->whereBetween('date', [$start, $end])
+                    ->whereBetween('date', [$start, $attendanceCutoff])
+                    ->whereHas('schedule')
                     ->get();
 
                 $absentCuts = AttendancePolicy::payableAbsenceQuery(
                     $employee->id,
                     $start,
-                    $end,
+                    $attendanceCutoff,
                 )->count() * 50000;
 
-                $lateMinutes = $preseces->sum('late_minutes');
-                $cutPerMinutes = $employee->position->cut_per_minute ?? 0;
-                $lateCuts = $lateMinutes * $cutPerMinutes;
+                $lateCount = $preseces->where('late_minutes', '>', 0)->count();
+                $lateCuts = $lateCount * 15000;
 
                 $baseSalary = $employee->position->base_salary;
 
@@ -117,9 +146,9 @@ class generateSalary extends Command
                 $leaves = LeaveRequest::with('types')
                     ->where('employee_id', $employee->id)
                     ->whereIn('status', AttendancePolicy::APPROVED_LEAVE_STATUSES)
-                    ->where(function ($q) use ($start, $end) {
-                        $q->whereBetween('start_date', [$start, $end])
-                            ->orWhereBetween('end_date', [$start, $end]);
+                    ->where(function ($q) use ($start, $attendanceCutoff) {
+                        $q->whereDate('start_date', '<=', $attendanceCutoff)
+                            ->whereDate('end_date', '>=', $start);
                     })
                     ->get();
 
@@ -133,7 +162,7 @@ class generateSalary extends Command
                     }
 
                     $leaveStart = Carbon::parse($leave->start_date)->max($start);
-                    $leaveEnd = Carbon::parse($leave->end_date)->min($end);
+                    $leaveEnd = Carbon::parse($leave->end_date)->min($attendanceCutoff);
 
                     $days = $leaveStart->diffInDays($leaveEnd) + 1;
 
@@ -161,7 +190,7 @@ class generateSalary extends Command
                 // Total Salary
                 $total = $beforeTax - $tax;
 
-                Salary::create([
+                $salaryData = [
                     'employee_id' => $employee->id,
                     'net_salary' => $baseSalary,
                     'cuts' => $totalCuts + $tax,
@@ -176,7 +205,18 @@ class generateSalary extends Command
                     'date' => $start,
                     'updated_at' => now(),
                     'created_at' => now(),
-                ]);
+                ];
+
+                if ($deletedSalary) {
+                    unset($salaryData['created_at']);
+
+                    $deletedSalary->restore();
+                    $deletedSalary->update($salaryData);
+                    $restored++;
+                } else {
+                    Salary::create($salaryData);
+                    $generated++;
+                }
 
                 Log::info('Salary Generated', [
                     'employee_id' => $employee->id,
@@ -208,7 +248,15 @@ class generateSalary extends Command
 
         }
 
-        Log::info('Salary generation ended');
+        Log::info('Salary generation ended', [
+            'period' => $start->format('Y-m'),
+            'attendance_cutoff' => $attendanceCutoff->toDateString(),
+            'generated' => $generated,
+            'restored' => $restored,
+            'skipped' => $skipped,
+        ]);
+
+        $this->info("Generate gaji periode {$start->format('Y-m')} selesai. Absensi dihitung sampai {$attendanceCutoff->toDateString()}. Baru: {$generated}, restore: {$restored}, dilewati: {$skipped}.");
 
         return Command::SUCCESS;
     }

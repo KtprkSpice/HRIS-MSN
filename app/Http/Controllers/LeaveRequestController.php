@@ -99,12 +99,12 @@ class LeaveRequestController extends Controller
         $rules = [
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'leave_id' => 'required',
+            'leave_id' => 'required|exists:leave_types,id',
             'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ];
 
         if ($role !== 'employee') {
-            $rules['employee_id'] = 'required';
+            $rules['employee_id'] = 'required|exists:employees,id';
         }
 
         $validated = $request->validate($rules);
@@ -115,6 +115,12 @@ class LeaveRequestController extends Controller
             : $request->employee_id;
 
         $leaveType = LeaveType::findOrFail($request->leave_id);
+
+        if ($leaveType->document && ! $request->hasFile('document_file')) {
+            return back()
+                ->withInput()
+                ->withErrors(['document_file' => 'Jenis cuti ini wajib melampirkan dokumen.']);
+        }
 
         $start = Carbon::parse($request->start_date);
         $end = Carbon::parse($request->end_date);
@@ -255,14 +261,20 @@ class LeaveRequestController extends Controller
         }
 
         $validated = $request->validate([
-            'employee_id' => 'required',
+            'employee_id' => 'required|exists:employees,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
-            'leave_id' => 'required',
+            'leave_id' => 'required|exists:leave_types,id',
             'document_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
 
         $leaveType = LeaveType::findOrFail($request->leave_id);
+
+        if ($leaveType->document && ! $request->hasFile('document_file') && ! $leaveRequest->document_file) {
+            return back()
+                ->withInput()
+                ->withErrors(['document_file' => 'Jenis cuti ini wajib melampirkan dokumen.']);
+        }
 
         $start = \Carbon\Carbon::parse($request->start_date);
         $end = \Carbon\Carbon::parse($request->end_date);

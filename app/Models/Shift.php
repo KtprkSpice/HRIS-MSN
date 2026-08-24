@@ -24,6 +24,11 @@ class Shift extends Model
         return $this->hasMany(Schedule::class);
     }
 
+    public function task()
+    {
+        return $this->belongsTo(Task::class);
+    }
+
     public function weeklyShiftAssginments()
     {
         return $this->hasMany(WeeklyShiftAssignment::class);

@@ -20,6 +20,25 @@ use function Symfony\Component\Clock\now;
 
 class TaskController extends Controller
 {
+    private function taskSchedulePeriod(Task $task, ?string $weekStart = null): array
+    {
+        $taskStart = Carbon::parse($task->start_time)->startOfDay();
+        $taskEnd = Carbon::parse($task->end_time)->startOfDay();
+        $selectedWeekStart = $weekStart
+            ? Carbon::parse($weekStart)->startOfWeek()
+            : Carbon::now()->startOfWeek();
+
+        $periodStart = $selectedWeekStart->max($taskStart);
+
+        if ($periodStart->gt($taskEnd)) {
+            $periodStart = $taskEnd->copy();
+        }
+
+        $periodEnd = $periodStart->copy()->addDays(6)->min($taskEnd);
+
+        return [$periodStart, $periodEnd];
+    }
+
     private function availableEmployeeQuery(?Task $task = null): Builder
     {
         return Employee::where('status', 'active')
@@ -68,10 +87,7 @@ class TaskController extends Controller
             'week_start' => 'nullable|date',
         ]);
 
-        $weekStart = isset($validated['week_start'])
-            ? Carbon::parse($validated['week_start'])->startOfWeek()
-            : Carbon::now()->startOfWeek();
-        $weekEnd = $weekStart->copy()->endOfWeek();
+        [$weekStart, $weekEnd] = $this->taskSchedulePeriod($task, $validated['week_start'] ?? null);
         $weekDates = collect();
 
         for ($date = $weekStart->copy(); $date->lte($weekEnd); $date->addDay()) {
@@ -102,9 +118,7 @@ class TaskController extends Controller
             'week_start' => 'nullable|date',
         ]);
 
-        $weekStart = isset($validated['week_start'])
-            ? Carbon::parse($validated['week_start'])->startOfWeek()
-            : Carbon::now()->startOfWeek();
+        [$weekStart, $weekEnd] = $this->taskSchedulePeriod($task, $validated['week_start'] ?? null);
 
         $task->load([
             'employees.division',
@@ -114,9 +128,9 @@ class TaskController extends Controller
         ]);
 
         $safeTaskName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $task->name);
-        $fileName = 'Template_Jadwal_' . $safeTaskName . '_' . $weekStart->format('d-m-Y') . '.xlsx';
+        $fileName = 'Template_Jadwal_' . $safeTaskName . '_' . $weekStart->format('d-m-Y') . '_sd_' . $weekEnd->format('d-m-Y') . '.xlsx';
 
-        return Excel::download(new TaskAssignmentExport($task, $weekStart), $fileName);
+        return Excel::download(new TaskAssignmentExport($task, $weekStart, $weekEnd), $fileName);
     }
 
     public function importSchedule(Request $request, Task $task)
@@ -209,7 +223,6 @@ class TaskController extends Controller
                         'start_time' => $request->shift_start[$index],
                         'end_time' => $request->shift_end[$index],
                         'late_tolerance_minutes' => $request->shift_late_tolerance[$index],
-                        'task_id' => $request->id,
                     ]);
                 }
 
@@ -346,6 +359,9 @@ class TaskController extends Controller
                     // GANTI dengan tabel yang benar-benar
                     // menggunakan TaskShift tersebut.
                     $isUsed = DB::table('presences')
+                        ->where('shift_id', $shiftToDelete->id)
+                        ->exists()
+                        || DB::table('schedules')
                         ->where('shift_id', $shiftToDelete->id)
                         ->exists();
 

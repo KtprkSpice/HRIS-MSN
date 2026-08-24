@@ -1014,6 +1014,88 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const submittedForms = new WeakSet();
+            const nativeSubmit = HTMLFormElement.prototype.submit;
+
+            function lockForm(form) {
+                submittedForms.add(form);
+                form.dataset.submitting = 'true';
+
+                form.querySelectorAll('button[type="submit"], input[type="submit"], button[type="button"]').forEach(function(button) {
+                    if (button.closest('.swal2-container')) {
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.classList.add('disabled');
+                    button.setAttribute('aria-disabled', 'true');
+                });
+            }
+
+            HTMLFormElement.prototype.submit = function() {
+                if (this.dataset.allowResubmit === 'true') {
+                    nativeSubmit.call(this);
+                    return;
+                }
+
+                if (submittedForms.has(this) || this.dataset.submitting === 'true') {
+                    return;
+                }
+
+                lockForm(this);
+                nativeSubmit.call(this);
+            };
+
+            document.addEventListener('submit', function(event) {
+                const form = event.target;
+
+                if (!(form instanceof HTMLFormElement) || form.dataset.allowResubmit === 'true') {
+                    return;
+                }
+
+                if (submittedForms.has(form)) {
+                    event.preventDefault();
+                    return;
+                }
+
+                lockForm(form);
+            }, true);
+
+            document.addEventListener('click', function(event) {
+                const submitButton = event.target.closest('button[type="submit"], input[type="submit"]');
+
+                if (submitButton?.form?.dataset.submitting === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                const actionLink = event.target.closest('a.btn[href]');
+
+                if (!actionLink || actionLink.dataset.allowDoubleClick === 'true') {
+                    return;
+                }
+
+                const href = actionLink.getAttribute('href');
+
+                if (!href || href === '#' || href.startsWith('javascript:')) {
+                    return;
+                }
+
+                if (actionLink.dataset.clicked === 'true') {
+                    event.preventDefault();
+                    return;
+                }
+
+                actionLink.dataset.clicked = 'true';
+                actionLink.classList.add('disabled');
+                actionLink.setAttribute('aria-disabled', 'true');
+                actionLink.style.pointerEvents = 'none';
+            }, true);
+        });
+    </script>
+
+    <script>
         function confirmLogout() {
             Swal.fire({
                 title: 'Logout Sekarang?',

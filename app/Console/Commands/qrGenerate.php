@@ -38,18 +38,22 @@ class qrGenerate extends Command
         foreach ($tasks as $task) {
             foreach (['check_in', 'check_out'] as $type) {
 
-                $exists = QrCode::where('task_id', $task->id)
+                $existingQrCodes = QrCode::where('task_id', $task->id)
                     ->whereDate('date', $workDate)
-                    ->where('type', 'on duty')
-                    ->exists();
+                    ->where('type', $type)
+                    ->where('is_active', true)
+                    ->orderByDesc('id')
+                    ->get();
 
-                if ($exists) {
+                if ($existingQrCodes->isNotEmpty()) {
+                    $existingQrCodes->skip(1)->each(function ($qrCode) {
+                        $qrCode->update(['is_active' => false]);
+                    });
+
                     continue;
                 }
 
-                $expiresAt = $type === 'check_in'
-                    ? Carbon::now()->endOfDay()
-                    : Carbon::now()->endOfDay()->addMinutes(30);
+                $expiresAt = Carbon::now()->endOfDay();
 
                 QrCode::create([
                     'task_id' => $task->id,

@@ -139,7 +139,7 @@
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text" name="late_cuts" class="form-control money-input"
-                                            value="{{ number_format(old('late_cuts', $salary->late_cuts), 0, ',', '.') }}">
+                                            value="{{ number_format(old('late_cuts', $salary->late_cuts), 0, ',', '.') }}" readonly>
                                     </div>
                                 </div>
 
@@ -151,7 +151,7 @@
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text" name="absent_cuts" class="form-control money-input"
-                                            value="{{ number_format(old('absent_cuts', $salary->absent_cuts), 0, ',', '.') }}">
+                                            value="{{ number_format(old('absent_cuts', $salary->absent_cuts), 0, ',', '.') }}" readonly>
                                     </div>
                                 </div>
                             </div>

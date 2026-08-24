@@ -86,8 +86,8 @@
                         <select name="shift_id" id="shift_id" class="form-control select2-js @error('shift_id') is-invalid @enderror">
                             <option value="">-- Pilih Shift --</option>
                             @foreach ($shifts as $shift)
-                                <option value="{{ $shift->id }}" {{ old('shift_id') == $shift->id ? 'selected' : '' }}>
-                                    {{ ucwords($shift->name) }}
+                                <option value="{{ $shift->id }}" data-task-id="{{ $shift->task_id }}" {{ old('shift_id') == $shift->id ? 'selected' : '' }}>
+                                    {{ ucwords($shift->name) }} - {{ ucwords($shift->task->name ?? '-') }}
                                 </option>
                             @endforeach
                         </select>
@@ -170,6 +170,20 @@
         document.querySelectorAll('input[name="is_paid"]').forEach(el => {
             el.addEventListener('change', toggleDeduction);
         });
+
+        $('#task_id').on('change', function() {
+            const taskId = $(this).val();
+            $('#shift_id option').each(function() {
+                const optionTaskId = $(this).data('task-id')?.toString();
+                $(this).prop('disabled', taskId && optionTaskId && optionTaskId !== taskId);
+            });
+
+            if ($('#shift_id option:selected').prop('disabled')) {
+                $('#shift_id').val('').trigger('change');
+            }
+
+            $('#shift_id').trigger('change.select2');
+        }).trigger('change');
     });
 </script>
 @endsection

@@ -135,7 +135,7 @@
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text" name="late_cuts" class="form-control money-input"
-                                            value="{{ old('late_cuts') }}">
+                                            value="{{ old('late_cuts') }}" readonly>
                                     </div>
                                 </div>
 
@@ -147,7 +147,7 @@
                                     <div class="input-group shadow-sm">
                                         <span class="input-group-text">Rp</span>
                                         <input type="text" name="absent_cuts" class="form-control money-input"
-                                            value="{{ old('absent_cuts') }}">
+                                            value="{{ old('absent_cuts') }}" readonly>
                                     </div>
                                 </div>
                             </div>

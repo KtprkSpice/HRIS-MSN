@@ -21,7 +21,7 @@ Route::get('/', function () {
 // Owner Route
 Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
     // Dashboard
-    Route::resource('/dashboard', DashboardController::class);
+    Route::resource('/dashboard', DashboardController::class)->only(['index']);
 
     // Edit Profile
     Route::get('/profile/{id}/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -71,9 +71,9 @@ Route::middleware(['auth', 'roles:owner,hr,employee'])->group(function () {
 
     // Schedules
     Route::get('/schedule/generate', [SchedulesController::class, 'generate'])->name('schedule.generate');
-    Route::resource('/schedule', SchedulesController::class);
+    Route::resource('/schedule', SchedulesController::class)->except(['show']);
 
     // Laporan
-    Route::resource('/report', ReportController::class);
     Route::get('/report/export/excel', [ReportController::class, 'export'])->name('report.export');
+    Route::resource('/report', ReportController::class)->only(['index']);
 });
